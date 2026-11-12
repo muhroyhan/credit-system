@@ -66,12 +66,18 @@ importers:
       '@credit/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@credit/server':
+        specifier: workspace:*
+        version: link:../server
       '@mantine/core':
         specifier: ^8.3.0
         version: 8.3.18(@mantine/hooks@8.3.18(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@mantine/hooks':
         specifier: ^8.3.0
         version: 8.3.18(react@19.3.1)
+      hono:
+        specifier: ^4.13.18
+        version: 4.13.18
       react:
         specifier: ^19.1.0
         version: 19.3.1
