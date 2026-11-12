@@ -13,3 +13,5 @@
 - Ikuti `docs/credit-system/api-code-standards.md` untuk pola repository, service, route factory, validasi, error, dan tipe RPC. Ambil `const db = connectDatabase().db` sekali di setiap fungsi repository dan gunakan `db` untuk query.
 
 - Urutan akses dan import wajib `global routes → controller → service → repository`. Global routes hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service/controller dan controller tidak mengimpor repository/database. Type dan kontrak bersama boleh diimpor terpisah. Middleware juga mengakses database melalui service. Test repository boleh mengimpor repository sebagai subjek pengujian.
+
+- Kumpulkan semua controller API dalam satu fungsi `routes()` di `apps/server/src/routes.ts`. `app.ts` hanya memasang hasilnya pada prefix `/api` dan mengekspor tipe RPC.

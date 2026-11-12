@@ -39,7 +39,7 @@ async function listSomething() {
 
 - Repository menyediakan interface bertipe di `<feature>.type.ts` untuk dipakai service. Service mengimpor repository fitur; simbol utama service mengikuti `<featureCamelCase>Service` dan menyediakan use case bagi controller.
 - DTO request/response yang dipakai lintas layer bersumber dari `@credit/contracts`. `unknown` dipakai pada batas input yang belum divalidasi, bukan hasil repository publik.
-- Urutan akses sekaligus import wajib `global routes → controller → service → repository`. Global routes (`app.ts`) hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
+- Urutan akses sekaligus import wajib `global routes → controller → service → repository`. Global routes (`routes.ts`) hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
 - Controller menerima request dan mengirim response melalui service. Service menangani aturan bisnis; hanya repository yang mengeksekusi query. Middleware autentikasi mengikuti urutan yang sama. Type dan kontrak bersama boleh diimpor terpisah; test repository boleh mengimpor repository sebagai subjek pengujian.
 - Import lintas package memakai `@credit/...`; internal server memakai `@server/...`. Type-only dependency memakai `import type`.
 
