@@ -6,7 +6,7 @@ import type {
 import { exportFile } from "@server/utils/export-file";
 export const adminUsersService = {
   async exportFile(query: AdminQuery, format: "pdf" | "xlsx") {
-    const rows = await adminUsersRepository.exportRows(query);
+    const { data: rows } = await adminUsersRepository.list(query, false);
     const values = rows.map((row) => [
       row.username ?? "",
       row.email ?? "",

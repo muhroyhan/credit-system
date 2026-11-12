@@ -8,7 +8,7 @@ import {
 import type { AdminRepository } from "@server/features/admin-users/admin-users.type";
 import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
 export const adminUsersRepository: AdminRepository = {
-  async list(query) {
+  async list(query, paginate = true) {
     const db = connectDatabase().db;
     const conditions = [];
     if (query.email)
@@ -22,7 +22,7 @@ export const adminUsersRepository: AdminRepository = {
       .select({ count: count() })
       .from(adminUsers)
       .where(where);
-    const data = await db
+    const dataQuery = db
       .select({
         id: adminUsers.id,
         username: adminUsers.username,
@@ -34,9 +34,10 @@ export const adminUsersRepository: AdminRepository = {
       .orderBy(
         (query.sortDirection === "asc" ? asc : desc)(adminUsers[query.sortBy]),
         desc(adminUsers.id),
-      )
-      .limit(query.limit)
-      .offset((query.page - 1) * query.limit);
+      );
+    const data = await (paginate
+      ? dataQuery.limit(query.limit).offset((query.page - 1) * query.limit)
+      : dataQuery);
     const assignedRoles = data.length
       ? await db
           .select({
@@ -62,28 +63,6 @@ export const adminUsersRepository: AdminRepository = {
         roles: assignedRoles.filter((role) => role.adminUserId === user.id),
       })),
     };
-  },
-  async exportRows(query) {
-    const db = connectDatabase().db;
-    const conditions = [];
-    if (query.email)
-      conditions.push(like(adminUsers.email, `%${query.email}%`));
-    if (query.username)
-      conditions.push(like(adminUsers.username, `%${query.username}%`));
-    if (query.active !== undefined)
-      conditions.push(eq(adminUsers.isActive, query.active === "true"));
-    return db
-      .select({
-        username: adminUsers.username,
-        email: adminUsers.email,
-        isActive: adminUsers.isActive,
-      })
-      .from(adminUsers)
-      .where(and(...conditions))
-      .orderBy(
-        (query.sortDirection === "asc" ? asc : desc)(adminUsers[query.sortBy]),
-        desc(adminUsers.id),
-      );
   },
   async detail(id) {
     const db = connectDatabase().db;
