@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Session } from "@web/constant/type";
-import { signIn } from "@web/features/auth/auth.api";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { Session } from '@web/constant/type';
+import { signIn } from '@web/features/auth/auth.api';
 
-const sessionKey = ["session"] as const;
+const sessionKey = ['session'] as const;
 export function useSession() {
   const client = useQueryClient();
   const { data: session = null } = useQuery<Session | null>({
@@ -22,13 +22,13 @@ export function useSession() {
   return {
     session,
     loading: mutation.isPending,
-    error: mutation.error?.message ?? "",
+    error: mutation.error?.message ?? '',
     login: mutation.mutate,
     logout: () => {
       void client.cancelQueries();
       client.setQueryData(sessionKey, null);
       client.removeQueries({
-        predicate: (query) => query.queryKey[0] !== "session",
+        predicate: (query) => query.queryKey[0] !== 'session',
       });
       client.getMutationCache().clear();
       mutation.reset();

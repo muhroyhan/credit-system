@@ -1,14 +1,15 @@
 import {
   CompanyConflict,
   CompanyNotFound,
-} from "@server/features/companies/companies.error";
-import { companiesRepository } from "@server/features/companies/companies.repository";
+} from '@server/features/companies/companies.error';
+import { companiesRepository } from '@server/features/companies/companies.repository';
 import type {
   CompanyInput,
   CompanyQuery,
-} from "@server/features/companies/companies.type";
-import { exportFile } from "@server/utils/export-file";
-import { withTransaction } from "@server/utils/transaction";
+} from '@server/features/companies/companies.type';
+import { exportFile } from '@server/utils/export-file';
+import { withTransaction } from '@server/utils/transaction';
+
 export const companiesService = {
   async interests(slug: string) {
     const id = await companiesRepository.bySlug(slug);
@@ -16,25 +17,25 @@ export const companiesService = {
       ? ((await companiesRepository.detail(id))?.bungaKredits ?? [])
       : [];
   },
-  async exportFile(query: CompanyQuery, format: "pdf" | "xlsx") {
+  async exportFile(query: CompanyQuery, format: 'pdf' | 'xlsx') {
     const result = await companiesRepository.list(query, false);
     return exportFile({
-      title: "Perusahaan",
+      title: 'Perusahaan',
       columns: [
-        "Badan usaha",
-        "Perusahaan",
-        "Username",
-        "Email",
-        "Slug",
-        "Status",
+        'Badan usaha',
+        'Perusahaan',
+        'Username',
+        'Email',
+        'Slug',
+        'Status',
       ],
       values: result.data.map((v) => [
-        v.entityType ?? "",
-        v.companyName ?? "",
-        v.username ?? "",
-        v.email ?? "",
-        v.slug ?? "",
-        v.status ?? "",
+        v.entityType ?? '',
+        v.companyName ?? '',
+        v.username ?? '',
+        v.email ?? '',
+        v.slug ?? '',
+        v.status ?? '',
       ]),
       format,
     });
@@ -44,17 +45,20 @@ export const companiesService = {
   async save(input: CompanyInput, actor: string, id?: number) {
     const password = input.password
       ? await Bun.password.hash(input.password, {
-          algorithm: "bcrypt",
+          algorithm: 'bcrypt',
           cost: 10,
         })
       : undefined;
     return withTransaction(async (tx) => {
-      if (id && !(await companiesRepository.lock(id, tx)))
+      if (id && !(await companiesRepository.lock(id, tx))) {
         throw new CompanyNotFound();
-      if (await companiesRepository.conflict(input, id, tx))
-        throw new CompanyConflict("Identitas perusahaan sudah digunakan");
-      if (!(await companiesRepository.entity(input.entityTypeId, tx)))
-        throw new CompanyConflict("Badan usaha tidak tersedia");
+      }
+      if (await companiesRepository.conflict(input, id, tx)) {
+        throw new CompanyConflict('Identitas perusahaan sudah digunakan');
+      }
+      if (!(await companiesRepository.entity(input.entityTypeId, tx))) {
+        throw new CompanyConflict('Badan usaha tidak tersedia');
+      }
       const { oldInterests, oldExpenses } = await companiesRepository.children(
         id,
         tx,
@@ -66,22 +70,26 @@ export const companiesService = {
         input.biaya.some(
           (v) => v.id !== undefined && !oldExpenses.some((o) => o.id === v.id),
         )
-      )
-        throw new CompanyConflict("Konfigurasi bukan milik perusahaan");
+      ) {
+        throw new CompanyConflict('Konfigurasi bukan milik perusahaan');
+      }
       if (
         new Set(input.bungaKredits.filter((v) => v.id).map((v) => v.id))
           .size !== input.bungaKredits.filter((v) => v.id).length ||
         new Set(input.biaya.filter((v) => v.id).map((v) => v.id)).size !==
           input.biaya.filter((v) => v.id).length
-      )
-        throw new CompanyConflict("ID konfigurasi duplikat");
+      ) {
+        throw new CompanyConflict('ID konfigurasi duplikat');
+      }
       const companyId = await companiesRepository.saveParent(
         { ...input, password },
         actor,
         id,
         tx,
       );
-      if (!companyId) throw new Error("Gagal membuat perusahaan");
+      if (!companyId) {
+        throw new Error('Gagal membuat perusahaan');
+      }
       await companiesRepository.saveChildren(
         input,
         actor,
@@ -99,9 +107,12 @@ export const companiesService = {
   },
   remove: (id: number) =>
     withTransaction(async (tx) => {
-      if (!(await companiesRepository.lock(id, tx))) return false;
-      if (await companiesRepository.hasDebitors(id, tx))
-        throw new CompanyConflict("Perusahaan masih memiliki debitor");
+      if (!(await companiesRepository.lock(id, tx))) {
+        return false;
+      }
+      if (await companiesRepository.hasDebitors(id, tx)) {
+        throw new CompanyConflict('Perusahaan masih memiliki debitor');
+      }
       return companiesRepository.remove(id, tx);
     }),
 };

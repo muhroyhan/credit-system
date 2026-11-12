@@ -1,17 +1,18 @@
-import { connectDatabase } from "@credit/database/client";
+import { connectDatabase } from '@credit/database/client';
 import {
   debitors,
   entityTypes,
   userBiaya,
   userBungaKredit,
   users,
-} from "@credit/database/schema";
-import type { DatabaseTransaction } from "@server/constant/type";
+} from '@credit/database/schema';
+import type { DatabaseTransaction } from '@server/constant/type';
 import type {
   CompanyInput,
   CompanyQuery,
-} from "@server/features/companies/companies.type";
-import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
+} from '@server/features/companies/companies.type';
+import { and, asc, count, desc, eq, inArray, like, ne, or } from 'drizzle-orm';
+
 export const companiesRepository = {
   async list(query: CompanyQuery, paginate = true) {
     const db = connectDatabase().db;
@@ -45,7 +46,7 @@ export const companiesRepository = {
       .leftJoin(entityTypes, eq(users.entityTypeId, entityTypes.id))
       .where(where)
       .orderBy(
-        (query.sortDirection === "asc" ? asc : desc)(users[query.sortBy]),
+        (query.sortDirection === 'asc' ? asc : desc)(users[query.sortBy]),
         desc(users.id),
       );
     return {
@@ -77,7 +78,9 @@ export const companiesRepository = {
       })
       .from(users)
       .where(eq(users.id, id));
-    if (!row) return null;
+    if (!row) {
+      return null;
+    }
     const bungaKredits = await db
       .select({
         id: userBungaKredit.id,
@@ -102,7 +105,7 @@ export const companiesRepository = {
       .select({ id: users.id })
       .from(users)
       .where(eq(users.id, id))
-      .for("update");
+      .for('update');
     return row ?? null;
   },
   async conflict(
@@ -165,7 +168,7 @@ export const companiesRepository = {
       ...parent
     } = input;
     let companyId = id;
-    if (id)
+    if (id) {
       await tx
         .update(users)
         .set({
@@ -175,7 +178,7 @@ export const companiesRepository = {
           updatedAt: new Date(),
         })
         .where(eq(users.id, id));
-    else {
+    } else {
       const [created] = await tx
         .insert(users)
         .values({ ...parent, password, createdBy: actor, updatedBy: actor })
@@ -193,7 +196,7 @@ export const companiesRepository = {
     tx: DatabaseTransaction,
   ) {
     const { bungaKredits, biaya } = input;
-    if (removeInterests.length)
+    if (removeInterests.length) {
       await tx
         .delete(userBungaKredit)
         .where(
@@ -202,7 +205,8 @@ export const companiesRepository = {
             inArray(userBungaKredit.id, removeInterests),
           ),
         );
-    if (removeExpenses.length)
+    }
+    if (removeExpenses.length) {
       await tx
         .delete(userBiaya)
         .where(
@@ -211,8 +215,9 @@ export const companiesRepository = {
             inArray(userBiaya.id, removeExpenses),
           ),
         );
+    }
     for (const { id: childId, ...value } of bungaKredits) {
-      if (childId)
+      if (childId) {
         await tx
           .update(userBungaKredit)
           .set({ ...value, updatedBy: actor, updatedAt: new Date() })
@@ -222,29 +227,31 @@ export const companiesRepository = {
               eq(userBungaKredit.userId, companyId),
             ),
           );
-      else
+      } else {
         await tx.insert(userBungaKredit).values({
           ...value,
           userId: companyId,
           createdBy: actor,
           updatedBy: actor,
         });
+      }
     }
     for (const { id: childId, ...value } of biaya) {
-      if (childId)
+      if (childId) {
         await tx
           .update(userBiaya)
           .set({ ...value, updatedBy: actor, updatedAt: new Date() })
           .where(
             and(eq(userBiaya.id, childId), eq(userBiaya.userId, companyId)),
           );
-      else
+      } else {
         await tx.insert(userBiaya).values({
           ...value,
           userId: companyId,
           createdBy: actor,
           updatedBy: actor,
         });
+      }
     }
   },
   async hasDebitors(id: number, tx: DatabaseTransaction) {

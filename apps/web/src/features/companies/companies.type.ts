@@ -3,8 +3,9 @@ import {
   companyInputSchema,
   companyInterestSchema,
   type companyQuerySchema,
-} from "@credit/contracts";
-import { z } from "zod";
+} from '@credit/contracts';
+import { z } from 'zod';
+
 export const companySchema = z.object({
   id: z.number(),
   entityTypeId: z.number().nullable(),
@@ -12,7 +13,7 @@ export const companySchema = z.object({
   email: z.string().nullable(),
   username: z.string().nullable(),
   slug: z.string().nullable(),
-  status: z.enum(["active", "inactive", "blocked"]).nullable(),
+  status: z.enum(['active', 'inactive', 'blocked']).nullable(),
   entityType: z.string().nullable().optional(),
 });
 export const companyDetailSchema = companySchema.extend({
@@ -26,15 +27,16 @@ export const companyListSchema = z.object({
 export const companyFormSchema = (editing: boolean) =>
   companyInputSchema
     .extend({
-      password: z.union([z.literal(""), z.string().min(8).max(72)]).optional(),
+      password: z.union([z.literal(''), z.string().min(8).max(72)]).optional(),
     })
     .superRefine((v, ctx) => {
-      if (!editing && !v.password)
+      if (!editing && !v.password) {
         ctx.addIssue({
-          code: "custom",
-          path: ["password"],
-          message: "Password wajib",
+          code: 'custom',
+          path: ['password'],
+          message: 'Password wajib',
         });
+      }
     });
 export const entityListSchema = z.array(
   z.object({ id: z.number(), value: z.string().nullable() }),
@@ -42,8 +44,8 @@ export const entityListSchema = z.array(
 export type CompanyInput = z.infer<typeof companyInputSchema>;
 export type CompanyDetail = z.infer<typeof companyDetailSchema>;
 export type CompanyQuery = z.input<typeof companyQuerySchema>;
-export type CompanyFormProps = {
+export interface CompanyFormProps {
   token: string;
   id?: number;
   initial?: CompanyInput;
-};
+}

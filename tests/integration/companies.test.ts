@@ -1,35 +1,38 @@
-import { closeDatabase } from "@credit/database/client";
-import { CompanyConflict } from "@server/features/companies/companies.error";
-import { companiesService } from "@server/features/companies/companies.service";
-import { afterAll, describe, expect, it } from "vitest";
+import { closeDatabase } from '@credit/database/client';
+import { CompanyConflict } from '@server/features/companies/companies.error';
+import { companiesService } from '@server/features/companies/companies.service';
+import { afterAll, describe, expect, it } from 'vitest';
 
 const url = process.env.DATABASE_URL;
 if (url) {
   const target = new URL(url);
   if (
-    !["localhost", "127.0.0.1", "::1"].includes(target.hostname) ||
+    !['localhost', '127.0.0.1', '::1'].includes(target.hostname) ||
     !/^\/credit_[a-z0-9_]*test$/.test(target.pathname)
-  )
-    throw new Error("Isolated test database required");
+  ) {
+    throw new Error('Isolated test database required');
+  }
 }
 afterAll(async () => {
-  if (url) await closeDatabase();
+  if (url) {
+    await closeDatabase();
+  }
 });
-describe.skipIf(!url)("company service transaction and ownership", () => {
-  it("reconciles children, rejects conflicts and foreign IDs without partial updates", async () => {
+describe.skipIf(!url)('company service transaction and ownership', () => {
+  it('reconciles children, rejects conflicts and foreign IDs without partial updates', async () => {
     const input = {
       entityTypeId: 900001,
-      companyName: "P04 integration",
-      username: "p04-integration",
-      email: "p04-integration@example.invalid",
-      slug: "p04-integration",
-      status: "active" as const,
-      bungaKredits: [{ bungaPercentage: "0.75", jangkaWaktuBulan: "12" }],
-      biaya: [{ expenseType: "Admin", type: "%", value: 1 }],
+      companyName: 'P04 integration',
+      username: 'p04-integration',
+      email: 'p04-integration@example.invalid',
+      slug: 'p04-integration',
+      status: 'active' as const,
+      bungaKredits: [{ bungaPercentage: '0.75', jangkaWaktuBulan: '12' }],
+      biaya: [{ expenseType: 'Admin', type: '%', value: 1 }],
     };
-    const id = await companiesService.save(input, "test");
+    const id = await companiesService.save(input, 'test');
     try {
-      await expect(companiesService.save(input, "test")).rejects.toBeInstanceOf(
+      await expect(companiesService.save(input, 'test')).rejects.toBeInstanceOf(
         CompanyConflict,
       );
       const detail = await companiesService.detail(id);
@@ -38,10 +41,10 @@ describe.skipIf(!url)("company service transaction and ownership", () => {
         companiesService.save(
           {
             ...input,
-            companyName: "Must rollback",
-            biaya: [{ expenseType: "Admin", type: "%", value: 1, id: 900001 }],
+            companyName: 'Must rollback',
+            biaya: [{ expenseType: 'Admin', type: '%', value: 1, id: 900001 }],
           },
-          "test",
+          'test',
           id,
         ),
       ).rejects.toBeInstanceOf(CompanyConflict);
@@ -52,10 +55,10 @@ describe.skipIf(!url)("company service transaction and ownership", () => {
         companiesService.save(
           {
             ...input,
-            companyName: "DB rollback",
-            biaya: [{ expenseType: "x".repeat(256), type: "%", value: 1 }],
+            companyName: 'DB rollback',
+            biaya: [{ expenseType: 'x'.repeat(256), type: '%', value: 1 }],
           },
-          "test",
+          'test',
           id,
         ),
       ).rejects.toThrow();
@@ -65,7 +68,7 @@ describe.skipIf(!url)("company service transaction and ownership", () => {
       expect((await companiesService.detail(id))?.bungaKredits).toHaveLength(1);
       await companiesService.save(
         { ...input, bungaKredits: [], biaya: [] },
-        "test",
+        'test',
         id,
       );
       expect(await companiesService.detail(id)).toMatchObject({

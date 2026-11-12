@@ -2,32 +2,32 @@ import {
   companyCreateSchema,
   companyInputSchema,
   companyInterestSchema,
-} from "@credit/contracts";
-import { describe, expect, it } from "vitest";
+} from '@credit/contracts';
+import { describe, expect, it } from 'vitest';
 
-describe("company configuration validation", () => {
-  it("validates percentage/tenor and preserves fractional interest", () => {
+describe('company configuration validation', () => {
+  it('validates percentage/tenor and preserves fractional interest', () => {
     expect(
       companyInterestSchema.parse({
-        bungaPercentage: "0.75",
-        jangkaWaktuBulan: "12",
+        bungaPercentage: '0.75',
+        jangkaWaktuBulan: '12',
       }).bungaPercentage,
-    ).toBe("0.75");
+    ).toBe('0.75');
     expect(
       companyInterestSchema.safeParse({
-        bungaPercentage: "NaN",
-        jangkaWaktuBulan: "0",
+        bungaPercentage: 'NaN',
+        jangkaWaktuBulan: '0',
       }).success,
     ).toBe(false);
   });
-  it("requires create password and accepts empty configuration", () => {
+  it('requires create password and accepts empty configuration', () => {
     const input = {
       entityTypeId: 1,
-      companyName: "Synthetic",
-      username: "synthetic",
-      email: "synthetic@example.invalid",
-      slug: "synthetic",
-      status: "active",
+      companyName: 'Synthetic',
+      username: 'synthetic',
+      email: 'synthetic@example.invalid',
+      slug: 'synthetic',
+      status: 'active',
       bungaKredits: [],
       biaya: [],
     };

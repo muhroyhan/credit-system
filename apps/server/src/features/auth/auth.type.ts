@@ -1,28 +1,29 @@
-import type { Identity } from "@server/constant/interface";
+import type { Identity } from '@server/constant/interface';
+
 export type IdentityResolver = (
-  type: Identity["type"],
+  type: Identity['type'],
   id: number,
   slug: string,
 ) => Promise<Identity | null>;
 
-type Account = {
+interface Account {
   id: number;
   slug: string;
   password: string | null;
   userData: Record<string, unknown>;
-};
+}
 export type AccountLookup = (
-  type: "admin" | "company" | "debitor",
+  type: 'admin' | 'company' | 'debitor',
   username: string,
   slug?: string,
 ) => Promise<Account | null>;
 
-export type LoginInput = {
-  type: "admin" | "company" | "debitor";
+export interface LoginInput {
+  type: 'admin' | 'company' | 'debitor';
   username: string;
   password: string;
   slug?: string;
-};
+}
 
 export interface AuthRepository {
   findAccount: AccountLookup;
@@ -30,8 +31,8 @@ export interface AuthRepository {
 }
 
 export type PermissionAction =
-  | "CREATE"
-  | "READ"
-  | "UPDATE"
-  | "DELETE"
-  | "APPROVAL";
+  | 'CREATE'
+  | 'READ'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'APPROVAL';

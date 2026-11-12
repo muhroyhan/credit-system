@@ -1,7 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
-import type { ExportFormat } from "@web/constant/type";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import type { ExportFormat } from '@web/constant/type';
 import {
   companyDetail,
   deleteCompany,
@@ -9,23 +9,24 @@ import {
   exportCompanies,
   listCompanies,
   saveCompany,
-} from "@web/features/companies/companies.api";
+} from '@web/features/companies/companies.api';
 import {
   type CompanyInput,
   companyFormSchema,
-} from "@web/features/companies/companies.type";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+} from '@web/features/companies/companies.type';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 export function useCompanyDetail(token: string, id: number) {
   return useQuery({
-    queryKey: ["companies", token, "detail", id],
+    queryKey: ['companies', token, 'detail', id],
     queryFn: () => companyDetail(token, id),
     enabled: Number.isInteger(id) && id > 0,
   });
 }
 export function useEntities(token: string) {
   return useQuery({
-    queryKey: ["entities", token],
+    queryKey: ['entities', token],
     queryFn: () => entities(token),
   });
 }
@@ -36,15 +37,15 @@ export function useCompanyForm(
 ) {
   const form = useForm<CompanyInput>({
     resolver: zodResolver(companyFormSchema(!!id)),
-    mode: "onTouched",
+    mode: 'onTouched',
     defaultValues: initial ?? {
       entityTypeId: 0,
-      companyName: "",
-      username: "",
-      email: "",
-      slug: "",
-      password: "",
-      status: "active",
+      companyName: '',
+      username: '',
+      email: '',
+      slug: '',
+      password: '',
+      status: 'active',
       bungaKredits: [],
       biaya: [],
     },
@@ -59,9 +60,9 @@ export function useCompanyForm(
         id,
       ),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: ["companies", token] });
-      await client.invalidateQueries({ queryKey: ["companies"] });
-      await navigate({ to: "/companies" });
+      await client.invalidateQueries({ queryKey: ['companies', token] });
+      await client.invalidateQueries({ queryKey: ['companies'] });
+      await navigate({ to: '/companies' });
     },
   });
   return { form, save };
@@ -69,26 +70,26 @@ export function useCompanyForm(
 export function useCompanies(token: string) {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
-    companyName: "",
-    username: "",
-    email: "",
-    status: "",
-    entityTypeId: "",
-    sortBy: "createdAt",
-    sortDirection: "desc",
+    companyName: '',
+    username: '',
+    email: '',
+    status: '',
+    entityTypeId: '',
+    sortBy: 'createdAt',
+    sortDirection: 'desc',
   });
   const query = new URLSearchParams(
     Object.entries(filters).filter(([, v]) => !!v),
   );
   const list = useQuery({
-    queryKey: ["companies", token, "list", query.toString(), page],
+    queryKey: ['companies', token, 'list', query.toString(), page],
     queryFn: () =>
       listCompanies(
         token,
         new URLSearchParams({
           ...Object.fromEntries(query),
           page: String(page),
-          limit: "20",
+          limit: '20',
         }),
       ),
   });
@@ -96,8 +97,10 @@ export function useCompanies(token: string) {
   const remove = useMutation({
     mutationFn: (id: number) => deleteCompany(token, id),
     onSuccess: async () => {
-      if (list.data?.data.length === 1 && page > 1) setPage(page - 1);
-      await client.invalidateQueries({ queryKey: ["companies"] });
+      if (list.data?.data.length === 1 && page > 1) {
+        setPage(page - 1);
+      }
+      await client.invalidateQueries({ queryKey: ['companies'] });
     },
   });
   const exporting = useMutation({

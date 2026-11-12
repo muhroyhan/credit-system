@@ -35,3 +35,5 @@
 ## Standar TypeScript
 
 - Ikuti `docs/credit-system/typescript-audit.md` untuk batas declaration/module. `pnpm typecheck` wajib mencakup workspace, tooling dan test; jangan menonaktifkan strict atau menambah ambient stub palsu untuk melewati error. Schema runtime tetap dalam `.ts`; `.d.ts` hanya untuk deklarasi tanpa implementasi.
+
+- Gunakan profil Google TypeScript yang didokumentasikan dalam `docs/credit-system/google-typescript-audit.md`: Biome menjadi sumber format, dengan pengecualian framework dan standar nama/import proyek yang dinyatakan eksplisit.

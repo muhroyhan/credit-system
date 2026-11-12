@@ -1,12 +1,13 @@
-import { useParams } from "@tanstack/react-router";
-import { CrudPage } from "@web/components/crud/CrudPage";
-import { RecordState } from "@web/components/crud/RecordState";
-import { useSession } from "@web/features/auth/hooks/useSession";
-import { CompanyForm } from "@web/features/companies/components/CompanyForm";
+import { useParams } from '@tanstack/react-router';
+import { CrudPage } from '@web/components/crud/CrudPage';
+import { RecordState } from '@web/components/crud/RecordState';
+import { useSession } from '@web/features/auth/hooks/useSession';
+import { CompanyForm } from '@web/features/companies/components/CompanyForm';
 import {
   useCompanyDetail,
   useEntities,
-} from "@web/features/companies/hooks/useCompanies";
+} from '@web/features/companies/hooks/useCompanies';
+
 export function CompaniesEditPage() {
   return (
     <CrudPage program="USC" action="update" title="Ubah perusahaan">
@@ -16,8 +17,8 @@ export function CompaniesEditPage() {
 }
 function Content() {
   const { session } = useSession();
-  const token = session?.authToken ?? "";
-  const { id } = useParams({ from: "/companies/$id/edit" });
+  const token = session?.authToken ?? '';
+  const { id } = useParams({ from: '/companies/$id/edit' });
   const query = useCompanyDetail(token, Number(id));
   const entity = useEntities(token);
 
@@ -35,11 +36,11 @@ function Content() {
             id={Number(id)}
             initial={{
               entityTypeId: data.entityTypeId ?? 0,
-              companyName: data.companyName ?? "",
-              username: data.username ?? "",
-              email: data.email ?? "",
-              slug: data.slug ?? "",
-              status: data.status ?? "inactive",
+              companyName: data.companyName ?? '',
+              username: data.username ?? '',
+              email: data.email ?? '',
+              slug: data.slug ?? '',
+              status: data.status ?? 'inactive',
               bungaKredits: data.bungaKredits,
               biaya: data.biaya,
             }}

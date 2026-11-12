@@ -5,7 +5,11 @@ export interface Permission {
 
 export interface Identity {
   id: number;
-  type: "admin" | "company" | "debitor";
+  type: 'admin' | 'company' | 'debitor';
   slug: string;
   permissions: Permission[];
+}
+
+export interface AuthEnv {
+  Variables: { identity: Identity };
 }

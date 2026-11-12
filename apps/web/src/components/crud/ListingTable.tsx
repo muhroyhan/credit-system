@@ -1,5 +1,6 @@
-import { Alert, Button, Group, NumberInput, Table, Text } from "@mantine/core";
-import type { ReactNode } from "react";
+import { Alert, Button, Group, NumberInput, Table, Text } from '@mantine/core';
+import type { ReactNode } from 'react';
+
 export function ListingTable<T extends { id: number }>({
   rows,
   columns,
@@ -15,7 +16,7 @@ export function ListingTable<T extends { id: number }>({
   filters,
 }: {
   rows: T[];
-  columns: { label: string; render: (row: T) => ReactNode }[];
+  columns: Array<{ label: string; render: (row: T) => ReactNode }>;
   actions: (row: T) => ReactNode;
   loading: boolean;
   error?: string;
@@ -23,7 +24,7 @@ export function ListingTable<T extends { id: number }>({
   total: number;
   onPageChange: (page: number) => void;
   exporting: boolean;
-  onExport: (format: "pdf" | "xlsx") => void;
+  onExport: (format: 'pdf' | 'xlsx') => void;
   addAction?: ReactNode;
   filters: ReactNode;
 }) {
@@ -36,14 +37,14 @@ export function ListingTable<T extends { id: number }>({
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport("pdf")}
+          onClick={() => onExport('pdf')}
         >
           Export PDF
         </Button>
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport("xlsx")}
+          onClick={() => onExport('xlsx')}
         >
           Export XLSX
         </Button>

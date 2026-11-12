@@ -1,4 +1,5 @@
-import { Button } from "@mantine/core";
+import { Button } from '@mantine/core';
+
 export function DeleteAction({
   allowed,
   pending,
@@ -15,7 +16,9 @@ export function DeleteAction({
       color="red"
       disabled={pending}
       onClick={() => {
-        if (window.confirm(message)) onDelete();
+        if (window.confirm(message)) {
+          onDelete();
+        }
       }}
     >
       Hapus

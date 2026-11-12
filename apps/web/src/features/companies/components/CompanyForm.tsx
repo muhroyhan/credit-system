@@ -8,15 +8,16 @@ import {
   Stack,
   TextInput,
   Title,
-} from "@mantine/core";
-import { Link } from "@tanstack/react-router";
-import { FormActions } from "@web/components/crud/FormActions";
-import type { CompanyFormProps } from "@web/features/companies/companies.type";
+} from '@mantine/core';
+import { Link } from '@tanstack/react-router';
+import { FormActions } from '@web/components/crud/FormActions';
+import type { CompanyFormProps } from '@web/features/companies/companies.type';
 import {
   useCompanyForm,
   useEntities,
-} from "@web/features/companies/hooks/useCompanies";
-import { Controller, useFieldArray } from "react-hook-form";
+} from '@web/features/companies/hooks/useCompanies';
+import { Controller, useFieldArray } from 'react-hook-form';
+
 export function CompanyForm({ token, id, initial }: CompanyFormProps) {
   const { form, save } = useCompanyForm(token, id, initial);
   const {
@@ -28,10 +29,10 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
   const entity = useEntities(token);
   const interests = useFieldArray({
     control,
-    name: "bungaKredits",
-    keyName: "key",
+    name: 'bungaKredits',
+    keyName: 'key',
   });
-  const expenses = useFieldArray({ control, name: "biaya", keyName: "key" });
+  const expenses = useFieldArray({ control, name: 'biaya', keyName: 'key' });
   return (
     <form noValidate onSubmit={handleSubmit((data) => save.mutate(data))}>
       <Stack>
@@ -57,27 +58,27 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         />
         <TextInput
           label="Nama perusahaan"
-          {...register("companyName")}
+          {...register('companyName')}
           error={errors.companyName?.message}
         />
         <TextInput
           label="Username perusahaan"
-          {...register("username")}
+          {...register('username')}
           error={errors.username?.message}
         />
         <TextInput
           label="Email perusahaan"
-          {...register("email")}
+          {...register('email')}
           error={errors.email?.message}
         />
         <TextInput
           label="Slug"
-          {...register("slug")}
+          {...register('slug')}
           error={errors.slug?.message}
         />
         <PasswordInput
           label="Password perusahaan"
-          {...register("password")}
+          {...register('password')}
           error={errors.password?.message}
         />
         <Controller
@@ -87,9 +88,11 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
             <Select
               label="Status perusahaan"
               {...field}
-              data={["active", "inactive", "blocked"]}
+              data={['active', 'inactive', 'blocked']}
               onChange={(v) => {
-                if (v) field.onChange(v);
+                if (v) {
+                  field.onChange(v);
+                }
               }}
               error={errors.status?.message}
             />
@@ -116,7 +119,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         <Button
           type="button"
           onClick={() =>
-            interests.append({ bungaPercentage: "", jangkaWaktuBulan: "" })
+            interests.append({ bungaPercentage: '', jangkaWaktuBulan: '' })
           }
         >
           Tambah bunga
@@ -143,7 +146,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
                   label={`Nilai biaya ${index + 1}`}
                   value={field.value}
                   onChange={(v) =>
-                    field.onChange(v === "" ? undefined : Number(v))
+                    field.onChange(v === '' ? undefined : Number(v))
                   }
                   onBlur={field.onBlur}
                   error={errors.biaya?.[index]?.value?.message}
@@ -158,7 +161,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         <Button
           type="button"
           onClick={() =>
-            expenses.append({ expenseType: "", type: "", value: 0 })
+            expenses.append({ expenseType: '', type: '', value: 0 })
           }
         >
           Tambah biaya

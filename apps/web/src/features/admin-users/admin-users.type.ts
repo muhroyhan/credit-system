@@ -1,5 +1,6 @@
-import { adminInputSchema } from "@credit/contracts";
-import { z } from "zod";
+import { adminInputSchema } from '@credit/contracts';
+import { z } from 'zod';
+
 export const adminSchema = z.object({
   id: z.number(),
   username: z.string().nullable(),
@@ -9,7 +10,7 @@ export const adminSchema = z.object({
     .array(
       z.object({
         programId: z.number(),
-        value: z.enum(["READ", "CREATE", "UPDATE", "DELETE", "APPROVAL"]),
+        value: z.enum(['READ', 'CREATE', 'UPDATE', 'DELETE', 'APPROVAL']),
       }),
     )
     .optional(),
@@ -22,22 +23,23 @@ export const adminListSchema = z.object({
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type Admin = z.infer<typeof adminSchema>;
 export type AdminList = z.infer<typeof adminListSchema>;
-export type AdminUserFormProps = {
+export interface AdminUserFormProps {
   token: string;
   id?: number;
   initial?: AdminInput;
-};
+}
 
 export const adminFormSchema = (editing: boolean) =>
   adminInputSchema
     .extend({
-      password: z.union([z.literal(""), z.string().min(8).max(72)]).optional(),
+      password: z.union([z.literal(''), z.string().min(8).max(72)]).optional(),
     })
     .superRefine((value, ctx) => {
-      if (!editing && !value.password)
+      if (!editing && !value.password) {
         ctx.addIssue({
-          code: "custom",
-          path: ["password"],
-          message: "Password wajib",
+          code: 'custom',
+          path: ['password'],
+          message: 'Password wajib',
         });
+      }
     });

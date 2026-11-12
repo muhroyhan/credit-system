@@ -1,11 +1,12 @@
-import { Group, Select, TextInput } from "@mantine/core";
-import { Link } from "@tanstack/react-router";
-import { CrudPage } from "@web/components/crud/CrudPage";
-import { DeleteAction } from "@web/components/crud/DeleteAction";
-import { ListingTable } from "@web/components/crud/ListingTable";
-import { useAdminUsers } from "@web/features/admin-users/hooks/useAdminUsers";
-import { useSession } from "@web/features/auth/hooks/useSession";
-import { crudaAccess } from "@web/utils/cruda";
+import { Group, Select, TextInput } from '@mantine/core';
+import { Link } from '@tanstack/react-router';
+import { CrudPage } from '@web/components/crud/CrudPage';
+import { DeleteAction } from '@web/components/crud/DeleteAction';
+import { ListingTable } from '@web/components/crud/ListingTable';
+import { useAdminUsers } from '@web/features/admin-users/hooks/useAdminUsers';
+import { useSession } from '@web/features/auth/hooks/useSession';
+import { crudaAccess } from '@web/utils/cruda';
+
 export function AdminUsersPage() {
   return (
     <CrudPage program="USA" action="read" title="Admin User">
@@ -15,8 +16,8 @@ export function AdminUsersPage() {
 }
 function Listing() {
   const { session } = useSession();
-  const access = crudaAccess(session, "USA");
-  const users = useAdminUsers(session?.authToken ?? "");
+  const access = crudaAccess(session, 'USA');
+  const users = useAdminUsers(session?.authToken ?? '');
   return (
     <>
       <Link to="/">Beranda</Link>
@@ -30,11 +31,11 @@ function Listing() {
         exporting={users.exporting}
         onExport={users.exportRows}
         columns={[
-          { label: "Username", render: (row) => row.username },
-          { label: "Email", render: (row) => row.email },
+          { label: 'Username', render: (row) => row.username },
+          { label: 'Email', render: (row) => row.email },
           {
-            label: "Status",
-            render: (row) => (row.isActive ? "Aktif" : "Tidak aktif"),
+            label: 'Status',
+            render: (row) => (row.isActive ? 'Aktif' : 'Tidak aktif'),
           },
         ]}
         addAction={
@@ -69,8 +70,8 @@ function Listing() {
                 users.setPage(1);
               }}
               data={[
-                { value: "true", label: "Aktif" },
-                { value: "false", label: "Tidak aktif" },
+                { value: 'true', label: 'Aktif' },
+                { value: 'false', label: 'Tidak aktif' },
               ]}
             />
             <Select
@@ -78,14 +79,16 @@ function Listing() {
               value={users.sortBy}
               allowDeselect={false}
               onChange={(v) => {
-                if (v) users.setSortBy(v);
+                if (v) {
+                  users.setSortBy(v);
+                }
                 users.setPage(1);
               }}
               data={[
-                { value: "createdAt", label: "Tanggal dibuat" },
-                { value: "username", label: "Username" },
-                { value: "email", label: "Email" },
-                { value: "isActive", label: "Status" },
+                { value: 'createdAt', label: 'Tanggal dibuat' },
+                { value: 'username', label: 'Username' },
+                { value: 'email', label: 'Email' },
+                { value: 'isActive', label: 'Status' },
               ]}
             />
             <Select
@@ -93,12 +96,14 @@ function Listing() {
               value={users.sortDirection}
               allowDeselect={false}
               onChange={(v) => {
-                if (v) users.setSortDirection(v);
+                if (v) {
+                  users.setSortDirection(v);
+                }
                 users.setPage(1);
               }}
               data={[
-                { value: "asc", label: "Naik" },
-                { value: "desc", label: "Turun" },
+                { value: 'asc', label: 'Naik' },
+                { value: 'desc', label: 'Turun' },
               ]}
             />
           </Group>

@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { z } from 'zod';
+
 export const referenceItemSchema = z.object({
   id: z.number(),
   value: z.string().nullable(),
@@ -24,23 +25,24 @@ export const constantsQuerySchema = z.object({ name: z.string().optional() });
 
 export const loginSchema = z
   .object({
-    type: z.enum(["admin", "company", "debitor"]),
+    type: z.enum(['admin', 'company', 'debitor']),
     username: z.string().min(1),
     password: z.string().min(1),
     slug: z.string().optional(),
   })
   .superRefine((v, ctx) => {
-    if (v.type !== "admin" && !v.slug)
+    if (v.type !== 'admin' && !v.slug) {
       ctx.addIssue({
-        code: "custom",
-        path: ["slug"],
-        message: "Slug wajib diisi",
+        code: 'custom',
+        path: ['slug'],
+        message: 'Slug wajib diisi',
       });
+    }
   });
 
 export const adminRoleSchema = z.object({
   programId: z.number().int().positive(),
-  value: z.enum(["READ", "CREATE", "UPDATE", "DELETE", "APPROVAL"]),
+  value: z.enum(['READ', 'CREATE', 'UPDATE', 'DELETE', 'APPROVAL']),
 });
 export const adminInputSchema = z.object({
   username: z.string().min(1).max(255),
@@ -53,12 +55,12 @@ export const adminInputSchema = z.object({
       (items) =>
         new Set(items.map((item) => `${item.programId}:${item.value}`)).size ===
         items.length,
-      "Izin program harus unik",
+      'Izin program harus unik',
     ),
 });
 export const adminCreateSchema = adminInputSchema.refine(
   (input) => !!input.password,
-  { path: ["password"], message: "Password wajib" },
+  { path: ['password'], message: 'Password wajib' },
 );
 export const adminUpdateSchema = adminInputSchema.extend({
   id: z.number().int().positive(),
@@ -66,12 +68,12 @@ export const adminUpdateSchema = adminInputSchema.extend({
 export const adminDeleteSchema = z.object({ id: z.number().int().positive() });
 export const adminListQuerySchema = z.object({
   sortBy: z
-    .enum(["createdAt", "username", "email", "isActive"])
-    .default("createdAt"),
-  sortDirection: z.enum(["asc", "desc"]).default("desc"),
+    .enum(['createdAt', 'username', 'email', 'isActive'])
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).default('desc'),
   email: z.string().optional(),
   username: z.string().optional(),
-  active: z.enum(["true", "false"]).optional(),
+  active: z.enum(['true', 'false']).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
@@ -103,7 +105,7 @@ export const companyInterestSchema = z.object({
     .max(255)
     .refine(
       (v) => Number.isFinite(Number(v)) && Number(v) >= 0,
-      "Bunga tidak valid",
+      'Bunga tidak valid',
     ),
   jangkaWaktuBulan: z
     .string()
@@ -111,7 +113,7 @@ export const companyInterestSchema = z.object({
     .max(255)
     .refine(
       (v) => Number.isInteger(Number(v)) && Number(v) > 0,
-      "Tenor tidak valid",
+      'Tenor tidak valid',
     ),
 });
 export const companyExpenseSchema = z.object({
@@ -130,14 +132,14 @@ export const companyInputSchema = z.object({
     .min(1)
     .max(255)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  status: z.enum(["active", "inactive", "blocked"]),
+  status: z.enum(['active', 'inactive', 'blocked']),
   password: z.string().min(8).max(72).optional(),
   bungaKredits: z.array(companyInterestSchema),
   biaya: z.array(companyExpenseSchema),
 });
 export const companyCreateSchema = companyInputSchema.refine(
   (v) => !!v.password,
-  { path: ["password"], message: "Password wajib" },
+  { path: ['password'], message: 'Password wajib' },
 );
 export const companyUpdateSchema = companyInputSchema.extend({
   id: z.number().int().positive(),
@@ -147,11 +149,11 @@ export const companyQuerySchema = z.object({
   username: z.string().optional(),
   companyName: z.string().optional(),
   entityTypeId: z.coerce.number().int().positive().optional(),
-  status: z.enum(["active", "inactive", "blocked"]).optional(),
+  status: z.enum(['active', 'inactive', 'blocked']).optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   sortBy: z
-    .enum(["companyName", "username", "email", "status", "createdAt"])
-    .default("createdAt"),
-  sortDirection: z.enum(["asc", "desc"]).default("desc"),
+    .enum(['companyName', 'username', 'email', 'status', 'createdAt'])
+    .default('createdAt'),
+  sortDirection: z.enum(['asc', 'desc']).default('desc'),
 });

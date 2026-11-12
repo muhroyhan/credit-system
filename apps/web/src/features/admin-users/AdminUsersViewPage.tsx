@@ -1,13 +1,14 @@
-import { Text, Title } from "@mantine/core";
-import { Link, useParams } from "@tanstack/react-router";
-import { CrudPage } from "@web/components/crud/CrudPage";
-import { DetailFields } from "@web/components/crud/DetailFields";
-import { RecordState } from "@web/components/crud/RecordState";
+import { Text, Title } from '@mantine/core';
+import { Link, useParams } from '@tanstack/react-router';
+import { CrudPage } from '@web/components/crud/CrudPage';
+import { DetailFields } from '@web/components/crud/DetailFields';
+import { RecordState } from '@web/components/crud/RecordState';
 import {
   useAdminDetail,
   useAdminPrograms,
-} from "@web/features/admin-users/hooks/useAdminDetail";
-import { useSession } from "@web/features/auth/hooks/useSession";
+} from '@web/features/admin-users/hooks/useAdminDetail';
+import { useSession } from '@web/features/auth/hooks/useSession';
+
 export function AdminUsersViewPage() {
   return (
     <CrudPage program="USA" action="read" title="Detail administrator">
@@ -17,9 +18,9 @@ export function AdminUsersViewPage() {
 }
 function ViewContent() {
   const { session } = useSession();
-  const { id } = useParams({ from: "/admin-users/$id" });
-  const query = useAdminDetail(session?.authToken ?? "", Number(id));
-  const programs = useAdminPrograms(session?.authToken ?? "");
+  const { id } = useParams({ from: '/admin-users/$id' });
+  const query = useAdminDetail(session?.authToken ?? '', Number(id));
+  const programs = useAdminPrograms(session?.authToken ?? '');
 
   return (
     <RecordState
@@ -32,11 +33,11 @@ function ViewContent() {
         <>
           <DetailFields
             fields={[
-              { label: "Username", value: data.username },
-              { label: "Email", value: data.email },
+              { label: 'Username', value: data.username },
+              { label: 'Email', value: data.email },
               {
-                label: "Status",
-                value: data.isActive ? "Aktif" : "Tidak aktif",
+                label: 'Status',
+                value: data.isActive ? 'Aktif' : 'Tidak aktif',
               },
             ]}
           />

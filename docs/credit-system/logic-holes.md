@@ -86,3 +86,5 @@ ACL granular: role READ/WRITE lama semula didukung; migration 0001 menghapus WRI
 Penghapusan WRITE: migration 0001 mengonversi setiap role WRITE menjadi CREATE/READ/UPDATE/DELETE tanpa APPROVAL dan menghapus nilai WRITE. Nilai WRITE yang ditambahkan setelah migration tidak memberi izin dan ditolak saat validasi. Jalankan migration sebelum menjalankan versi aplikasi ini pada database yang memiliki role lama; review backup dan data sebelum migration lingkungan bersama.
 
 Audit TypeScript 12 November 2026: konfigurasi strict dan cakupan typecheck diperkuat; request RPC masih memiliki 12 assertion as never, frontend masih membutuhkan ambient Bun melalui tipe AppType, dan probe declaration pihak ketiga tanpa skipLibCheck belum lulus. Detail dan batas audit ada di typescript-audit.md.
+
+Audit Google TypeScript: profil format/import/interface diterapkan lewat Biome; daftar pengecualian proyek dan utang JSDoc/factory arrow/asersi RPC dicatat dalam google-typescript-audit.md. Ini bukan klaim kepatuhan penuh terhadap toolchain internal Google.

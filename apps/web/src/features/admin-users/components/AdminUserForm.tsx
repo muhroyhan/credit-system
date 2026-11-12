@@ -1,4 +1,4 @@
-import { adminRoleSchema } from "@credit/contracts";
+import { adminRoleSchema } from '@credit/contracts';
 import {
   Alert,
   Checkbox,
@@ -6,15 +6,16 @@ import {
   PasswordInput,
   Stack,
   TextInput,
-} from "@mantine/core";
-import { Link } from "@tanstack/react-router";
-import { FormActions } from "@web/components/crud/FormActions";
-import { PERMISSION_OPTIONS } from "@web/constant/constant";
-import type { AdminUserFormProps } from "@web/features/admin-users/admin-users.type";
-import { useAdminPrograms } from "@web/features/admin-users/hooks/useAdminDetail";
-import { useAdminForm } from "@web/features/admin-users/hooks/useAdminForm";
-import { useAdminSave } from "@web/features/admin-users/hooks/useAdminSave";
-import { Controller } from "react-hook-form";
+} from '@mantine/core';
+import { Link } from '@tanstack/react-router';
+import { FormActions } from '@web/components/crud/FormActions';
+import { PERMISSION_OPTIONS } from '@web/constant/constant';
+import type { AdminUserFormProps } from '@web/features/admin-users/admin-users.type';
+import { useAdminPrograms } from '@web/features/admin-users/hooks/useAdminDetail';
+import { useAdminForm } from '@web/features/admin-users/hooks/useAdminForm';
+import { useAdminSave } from '@web/features/admin-users/hooks/useAdminSave';
+import { Controller } from 'react-hook-form';
+
 export function AdminUserForm({
   token,
   id: editId,
@@ -49,25 +50,25 @@ export function AdminUserForm({
         <TextInput
           label="Username administrator"
           required
-          {...register("username")}
+          {...register('username')}
           error={errors.username?.message}
         />
         <TextInput
           label="Email administrator"
           type="email"
           required
-          {...register("email")}
+          {...register('email')}
           error={errors.email?.message}
         />
         <PasswordInput
           label="Password administrator"
           required={!editId}
-          {...register("password")}
+          {...register('password')}
           error={errors.password?.message}
         />
         <Checkbox
           label="Aktif"
-          {...register("isActive")}
+          {...register('isActive')}
           error={errors.isActive?.message}
         />
         <Controller

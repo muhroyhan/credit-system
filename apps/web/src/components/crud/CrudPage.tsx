@@ -1,7 +1,8 @@
-import { Container, Stack, Title } from "@mantine/core";
-import { AccessGate } from "@web/components/AccessGate";
-import type { CrudaAction } from "@web/constant/type";
-import type { ReactNode } from "react";
+import { Container, Stack, Title } from '@mantine/core';
+import { AccessGate } from '@web/components/AccessGate';
+import type { CrudaAction } from '@web/constant/type';
+import type { ReactNode } from 'react';
+
 export function CrudPage({
   program,
   action,

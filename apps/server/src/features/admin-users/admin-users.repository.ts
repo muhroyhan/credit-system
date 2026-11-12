@@ -1,17 +1,21 @@
-import { connectDatabase } from "@credit/database/client";
-import { adminUsers, programs, roles } from "@credit/database/schema";
-import type { AdminRepository } from "@server/features/admin-users/admin-users.type";
-import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
+import { connectDatabase } from '@credit/database/client';
+import { adminUsers, programs, roles } from '@credit/database/schema';
+import type { AdminRepository } from '@server/features/admin-users/admin-users.type';
+import { and, asc, count, desc, eq, inArray, like, ne, or } from 'drizzle-orm';
+
 export const adminUsersRepository: AdminRepository = {
   async list(query, paginate = true) {
     const db = connectDatabase().db;
     const conditions = [];
-    if (query.email)
+    if (query.email) {
       conditions.push(like(adminUsers.email, `%${query.email}%`));
-    if (query.username)
+    }
+    if (query.username) {
       conditions.push(like(adminUsers.username, `%${query.username}%`));
-    if (query.active !== undefined)
-      conditions.push(eq(adminUsers.isActive, query.active === "true"));
+    }
+    if (query.active !== undefined) {
+      conditions.push(eq(adminUsers.isActive, query.active === 'true'));
+    }
     const where = and(...conditions);
     const [total] = await db
       .select({ count: count() })
@@ -27,7 +31,7 @@ export const adminUsersRepository: AdminRepository = {
       .from(adminUsers)
       .where(where)
       .orderBy(
-        (query.sortDirection === "asc" ? asc : desc)(adminUsers[query.sortBy]),
+        (query.sortDirection === 'asc' ? asc : desc)(adminUsers[query.sortBy]),
         desc(adminUsers.id),
       );
     const data = await (paginate
@@ -70,7 +74,9 @@ export const adminUsersRepository: AdminRepository = {
       })
       .from(adminUsers)
       .where(eq(adminUsers.id, id));
-    if (!user) return null;
+    if (!user) {
+      return null;
+    }
     const userRoles = await db
       .select({ programId: roles.programId, value: roles.value })
       .from(roles)
@@ -94,7 +100,9 @@ export const adminUsersRepository: AdminRepository = {
     return conflict.length > 0;
   },
   async programs(ids, tx) {
-    if (!ids.length) return [];
+    if (!ids.length) {
+      return [];
+    }
     const found = await tx
       .select({ id: programs.id })
       .from(programs)
@@ -106,7 +114,7 @@ export const adminUsersRepository: AdminRepository = {
       .select({ id: adminUsers.id })
       .from(adminUsers)
       .where(eq(adminUsers.id, id))
-      .for("update");
+      .for('update');
     return row ?? null;
   },
   async save(input, actor, id, tx) {
@@ -135,7 +143,7 @@ export const adminUsersRepository: AdminRepository = {
       });
       userId = result.insertId;
     }
-    if (input.roles.length)
+    if (input.roles.length) {
       await tx.insert(roles).values(
         input.roles.map((role) => ({
           adminUserId: userId,
@@ -143,6 +151,7 @@ export const adminUsersRepository: AdminRepository = {
           value: role.value,
         })),
       );
+    }
     return userId;
   },
   async remove(id, tx) {

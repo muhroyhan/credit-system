@@ -1,14 +1,15 @@
-import { Group, Select, TextInput } from "@mantine/core";
-import { Link } from "@tanstack/react-router";
-import { CrudPage } from "@web/components/crud/CrudPage";
-import { DeleteAction } from "@web/components/crud/DeleteAction";
-import { ListingTable } from "@web/components/crud/ListingTable";
-import { useSession } from "@web/features/auth/hooks/useSession";
+import { Group, Select, TextInput } from '@mantine/core';
+import { Link } from '@tanstack/react-router';
+import { CrudPage } from '@web/components/crud/CrudPage';
+import { DeleteAction } from '@web/components/crud/DeleteAction';
+import { ListingTable } from '@web/components/crud/ListingTable';
+import { useSession } from '@web/features/auth/hooks/useSession';
 import {
   useCompanies,
   useEntities,
-} from "@web/features/companies/hooks/useCompanies";
-import { crudaAccess } from "@web/utils/cruda";
+} from '@web/features/companies/hooks/useCompanies';
+import { crudaAccess } from '@web/utils/cruda';
+
 export function CompaniesPage() {
   return (
     <CrudPage program="USC" action="read" title="Perusahaan">
@@ -18,9 +19,9 @@ export function CompaniesPage() {
 }
 function Listing() {
   const { session } = useSession();
-  const access = crudaAccess(session, "USC");
-  const users = useCompanies(session?.authToken ?? "");
-  const entity = useEntities(session?.authToken ?? "");
+  const access = crudaAccess(session, 'USC');
+  const users = useCompanies(session?.authToken ?? '');
+  const entity = useEntities(session?.authToken ?? '');
   return (
     <>
       <Link to="/">Beranda</Link>
@@ -41,22 +42,22 @@ function Listing() {
         exporting={users.exporting.isPending}
         onExport={(format) => users.exporting.mutate(format)}
         columns={[
-          { label: "Badan usaha", render: (row) => row.entityType },
-          { label: "Nama", render: (row) => row.companyName },
-          { label: "Username", render: (row) => row.username },
-          { label: "Email", render: (row) => row.email },
-          { label: "Slug", render: (row) => row.slug },
-          { label: "Status", render: (row) => row.status },
+          { label: 'Badan usaha', render: (row) => row.entityType },
+          { label: 'Nama', render: (row) => row.companyName },
+          { label: 'Username', render: (row) => row.username },
+          { label: 'Email', render: (row) => row.email },
+          { label: 'Slug', render: (row) => row.slug },
+          { label: 'Status', render: (row) => row.status },
         ]}
         addAction={
           access.create && <Link to="/companies/add">Tambah perusahaan</Link>
         }
         filters={
           <Group>
-            {(["companyName", "username", "email"] as const).map((name, i) => (
+            {(['companyName', 'username', 'email'] as const).map((name, i) => (
               <TextInput
                 key={name}
-                label={["Nama perusahaan", "Username", "Email"][i]}
+                label={['Nama perusahaan', 'Username', 'Email'][i]}
                 value={users.filters[name]}
                 onChange={(e) => users.filter(name, e.currentTarget.value)}
               />
@@ -69,29 +70,33 @@ function Listing() {
                 label: v.value ?? String(v.id),
               }))}
               value={users.filters.entityTypeId || null}
-              onChange={(v) => users.filter("entityTypeId", v ?? "")}
+              onChange={(v) => users.filter('entityTypeId', v ?? '')}
             />
             <Select
               label="Status"
               clearable
-              data={["active", "inactive", "blocked"]}
+              data={['active', 'inactive', 'blocked']}
               value={users.filters.status || null}
-              onChange={(v) => users.filter("status", v ?? "")}
+              onChange={(v) => users.filter('status', v ?? '')}
             />
             <Select
               label="Urutkan"
-              data={["createdAt", "companyName", "username", "email", "status"]}
+              data={['createdAt', 'companyName', 'username', 'email', 'status']}
               value={users.filters.sortBy}
               onChange={(v) => {
-                if (v) users.filter("sortBy", v);
+                if (v) {
+                  users.filter('sortBy', v);
+                }
               }}
             />
             <Select
               label="Arah"
-              data={["asc", "desc"]}
+              data={['asc', 'desc']}
               value={users.filters.sortDirection}
               onChange={(v) => {
-                if (v) users.filter("sortDirection", v);
+                if (v) {
+                  users.filter('sortDirection', v);
+                }
               }}
             />
           </Group>

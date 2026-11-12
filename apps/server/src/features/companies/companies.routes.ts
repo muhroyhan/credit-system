@@ -1,50 +1,51 @@
-import type { AuthEnv } from "@server/constant/type";
-import { companiesController } from "@server/features/companies/companies.controller";
-import type { CompaniesRoutes } from "@server/features/companies/companies.type";
-import { identityContext } from "@server/middleware/identity-context.middleware";
-import { permission } from "@server/middleware/permission.middleware";
-import { Hono } from "hono";
+import type { AuthEnv } from '@server/constant/interface';
+import { companiesController } from '@server/features/companies/companies.controller';
+import type { CompaniesRoutes } from '@server/features/companies/companies.type';
+import { identityContext } from '@server/middleware/identity-context.middleware';
+import { permission } from '@server/middleware/permission.middleware';
+import { Hono } from 'hono';
+
 export function companiesRoutes() {
   const user = new Hono<AuthEnv>();
   const companies = user.get(
-    "/list",
+    '/list',
     identityContext,
-    permission("USC_READ"),
+    permission('USC_READ'),
     companiesController.list,
   );
   const company = user.get(
-    "/detail",
+    '/detail',
     identityContext,
-    permission("USC_READ"),
+    permission('USC_READ'),
     companiesController.detail,
   );
   const companyCreate = user.post(
-    "/create",
+    '/create',
     identityContext,
-    permission("USC_CREATE"),
+    permission('USC_CREATE'),
     companiesController.create,
   );
   const companyUpdate = user.put(
-    "/update",
+    '/update',
     identityContext,
-    permission("USC_UPDATE"),
+    permission('USC_UPDATE'),
     companiesController.update,
   );
   const companyDelete = user.put(
-    "/delete",
+    '/delete',
     identityContext,
-    permission("USC_DELETE"),
+    permission('USC_DELETE'),
     companiesController.remove,
   );
   const interests = user.get(
-    "/bunga-kredits",
+    '/bunga-kredits',
     identityContext,
     companiesController.interests,
   );
   const companyExport = user.get(
-    "/export",
+    '/export',
     identityContext,
-    permission("USC_READ"),
+    permission('USC_READ'),
     companiesController.exportFile,
   );
   return user as Hono<

@@ -1,14 +1,14 @@
-import type { AppType } from "@credit/server/app";
-import type { ApiResponse } from "@web/constant/interface";
-import { apiErrorSchema } from "@web/constant/schema";
-import type { ExportFormat } from "@web/constant/type";
+import type { AppType } from '@credit/server/app';
+import type { ApiResponse } from '@web/constant/interface';
+import { apiErrorSchema } from '@web/constant/schema';
+import type { ExportFormat } from '@web/constant/type';
 import {
   type CompanyInput,
   companyDetailSchema,
   companyListSchema,
   entityListSchema,
-} from "@web/features/companies/companies.type";
-import { hc } from "hono/client";
+} from '@web/features/companies/companies.type';
+import { hc } from 'hono/client';
 
 const client = hc<AppType>(window.location.origin);
 const options = (token: string) => ({
@@ -16,10 +16,11 @@ const options = (token: string) => ({
 });
 async function read(response: ApiResponse) {
   const value = await response.json();
-  if (!response.ok)
+  if (!response.ok) {
     throw new Error(
-      apiErrorSchema.safeParse(value).data?.error ?? "Operasi gagal",
+      apiErrorSchema.safeParse(value).data?.error ?? 'Operasi gagal',
     );
+  }
   return value;
 }
 export async function listCompanies(token: string, query: URLSearchParams) {
@@ -44,7 +45,7 @@ export async function companyDetail(token: string, id: number) {
 }
 export async function entities(token: string) {
   return entityListSchema.parse(
-    await read(await client.api["entity-types"].$get({}, options(token))),
+    await read(await client.api['entity-types'].$get({}, options(token))),
   );
 }
 export async function saveCompany(
@@ -77,14 +78,16 @@ export async function exportCompanies(
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  query.set("format", format);
+  query.set('format', format);
   const response = await client.api.user.export.$get(
     { query: Object.fromEntries(query) } as never,
     options(token),
   );
-  if (!response.ok) throw new Error("Ekspor gagal");
+  if (!response.ok) {
+    throw new Error('Ekspor gagal');
+  }
   const url = URL.createObjectURL(await response.blob());
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = `companies.${format}`;
   a.click();

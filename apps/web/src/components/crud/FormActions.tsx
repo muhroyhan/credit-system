@@ -1,5 +1,6 @@
-import { Button, Group } from "@mantine/core";
-import type { ReactNode } from "react";
+import { Button, Group } from '@mantine/core';
+import type { ReactNode } from 'react';
+
 export function FormActions({
   pending,
   disabled,

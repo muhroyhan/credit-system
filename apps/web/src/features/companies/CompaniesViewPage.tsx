@@ -1,13 +1,14 @@
-import { Text, Title } from "@mantine/core";
-import { Link, useParams } from "@tanstack/react-router";
-import { CrudPage } from "@web/components/crud/CrudPage";
-import { DetailFields } from "@web/components/crud/DetailFields";
-import { RecordState } from "@web/components/crud/RecordState";
-import { useSession } from "@web/features/auth/hooks/useSession";
+import { Text, Title } from '@mantine/core';
+import { Link, useParams } from '@tanstack/react-router';
+import { CrudPage } from '@web/components/crud/CrudPage';
+import { DetailFields } from '@web/components/crud/DetailFields';
+import { RecordState } from '@web/components/crud/RecordState';
+import { useSession } from '@web/features/auth/hooks/useSession';
 import {
   useCompanyDetail,
   useEntities,
-} from "@web/features/companies/hooks/useCompanies";
+} from '@web/features/companies/hooks/useCompanies';
+
 export function CompaniesViewPage() {
   return (
     <CrudPage program="USC" action="read" title="Detail perusahaan">
@@ -17,8 +18,8 @@ export function CompaniesViewPage() {
 }
 function Content() {
   const { session } = useSession();
-  const token = session?.authToken ?? "";
-  const { id } = useParams({ from: "/companies/$id" });
+  const token = session?.authToken ?? '';
+  const { id } = useParams({ from: '/companies/$id' });
   const query = useCompanyDetail(token, Number(id));
   const entity = useEntities(token);
 
@@ -34,16 +35,16 @@ function Content() {
           <DetailFields
             fields={[
               {
-                label: "Badan usaha",
+                label: 'Badan usaha',
                 value:
                   entity.data?.find((e) => e.id === data.entityTypeId)?.value ??
                   data.entityTypeId,
               },
-              { label: "Nama perusahaan", value: data.companyName },
-              { label: "Username", value: data.username },
-              { label: "Email", value: data.email },
-              { label: "Slug", value: data.slug },
-              { label: "Status", value: data.status },
+              { label: 'Nama perusahaan', value: data.companyName },
+              { label: 'Username', value: data.username },
+              { label: 'Email', value: data.email },
+              { label: 'Slug', value: data.slug },
+              { label: 'Status', value: data.status },
             ]}
           />
           <Title order={2}>Bunga per tenor</Title>

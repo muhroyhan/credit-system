@@ -1,40 +1,45 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ExportFormat } from "@web/constant/type";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ExportFormat } from '@web/constant/type';
 import {
   deleteAdmin,
   exportAdmins,
   listAdmins,
-} from "@web/features/admin-users/admin-users.api";
-import { useState } from "react";
+} from '@web/features/admin-users/admin-users.api';
+import { useState } from 'react';
+
 export function useAdminUsers(token: string) {
   const client = useQueryClient();
   const [page, setPage] = useState(1);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [active, setActive] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortDirection, setSortDirection] = useState("desc");
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortDirection, setSortDirection] = useState('desc');
   const query = new URLSearchParams({ username, email, sortBy, sortDirection });
-  if (active) query.set("active", active);
+  if (active) {
+    query.set('active', active);
+  }
   const filters = query.toString();
   const list = useQuery({
-    queryKey: ["admin-users", token, "list", filters, page],
+    queryKey: ['admin-users', token, 'list', filters, page],
     queryFn: () =>
       listAdmins(
         token,
         new URLSearchParams({
           ...Object.fromEntries(query),
           page: String(page),
-          limit: "20",
+          limit: '20',
         }),
       ),
   });
   const remove = useMutation({
     mutationFn: (id: number) => deleteAdmin(token, id),
     onSuccess: async (_, id) => {
-      client.removeQueries({ queryKey: ["admin-users", token, "detail", id] });
-      if (list.data?.data.length === 1 && page > 1) setPage(page - 1);
-      await client.invalidateQueries({ queryKey: ["admin-users", token] });
+      client.removeQueries({ queryKey: ['admin-users', token, 'detail', id] });
+      if (list.data?.data.length === 1 && page > 1) {
+        setPage(page - 1);
+      }
+      await client.invalidateQueries({ queryKey: ['admin-users', token] });
     },
   });
   const exporting = useMutation({
@@ -60,7 +65,7 @@ export function useAdminUsers(token: string) {
     loading: list.isFetching,
     deleting: remove.isPending,
     exporting: exporting.isPending,
-    error: (remove.error ?? exporting.error ?? list.error)?.message ?? "",
+    error: (remove.error ?? exporting.error ?? list.error)?.message ?? '',
     remove: remove.mutate,
     exportRows: exporting.mutate,
   };

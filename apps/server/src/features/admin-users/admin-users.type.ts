@@ -3,9 +3,10 @@ import type {
   adminListDtoSchema,
   adminListQuerySchema,
   adminUserDtoSchema,
-} from "@credit/contracts";
-import type { DatabaseTransaction } from "@server/constant/type";
-import type { z } from "zod";
+} from '@credit/contracts';
+import type { DatabaseTransaction, SchemaOf } from '@server/constant/type';
+import type { z } from 'zod';
+
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type AdminQuery = z.infer<typeof adminListQuerySchema>;
 export interface AdminRepository {
@@ -14,7 +15,10 @@ export interface AdminRepository {
     id: number | undefined,
     tx: DatabaseTransaction,
   ): Promise<boolean>;
-  programs(ids: number[], tx: DatabaseTransaction): Promise<{ id: number }[]>;
+  programs(
+    ids: number[],
+    tx: DatabaseTransaction,
+  ): Promise<Array<{ id: number }>>;
   lock(id: number, tx: DatabaseTransaction): Promise<{ id: number } | null>;
   list(
     query: AdminQuery,
@@ -30,7 +34,6 @@ export interface AdminRepository {
   remove(id: number, transaction: DatabaseTransaction): Promise<boolean>;
 }
 
-import type { SchemaOf } from "@server/constant/type";
 export type AdminUsersRoutes<L, D, C, U, R, E> = SchemaOf<L> &
   SchemaOf<D> &
   SchemaOf<C> &
