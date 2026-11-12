@@ -11,6 +11,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.2.4
         version: 2.6.7
+      drizzle-kit:
+        specifier: ^0.31.0
+        version: 0.31.11
       turbo:
         specifier: ^2.5.8
         version: 2.11.11
