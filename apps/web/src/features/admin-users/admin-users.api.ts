@@ -1,27 +1,16 @@
 import { adminInputSchema } from "@credit/contracts";
 import type { AppType } from "@credit/server/app";
-import type {
-  Admin,
-  AdminExportFormat,
-  AdminInput,
-  AdminList,
-  ApiError,
-  ApiResponse,
+import {
+  type Admin,
+  type AdminExportFormat,
+  type AdminInput,
+  type AdminList,
+  type ApiError,
+  type ApiResponse,
+  adminListSchema,
+  adminSchema,
 } from "@web/features/admin-users/admin-users.type";
 import { hc } from "hono/client";
-import { z } from "zod";
-
-export const adminSchema = z.object({
-  id: z.number(),
-  username: z.string().nullable(),
-  email: z.string().nullable(),
-  isActive: z.boolean().nullable(),
-  roles: z
-    .array(
-      z.object({ programId: z.number(), value: z.enum(["READ", "WRITE"]) }),
-    )
-    .optional(),
-});
 
 const client = hc<AppType>(window.location.origin);
 function options(token: string) {
@@ -43,9 +32,7 @@ export async function listAdmins(
     { query: Object.fromEntries(query) } as never,
     options(token),
   );
-  return z
-    .object({ count: z.number(), data: z.array(adminSchema) })
-    .parse(await read(response));
+  return adminListSchema.parse(await read(response));
 }
 export async function adminDetail(token: string, id: number): Promise<Admin> {
   const response = await client.api["admin-user"].$get(

@@ -1,24 +1,20 @@
-import { loginSchema, slugSchema } from "@credit/contracts";
+import { loginSchema } from "@credit/contracts";
 import type { AppType } from "@credit/server/app";
-import type { Session } from "@web/features/auth/auth.type";
+import {
+  type LoginInput,
+  type Session,
+  sessionSchema,
+  slugListSchema,
+} from "@web/features/auth/auth.type";
 import { hc } from "hono/client";
-import { z } from "zod";
 
 const client = hc<AppType>(window.location.origin);
-export const sessionSchema = z.object({
-  authToken: z.string(),
-  type: z.enum(["admin", "company", "debitor"]),
-  userData: z.object({ id: z.number() }).passthrough(),
-});
-
 export async function getSlugs() {
   const response = await client.api.user.slugs.$get();
   if (!response.ok) throw new Error("Gagal memuat perusahaan");
-  return slugSchema.array().parse(await response.json());
+  return slugListSchema.parse(await response.json());
 }
-export async function signIn(
-  input: z.input<typeof loginSchema>,
-): Promise<Session> {
+export async function signIn(input: LoginInput): Promise<Session> {
   const payload = loginSchema.parse(input);
   const response = await client.api.login.$post(
     {},
