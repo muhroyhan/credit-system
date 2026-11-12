@@ -22,20 +22,16 @@ export function createReferenceRoutes(repository: ReferenceRepository) {
   const slugs = app.get("/user/slugs", async (c) =>
     c.json(slugSchema.array().parse(await service.slugs())),
   );
-  app.use("/programs", identityContext);
-  app.use("/entity-types", identityContext);
-  app.use("/countries", identityContext);
-  app.use("/constants", identityContext);
-  const programs = app.get("/programs", async (c) =>
+  const programs = app.get("/programs", identityContext, async (c) =>
     c.json(programSchema.array().parse(await service.programs())),
   );
-  const entityTypes = app.get("/entity-types", async (c) =>
+  const entityTypes = app.get("/entity-types", identityContext, async (c) =>
     c.json(referenceItemSchema.array().parse(await service.entityTypes())),
   );
-  const countries = app.get("/countries", async (c) =>
+  const countries = app.get("/countries", identityContext, async (c) =>
     c.json(countrySchema.array().parse(await service.countries())),
   );
-  const constants = app.get("/constants", async (c) => {
+  const constants = app.get("/constants", identityContext, async (c) => {
     const query = constantsQuerySchema.safeParse(c.req.query());
     if (!query.success) return c.json({ error: "invalid query" }, 400);
     return c.json(
