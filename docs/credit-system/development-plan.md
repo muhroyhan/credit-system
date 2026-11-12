@@ -216,6 +216,9 @@ Format catatan pelaksanaan yang dapat ditambahkan per task:
 
 | Kode task | Status | Branch / hash commit | Keluaran / keputusan | Hasil verifikasi akhir phase |
 | --- | --- | --- | --- | --- |
+| P03-T03 | done | lihat commit Task: P03-T03 | lint, typecheck, build, Vitest dan E2E MySQL terisolasi lulus | lulus |
+| P03-T02 | done | e400994 | route dan form admin | lulus P03-T03 |
+| P03-T01 | done | cf18ce5 | service dan transaksi admin | lulus P03-T03 |
 | P02-T04 | done | lihat commit Task: P02-T04 | lint, typecheck, build, unit, integration MySQL dan E2E lulus | lulus |
 | P02-T03 | done | ad2cb5f | form login dan shell awal | lulus P02-T04 |
 | P02-T02 | done | 983acc2 | identitas dan helper izin | lulus P02-T04 |

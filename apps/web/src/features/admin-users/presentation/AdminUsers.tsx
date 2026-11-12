@@ -225,7 +225,12 @@ export function AdminUsers({
                         (r) => r.programId !== Number(p.value),
                       ),
                       ...(v === "READ" || v === "WRITE"
-                        ? [{ programId: Number(p.value), value: v }]
+                        ? [
+                            {
+                              programId: Number(p.value),
+                              value: v as "READ" | "WRITE",
+                            },
+                          ]
                         : []),
                     ],
                   })

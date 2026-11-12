@@ -33,7 +33,31 @@ export const adminRepository: AdminRepository = {
       .orderBy(desc(adminUsers.createdAt), desc(adminUsers.id))
       .limit(query.limit)
       .offset((query.page - 1) * query.limit);
-    return { count: total?.count ?? 0, data };
+    const assignedRoles = data.length
+      ? await db
+          .select({
+            adminUserId: roles.adminUserId,
+            programId: roles.programId,
+            value: roles.value,
+            program: programs.name,
+            abbreviation: programs.abbreviation,
+          })
+          .from(roles)
+          .leftJoin(programs, eq(roles.programId, programs.id))
+          .where(
+            inArray(
+              roles.adminUserId,
+              data.map((user) => user.id),
+            ),
+          )
+      : [];
+    return {
+      count: total?.count ?? 0,
+      data: data.map((user) => ({
+        ...user,
+        roles: assignedRoles.filter((role) => role.adminUserId === user.id),
+      })),
+    };
   },
   async detail(id) {
     const db = connectDatabase().db;
@@ -100,28 +124,24 @@ export const adminRepository: AdminRepository = {
           .where(eq(adminUsers.id, userId));
         await tx.delete(roles).where(eq(roles.adminUserId, userId));
       } else {
-        const [result] = await tx
-          .insert(adminUsers)
-          .values({
-            username: input.username,
-            email: input.email,
-            password: input.password,
-            isActive: input.isActive,
-            createdBy: actor,
-            updatedBy: actor,
-          });
+        const [result] = await tx.insert(adminUsers).values({
+          username: input.username,
+          email: input.email,
+          password: input.password,
+          isActive: input.isActive,
+          createdBy: actor,
+          updatedBy: actor,
+        });
         userId = result.insertId;
       }
       if (input.roles.length)
-        await tx
-          .insert(roles)
-          .values(
-            input.roles.map((role) => ({
-              adminUserId: userId,
-              programId: role.programId,
-              value: role.value,
-            })),
-          );
+        await tx.insert(roles).values(
+          input.roles.map((role) => ({
+            adminUserId: userId,
+            programId: role.programId,
+            value: role.value,
+          })),
+        );
       return userId;
     });
   },
