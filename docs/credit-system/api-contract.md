@@ -1,6 +1,6 @@
 # Kontrak API credit-system
 
-Kontrak berikut merangkum kebutuhan fungsi dan route yang perlu dipertahankan atau dipetakan secara eksplisit. Implementasi Hono RPC dan schema Zod belum tersedia. Bentuk snake_case persistence dan camelCase response harus dipetakan dan diuji; keputusan perubahan path/status error harus dicatat.
+Kontrak berikut merangkum kebutuhan fungsi dan route yang perlu dipertahankan atau dipetakan secara eksplisit. Implementasi Hono RPC dan schema Zod tersedia untuk login dan referensi; endpoint lainnya masih berupa kebutuhan. Bentuk snake_case persistence dan camelCase response harus dipetakan dan diuji; keputusan perubahan path/status error harus dicatat.
 
 ## Autentikasi dan referensi
 
@@ -60,4 +60,8 @@ Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK, s
 
 ## Implementasi referensi P01
 
-P01 menyediakan array DTO: program `{id, name, abbreviation}`, jenis entitas `{id, value}`, negara `{id, code, value}`, constant `{id, name, type, value}`, dan slug `{id, slug, companyName}`. Kolom model yang belum memiliki NOT NULL dapat bernilai null. `GET /api/constants?name=...` mencocokkan nama secara tepat. Slug publik memuat semua perusahaan tanpa filter status, sesuai perilaku yang masih perlu diputuskan pada SUPPORT-11. Empat endpoint referensi lainnya menolak semua request dengan 401 sampai verifikasi identitas P02 tersedia; fixture identity hanya dipasang pada app test, tidak dapat diaktifkan lewat header di aplikasi.
+P01 menyediakan array DTO: program `{id, name, abbreviation}`, jenis entitas `{id, value}`, negara `{id, code, value}`, constant `{id, name, type, value}`, dan slug `{id, slug, companyName}`. Kolom model yang belum memiliki NOT NULL dapat bernilai null. `GET /api/constants?name=...` mencocokkan nama secara tepat. Slug publik memuat semua perusahaan tanpa filter status, sesuai perilaku yang masih perlu diputuskan pada SUPPORT-11. Empat endpoint referensi lainnya memerlukan bearer JWT yang valid dan identitas aktif sesuai aturan P02; fixture identity hanya dipasang pada app test.
+
+## Implementasi autentikasi P02
+
+Login menerima `{type, username, password, slug?}`; slug wajib untuk perusahaan dan debitor. Response `{authToken, type, userData}` tidak menyertakan hash password. Input tidak valid menghasilkan 400 dan kredensial salah menghasilkan 401. Referensi privat memverifikasi token dan memuat status akun serta role terkini pada setiap request. `JWT_SECRET` harus disediakan melalui environment. Session UI berada dalam memori dan berakhir saat reload atau keluar.

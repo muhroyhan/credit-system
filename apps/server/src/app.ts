@@ -1,4 +1,5 @@
 import { authenticate } from "@server/features/auth/application/identity";
+import { resolveIdentity } from "@server/features/auth/data/accounts";
 import { loginRoute } from "@server/features/auth/presentation/routes";
 import { referenceRepository } from "@server/features/reference/data/reference";
 import { createReferenceRoutes } from "@server/features/reference/presentation/routes";
@@ -10,7 +11,7 @@ app.route(
   "/api",
   createReferenceRoutes(
     referenceRepository,
-    async (header) => !!(await authenticate(header)),
+    async (header) => !!(await authenticate(header, resolveIdentity)),
   ),
 );
 app.route("/api", loginRoute);

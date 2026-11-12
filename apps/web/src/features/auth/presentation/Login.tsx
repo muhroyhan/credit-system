@@ -9,42 +9,16 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { useCompanies } from "@web/features/auth/application/useCompanies";
 import { useSession } from "@web/features/auth/application/useSession";
-import { getSlugs } from "@web/features/auth/data/gateway";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 export function Login() {
   const { session, loading, error, login, logout } = useSession();
   const [type, setType] = useState<"admin" | "company" | "debitor">("admin");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [slug, setSlug] = useState<string | null>(null);
-  const [companies, setCompanies] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [companyError, setCompanyError] = useState("");
-  useEffect(() => {
-    if (type === "admin") return;
-    let active = true;
-    setCompanyError("");
-    getSlugs()
-      .then((items) => {
-        if (active)
-          setCompanies(
-            items
-              .filter((v) => v.slug)
-              .map((v) => ({
-                value: v.slug as string,
-                label: v.companyName ?? (v.slug as string),
-              })),
-          );
-      })
-      .catch(() => {
-        if (active) setCompanyError("Gagal memuat daftar perusahaan");
-      });
-    return () => {
-      active = false;
-    };
-  }, [type]);
+  const { companies, companyError } = useCompanies(type);
   if (window.location.pathname !== "/")
     return (
       <Container>

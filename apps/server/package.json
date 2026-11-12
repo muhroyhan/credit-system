@@ -21,6 +21,7 @@
   "exports": {
     "./app": "./src/app.ts",
     "./reference-repository": "./src/features/reference/data/reference.ts",
-    "./reference-routes": "./src/features/reference/presentation/routes.ts"
+    "./reference-routes": "./src/features/reference/presentation/routes.ts",
+    "./identity": "./src/features/auth/application/identity.ts"
   }
 }

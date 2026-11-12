@@ -216,6 +216,10 @@ Format catatan pelaksanaan yang dapat ditambahkan per task:
 
 | Kode task | Status | Branch / hash commit | Keluaran / keputusan | Hasil verifikasi akhir phase |
 | --- | --- | --- | --- | --- |
+| P02-T04 | done | lihat commit Task: P02-T04 | lint, typecheck, build, unit, integration MySQL dan E2E lulus | lulus |
+| P02-T03 | done | ad2cb5f | form login dan shell awal | lulus P02-T04 |
+| P02-T02 | done | 983acc2 | identitas dan helper izin | lulus P02-T04 |
+| P02-T01 | done | 5eea57f | login tiga aktor dan JWT | lulus P02-T04 |
 | P01-T04 | done | lihat commit Task: P01-T04 | MySQL disposable: migration, seed dua kali dan integrasi lulus; lint, typecheck, build, unit dan E2E lulus | lulus |
 | P01-T03 | done | 7d830d7 | API referensi dan kontrak | lulus P01-T04 |
 | P01-T02 | done | 2e92f6e | seed sintetis bcrypt | lulus P01-T04 |

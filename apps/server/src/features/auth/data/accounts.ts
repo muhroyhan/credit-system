@@ -21,7 +21,7 @@ export async function findAccount(
         or(eq(adminUsers.username, username), eq(adminUsers.email, username)),
       )
       .limit(1);
-    if (!account || !account.isActive) return null;
+    if (!account?.isActive) return null;
     const permissions = await db
       .select({ program: programs.abbreviation, value: roles.value })
       .from(roles)

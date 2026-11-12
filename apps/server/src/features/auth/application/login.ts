@@ -1,11 +1,25 @@
-import { findAccount } from "@server/features/auth/data/accounts";
 import { sign } from "hono/jwt";
-export async function login(input: {
-  type: "admin" | "company" | "debitor";
-  username: string;
-  password: string;
-  slug?: string;
-}) {
+
+type Account = {
+  id: number;
+  slug: string;
+  password: string | null;
+  userData: Record<string, unknown>;
+};
+export type AccountLookup = (
+  type: "admin" | "company" | "debitor",
+  username: string,
+  slug?: string,
+) => Promise<Account | null>;
+export async function login(
+  input: {
+    type: "admin" | "company" | "debitor";
+    username: string;
+    password: string;
+    slug?: string;
+  },
+  findAccount: AccountLookup,
+) {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is required");
   const account = await findAccount(input.type, input.username, input.slug);

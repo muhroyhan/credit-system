@@ -13,5 +13,10 @@
       "dependsOn": ["^typecheck"]
     }
   },
-  "globalPassThroughEnv": ["PLAYWRIGHT_BROWSER_PATH", "DATABASE_URL"]
+  "globalPassThroughEnv": [
+    "PLAYWRIGHT_BROWSER_PATH",
+    "DATABASE_URL",
+    "SEED_PASSWORD",
+    "JWT_SECRET"
+  ]
 }

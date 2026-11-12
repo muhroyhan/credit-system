@@ -4,7 +4,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "paths": {
-      "@web/*": ["./src/*"]
+      "@web/*": ["./src/*"],
+      "@server/*": ["../server/src/*"]
     }
   }
 }

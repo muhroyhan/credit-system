@@ -1,4 +1,3 @@
-import { resolveIdentity } from "@server/features/auth/data/accounts";
 import { verify } from "hono/jwt";
 import { z } from "zod";
 
@@ -8,7 +7,21 @@ const claimsSchema = z.object({
   slug: z.string().min(1),
   exp: z.number().int().positive(),
 });
-export async function authenticate(header?: string) {
+export type Identity = {
+  id: number;
+  type: "admin" | "company" | "debitor";
+  slug: string;
+  permissions: { program: string | null; value: string | null }[];
+};
+export type IdentityResolver = (
+  type: Identity["type"],
+  id: number,
+  slug: string,
+) => Promise<Identity | null>;
+export async function authenticate(
+  header: string | undefined,
+  resolveIdentity: IdentityResolver,
+) {
   if (!header?.startsWith("Bearer ")) return null;
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is required");
@@ -23,7 +36,6 @@ export async function authenticate(header?: string) {
     return null;
   return resolveIdentity(claims.data.type, claims.data.id, claims.data.slug);
 }
-export type Identity = NonNullable<Awaited<ReturnType<typeof authenticate>>>;
 export function hasProgramPermission(
   identity: Identity,
   program: string,
