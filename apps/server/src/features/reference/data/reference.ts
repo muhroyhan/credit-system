@@ -11,8 +11,9 @@ import { eq } from "drizzle-orm";
 
 export const referenceRepository: ReferenceRepository = {
   async listPrograms() {
-    return connectDatabase()
-      .db.select({
+    const db = connectDatabase().db;
+    return db
+      .select({
         id: programs.id,
         name: programs.name,
         abbreviation: programs.abbreviation,
@@ -20,13 +21,15 @@ export const referenceRepository: ReferenceRepository = {
       .from(programs);
   },
   async listEntityTypes() {
-    return connectDatabase()
-      .db.select({ id: entityTypes.id, value: entityTypes.value })
+    const db = connectDatabase().db;
+    return db
+      .select({ id: entityTypes.id, value: entityTypes.value })
       .from(entityTypes);
   },
   async listCountries() {
-    return connectDatabase()
-      .db.select({
+    const db = connectDatabase().db;
+    return db
+      .select({
         id: countries.id,
         code: countries.code,
         value: countries.value,
@@ -34,8 +37,9 @@ export const referenceRepository: ReferenceRepository = {
       .from(countries);
   },
   async listConstants(name) {
-    const query = connectDatabase()
-      .db.select({
+    const db = connectDatabase().db;
+    const query = db
+      .select({
         id: constants.id,
         name: constants.name,
         type: constants.type,
@@ -47,8 +51,9 @@ export const referenceRepository: ReferenceRepository = {
       : await query.where(eq(constants.name, name));
   },
   async listSlugs() {
-    return connectDatabase()
-      .db.select({
+    const db = connectDatabase().db;
+    return db
+      .select({
         id: users.id,
         companyName: users.companyName,
         slug: users.slug,

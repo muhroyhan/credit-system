@@ -70,3 +70,22 @@ export const adminListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
+
+export const idQuerySchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
+export const adminRoleDtoSchema = z.object({
+  programId: z.number().nullable(),
+  value: z.string().nullable(),
+});
+export const adminUserDtoSchema = z.object({
+  id: z.number(),
+  username: z.string().nullable(),
+  email: z.string().nullable(),
+  isActive: z.boolean().nullable(),
+  roles: z.array(adminRoleDtoSchema),
+});
+export const adminListDtoSchema = z.object({
+  count: z.number(),
+  data: z.array(adminUserDtoSchema),
+});

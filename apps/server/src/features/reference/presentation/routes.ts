@@ -14,6 +14,7 @@ import {
   createReferenceService,
   type ReferenceRepository,
 } from "@server/features/reference/application/reference";
+import type { SchemaOf } from "@server/infrastructure/rpc-types";
 import { Hono } from "hono";
 
 export function createReferenceRoutes(repository: ReferenceRepository) {
@@ -39,7 +40,6 @@ export function createReferenceRoutes(repository: ReferenceRepository) {
     );
   });
   // Each registration returns its schema while mutating the same app instance.
-  type SchemaOf<T> = T extends Hono<infer _E, infer S, infer _P> ? S : never;
   type Routes = SchemaOf<typeof slugs> &
     SchemaOf<typeof programs> &
     SchemaOf<typeof entityTypes> &

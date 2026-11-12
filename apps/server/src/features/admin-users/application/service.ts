@@ -1,10 +1,15 @@
-import type { adminInputSchema, adminListQuerySchema } from "@credit/contracts";
+import type {
+  adminInputSchema,
+  adminListDtoSchema,
+  adminListQuerySchema,
+  adminUserDtoSchema,
+} from "@credit/contracts";
 import type { z } from "zod";
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type AdminQuery = z.infer<typeof adminListQuerySchema>;
 export interface AdminRepository {
-  list(query: AdminQuery): Promise<unknown>;
-  detail(id: number): Promise<unknown | null>;
+  list(query: AdminQuery): Promise<z.infer<typeof adminListDtoSchema>>;
+  detail(id: number): Promise<z.infer<typeof adminUserDtoSchema> | null>;
   save(input: AdminInput, actor: string, id?: number): Promise<number>;
   remove(id: number): Promise<boolean>;
 }
