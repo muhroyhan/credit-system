@@ -68,3 +68,5 @@ Daftar ini mencatat risiko dari analisis statis; dampak runtime, tingkat keparah
 - Pastikan mapping nama kolom fisik, nama property dan alias relasi tidak menghasilkan kolom ganda atau perubahan bentuk payload.
 
 P01: SUPPORT-11 belum diselesaikan; daftar slug publik mempertahankan seluruh perusahaan tanpa filter status. Pengungkapan slug tenant inactive/blocked merupakan dampak yang memerlukan keputusan produk sebelum filter diubah. Referensi nonpublik menolak semua request sementara autentikasi P02 belum diimplementasikan.
+
+P02-T01: login admin dan perusahaan menolak akun tidak aktif; login debitor mempertahankan perilaku kontrak yang belum mensyaratkan status perusahaan (SUPPORT-03). Respons kredensial salah menggunakan HTTP 401; body malformed menggunakan 400. JWT memuat `id`, `slug`, `type`, dan `exp` 24 jam. Revalidasi status dan role diperlakukan pada middleware P02-T02 (SUPPORT-02).
