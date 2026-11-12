@@ -22,14 +22,11 @@ export const adminListSchema = z.object({
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type Admin = z.infer<typeof adminSchema>;
 export type AdminList = z.infer<typeof adminListSchema>;
-export type ApiResponse = { ok: boolean; json: () => Promise<unknown> };
-export type ApiError = { error?: string };
 export type AdminUserFormProps = {
   token: string;
   id?: number;
   initial?: AdminInput;
 };
-export type AdminExportFormat = "pdf" | "xlsx";
 
 export const adminFormSchema = (editing: boolean) =>
   adminInputSchema

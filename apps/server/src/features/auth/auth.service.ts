@@ -1,14 +1,15 @@
+import type { Identity } from "@server/constant/interface";
+import { aclSchema } from "@server/constant/schema";
 import { authRepository } from "@server/features/auth/auth.repository";
 import type {
   AccountLookup,
-  Identity,
   IdentityResolver,
   LoginInput,
   PermissionAction,
 } from "@server/features/auth/auth.type";
 import { withTransaction } from "@server/utils/transaction";
 
-export type { Identity } from "@server/features/auth/auth.type";
+export type { Identity } from "@server/constant/interface";
 
 import { verify } from "hono/jwt";
 import { z } from "zod";
@@ -38,9 +39,9 @@ export async function authenticate(
   return resolveIdentity(claims.data.type, claims.data.id, claims.data.slug);
 }
 export function hasAclPermission(identity: Identity, acl: string) {
-  const match = /^([A-Z0-9]+)_(CREATE|READ|UPDATE|DELETE|APPROVAL)$/.exec(acl);
-  if (!match || identity.type !== "admin") return false;
-  const [, program, action] = match;
+  const parsed = aclSchema.safeParse(acl);
+  if (!parsed.success || identity.type !== "admin") return false;
+  const [program, action] = parsed.data.split("_");
   return identity.permissions.some(
     (p) => p.program === program && p.value === action,
   );

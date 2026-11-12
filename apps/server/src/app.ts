@@ -1,4 +1,4 @@
-import type { SchemaOf } from "@server/infrastructure/rpc-types";
+import type { SchemaOf } from "@server/constant/type";
 import { routes } from "@server/routes";
 import { Hono } from "hono";
 import type { BlankEnv, MergeSchemaPath } from "hono/types";

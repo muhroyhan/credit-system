@@ -6,7 +6,7 @@ import {
   roles,
   users,
 } from "@credit/database/schema";
-import type { DatabaseTransaction } from "@server/utils/transaction";
+import type { DatabaseTransaction } from "@server/constant/type";
 import { and, eq, or } from "drizzle-orm";
 export async function findAccount(
   type: "admin" | "company" | "debitor",

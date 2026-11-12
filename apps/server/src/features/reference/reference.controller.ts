@@ -6,7 +6,7 @@ import {
   referenceItemSchema,
   slugSchema,
 } from "@credit/contracts";
-import type { AuthEnv } from "@server/features/auth/auth.type";
+import type { AuthEnv } from "@server/constant/type";
 import { referenceService } from "@server/features/reference/reference.service";
 import type { Context } from "hono";
 export const referenceController = {

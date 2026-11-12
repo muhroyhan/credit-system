@@ -14,7 +14,7 @@ export interface ReferenceRepository {
   listSlugs(): Promise<z.infer<typeof slugSchema>[]>;
 }
 
-import type { SchemaOf } from "@server/infrastructure/rpc-types";
+import type { SchemaOf } from "@server/constant/type";
 export type ReferenceRoutes<S, P, E, C, K> = SchemaOf<S> &
   SchemaOf<P> &
   SchemaOf<E> &

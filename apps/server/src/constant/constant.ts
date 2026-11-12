@@ -1,0 +1,1 @@
+export const ACL_PATTERN = /^([A-Z0-9]+)_(CREATE|READ|UPDATE|DELETE|APPROVAL)$/;

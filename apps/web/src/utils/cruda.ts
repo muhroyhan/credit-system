@@ -1,5 +1,4 @@
-import type { Session } from "@web/features/auth/auth.type";
-export type CrudaAction = "create" | "read" | "update" | "delete" | "approve";
+import type { CrudaAction, Session } from "@web/constant/type";
 export function crudaAccess(
   session: Session | null,
   program: string,

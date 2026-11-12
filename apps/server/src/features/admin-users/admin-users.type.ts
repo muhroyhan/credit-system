@@ -4,7 +4,7 @@ import type {
   adminListQuerySchema,
   adminUserDtoSchema,
 } from "@credit/contracts";
-import type { DatabaseTransaction } from "@server/utils/transaction";
+import type { DatabaseTransaction } from "@server/constant/type";
 import type { z } from "zod";
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type AdminQuery = z.infer<typeof adminListQuerySchema>;
@@ -30,7 +30,7 @@ export interface AdminRepository {
   remove(id: number, transaction: DatabaseTransaction): Promise<boolean>;
 }
 
-import type { SchemaOf } from "@server/infrastructure/rpc-types";
+import type { SchemaOf } from "@server/constant/type";
 export type AdminUsersRoutes<L, D, C, U, R, E> = SchemaOf<L> &
   SchemaOf<D> &
   SchemaOf<C> &

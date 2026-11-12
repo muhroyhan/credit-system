@@ -1,4 +1,4 @@
-import type { AuthEnv } from "@server/features/auth/auth.type";
+import type { AuthEnv } from "@server/constant/type";
 import { companiesController } from "@server/features/companies/companies.controller";
 import type { CompaniesRoutes } from "@server/features/companies/companies.type";
 import { identityContext } from "@server/middleware/identity-context.middleware";

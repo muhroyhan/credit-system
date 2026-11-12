@@ -1,12 +1,12 @@
 import { adminInputSchema } from "@credit/contracts";
 import type { AppType } from "@credit/server/app";
+import type { ApiResponse } from "@web/constant/interface";
+import { apiErrorSchema } from "@web/constant/schema";
+import type { ExportFormat } from "@web/constant/type";
 import {
   type Admin,
-  type AdminExportFormat,
   type AdminInput,
   type AdminList,
-  type ApiError,
-  type ApiResponse,
   adminListSchema,
   adminSchema,
 } from "@web/features/admin-users/admin-users.type";
@@ -19,8 +19,9 @@ function options(token: string) {
 async function read(response: ApiResponse): Promise<unknown> {
   const data = await response.json();
   if (!response.ok) {
-    const error = data as ApiError;
-    throw new Error(error.error ?? "Operasi gagal");
+    throw new Error(
+      apiErrorSchema.safeParse(data).data?.error ?? "Operasi gagal",
+    );
   }
   return data;
 }
@@ -71,7 +72,7 @@ export async function deleteAdmin(token: string, id: number) {
 export async function exportAdmins(
   token: string,
   filters: URLSearchParams,
-  format: AdminExportFormat,
+  format: ExportFormat,
 ): Promise<void> {
   filters.set("format", format);
   const response = await client.api["admin-user"].export.$get(

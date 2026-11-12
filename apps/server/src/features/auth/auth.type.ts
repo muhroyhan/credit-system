@@ -1,9 +1,4 @@
-export type Identity = {
-  id: number;
-  type: "admin" | "company" | "debitor";
-  slug: string;
-  permissions: { program: string | null; value: string | null }[];
-};
+import type { Identity } from "@server/constant/interface";
 export type IdentityResolver = (
   type: Identity["type"],
   id: number,
@@ -28,7 +23,6 @@ export type LoginInput = {
   password: string;
   slug?: string;
 };
-export type AuthEnv = { Variables: { identity: Identity } };
 
 export interface AuthRepository {
   findAccount: AccountLookup;

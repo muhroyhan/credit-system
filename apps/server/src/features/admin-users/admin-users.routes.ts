@@ -1,6 +1,6 @@
+import type { AuthEnv } from "@server/constant/type";
 import { adminUsersController } from "@server/features/admin-users/admin-users.controller";
 import type { AdminUsersRoutes } from "@server/features/admin-users/admin-users.type";
-import type { AuthEnv } from "@server/features/auth/auth.type";
 import { identityContext } from "@server/middleware/identity-context.middleware";
 import { permission } from "@server/middleware/permission.middleware";
 import { Hono } from "hono";

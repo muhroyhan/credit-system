@@ -6,11 +6,11 @@ import {
   userBungaKredit,
   users,
 } from "@credit/database/schema";
+import type { DatabaseTransaction } from "@server/constant/type";
 import type {
   CompanyInput,
   CompanyQuery,
 } from "@server/features/companies/companies.type";
-import type { DatabaseTransaction } from "@server/utils/transaction";
 import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
 export const companiesRepository = {
   async list(query: CompanyQuery, paginate = true) {

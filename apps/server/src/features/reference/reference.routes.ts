@@ -1,4 +1,4 @@
-import type { AuthEnv } from "@server/features/auth/auth.type";
+import type { AuthEnv } from "@server/constant/type";
 import { referenceController } from "@server/features/reference/reference.controller";
 import type { ReferenceRoutes } from "@server/features/reference/reference.type";
 import { identityContext } from "@server/middleware/identity-context.middleware";

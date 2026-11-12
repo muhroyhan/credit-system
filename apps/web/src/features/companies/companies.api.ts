@@ -1,11 +1,11 @@
 import type { AppType } from "@credit/server/app";
+import type { ApiResponse } from "@web/constant/interface";
+import { apiErrorSchema } from "@web/constant/schema";
+import type { ExportFormat } from "@web/constant/type";
 import {
-  type CompanyApiResponse,
   type CompanyInput,
-  companyApiErrorSchema,
   companyDetailSchema,
   companyListSchema,
-  type ExportFormat,
   entityListSchema,
 } from "@web/features/companies/companies.type";
 import { hc } from "hono/client";
@@ -14,11 +14,11 @@ const client = hc<AppType>(window.location.origin);
 const options = (token: string) => ({
   headers: { Authorization: `Bearer ${token}` },
 });
-async function read(response: CompanyApiResponse) {
+async function read(response: ApiResponse) {
   const value = await response.json();
   if (!response.ok)
     throw new Error(
-      companyApiErrorSchema.safeParse(value).data?.error ?? "Operasi gagal",
+      apiErrorSchema.safeParse(value).data?.error ?? "Operasi gagal",
     );
   return value;
 }

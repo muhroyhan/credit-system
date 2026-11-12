@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import type { ExportFormat } from "@web/constant/type";
 import {
   companyDetail,
   deleteCompany,
@@ -12,7 +13,6 @@ import {
 import {
   type CompanyInput,
   companyFormSchema,
-  type ExportFormat,
 } from "@web/features/companies/companies.type";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

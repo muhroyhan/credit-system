@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ExportFormat } from "@web/constant/type";
 import {
   deleteAdmin,
   exportAdmins,
   listAdmins,
 } from "@web/features/admin-users/admin-users.api";
-import type { AdminExportFormat } from "@web/features/admin-users/admin-users.type";
 import { useState } from "react";
 export function useAdminUsers(token: string) {
   const client = useQueryClient();
@@ -38,7 +38,7 @@ export function useAdminUsers(token: string) {
     },
   });
   const exporting = useMutation({
-    mutationFn: async (format: AdminExportFormat) => {
+    mutationFn: async (format: ExportFormat) => {
       await exportAdmins(token, new URLSearchParams(filters), format);
     },
   });

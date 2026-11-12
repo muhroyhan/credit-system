@@ -1,4 +1,4 @@
-import type { AuthEnv } from "@server/features/auth/auth.type";
+import type { AuthEnv } from "@server/constant/type";
 import { healthController } from "@server/features/health/health.controller";
 import type { Hono } from "hono";
 export function healthRoutes(app: Hono<AuthEnv>) {

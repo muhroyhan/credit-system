@@ -16,3 +16,5 @@
 
 - Route fitur berada di `<feature>.routes.ts`, memakai `createCrudRoutes` untuk pola listing/add/edit/view. Root `router.tsx` hanya mendefinisikan `/`, `/login` dan prefix fitur; child route berada di fitur.
 - Empat page memakai komponen bersama dari `src/components/crud`: `CrudPage` (layout dan gate CRUDA), `ListingTable` (table/pagination/export), `RecordState` (loading/error/ID), `DetailFields` (detail teks), `DeleteAction` dan `FormActions`. Fitur baru menyediakan kolom, filter, field form, mapping data dan hook; jangan menyalin ulang layout atau komponen kontrol standar.
+
+- Definisi yang dipakai lintas fitur dalam aplikasi berada di `src/constant/constant.ts`, `type.ts`, `interface.ts`, dan `schema.ts` sesuai jenisnya. Definisi khusus fitur tetap di file fitur; kontrak lintas package tetap di `@credit/contracts`.

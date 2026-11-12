@@ -5,12 +5,12 @@ import {
   adminUpdateSchema,
   idQuerySchema,
 } from "@credit/contracts";
+import type { AuthEnv } from "@server/constant/type";
 import {
   AdminConflict,
   AdminNotFound,
 } from "@server/features/admin-users/admin-users.error";
 import { adminUsersService } from "@server/features/admin-users/admin-users.service";
-import type { AuthEnv } from "@server/features/auth/auth.type";
 import type { Context } from "hono";
 
 const list = async (c: Context<AuthEnv>) => {

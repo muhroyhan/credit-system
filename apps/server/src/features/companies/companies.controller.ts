@@ -5,7 +5,7 @@ import {
   companyUpdateSchema,
   idQuerySchema,
 } from "@credit/contracts";
-import type { AuthEnv } from "@server/features/auth/auth.type";
+import type { AuthEnv } from "@server/constant/type";
 import {
   CompanyConflict,
   CompanyNotFound,

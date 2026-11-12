@@ -1,6 +1,6 @@
 import { loginSchema } from "@credit/contracts";
+import type { AuthEnv } from "@server/constant/type";
 import { authService } from "@server/features/auth/auth.service";
-import type { AuthEnv } from "@server/features/auth/auth.type";
 import type { Context } from "hono";
 
 const login = async (c: Context<AuthEnv>) => {

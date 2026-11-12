@@ -1,11 +1,8 @@
 import { loginSchema } from "@credit/contracts";
 import type { AppType } from "@credit/server/app";
-import {
-  type LoginInput,
-  type Session,
-  sessionSchema,
-  slugListSchema,
-} from "@web/features/auth/auth.type";
+import { sessionSchema } from "@web/constant/schema";
+import type { Session } from "@web/constant/type";
+import { type LoginInput, slugListSchema } from "@web/features/auth/auth.type";
 import { hc } from "hono/client";
 
 const client = hc<AppType>(window.location.origin);

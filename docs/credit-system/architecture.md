@@ -33,7 +33,8 @@ credit-system/
       <feature>.repository.ts
       <feature>.type.ts
     server/src/middleware/  # satu fungsi middleware per file
-    server/src/infrastructure/
+    server/src/constant/{constant,type,interface,schema}.ts  # definisi lintas fitur
+    web/src/constant/{constant,type,interface,schema}.ts  # definisi lintas fitur
     web/src/features/<feature>/  # halaman, hook, dan <feature>.api.ts
     web/src/components/  # komponen bersama
     web/src/utils/       # utilitas bersama
@@ -89,3 +90,5 @@ Form frontend menggunakan React Hook Form dengan Zod resolver, menampilkan kesal
 Root `apps/web/src/router.tsx` mendefinisikan `/`, `/login` dan prefix fitur. Masing-masing `<feature>.routes.ts` memasang child listing (`/`), tambah (`add`), edit (`$id/edit`) dan detail (`$id`) melalui `createCrudRoutes`, sambil mempertahankan tipe parameter/link TanStack Router. Pola ini mengikuti [code-based routing TanStack](https://tanstack.com/router/latest/docs/routing/code-based-routing).
 
 Empat page fitur mengomposisikan komponen bersama dalam `src/components/crud`. `CrudPage` menangani container, title dan gate CRUDA sebelum konten dimount. `ListingTable` menangani tabel, export, loading/error, kondisi kosong dan pagination; kolom/filter/aksi diberikan fitur. `RecordState` menangani ID, loading dan error detail; `DetailFields` menampilkan teks. `DeleteAction` dan `FormActions` menangani kontrol standar. Validasi dan mapping bisnis tetap di fitur dan hooks; jangan menyalin ulang komponen bersama saat menambah fitur.
+
+Definisi lintas fitur untuk masing-masing aplikasi disimpan pada `src/constant/` dalam `constant.ts`, `type.ts`, `interface.ts` dan `schema.ts` sesuai jenisnya. Schema/type khusus fitur tetap dalam `<feature>.type.ts`; kontrak lintas package tetap di `@credit/contracts`.

@@ -1,7 +1,8 @@
 import { Alert } from "@mantine/core";
 import { Navigate } from "@tanstack/react-router";
+import type { CrudaAction } from "@web/constant/type";
 import { useSession } from "@web/features/auth/hooks/useSession";
-import { type CrudaAction, crudaAccess } from "@web/utils/cruda";
+import { crudaAccess } from "@web/utils/cruda";
 import type { ReactNode } from "react";
 export function AccessGate({
   program,

@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { FormActions } from "@web/components/crud/FormActions";
+import { PERMISSION_OPTIONS } from "@web/constant/constant";
 import type { AdminUserFormProps } from "@web/features/admin-users/admin-users.type";
 import { useAdminPrograms } from "@web/features/admin-users/hooks/useAdminDetail";
 import { useAdminForm } from "@web/features/admin-users/hooks/useAdminForm";
@@ -78,13 +79,7 @@ export function AdminUserForm({
                 <MultiSelect
                   key={p.value}
                   label={p.label}
-                  data={[
-                    { value: "READ", label: "READ" },
-                    { value: "CREATE", label: "CREATE" },
-                    { value: "UPDATE", label: "UPDATE" },
-                    { value: "DELETE", label: "DELETE" },
-                    { value: "APPROVAL", label: "APPROVAL" },
-                  ]}
+                  data={PERMISSION_OPTIONS}
                   value={field.value
                     .filter((r) => r.programId === Number(p.value))
                     .map((r) => r.value)}

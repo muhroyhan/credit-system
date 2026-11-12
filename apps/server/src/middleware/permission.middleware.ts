@@ -1,5 +1,5 @@
+import type { AuthEnv } from "@server/constant/type";
 import { authService } from "@server/features/auth/auth.service";
-import type { AuthEnv } from "@server/features/auth/auth.type";
 import { createMiddleware } from "hono/factory";
 export function permission(acl: string) {
   return createMiddleware<AuthEnv>(async (c, next) => {
