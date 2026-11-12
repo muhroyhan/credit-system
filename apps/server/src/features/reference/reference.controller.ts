@@ -6,15 +6,13 @@ import {
   referenceItemSchema,
   slugSchema,
 } from "@credit/contracts";
-import {
-  type AuthEnv,
-  identityContext,
-} from "@server/features/auth/auth.controller";
-import {
-  type ReferenceRepository,
-  referenceService,
-} from "@server/features/reference/reference.service";
-import type { SchemaOf } from "@server/infrastructure/rpc-types";
+import { identityContext } from "@server/features/auth/auth.controller";
+import type { AuthEnv } from "@server/features/auth/auth.type";
+import { referenceService } from "@server/features/reference/reference.service";
+import type {
+  ReferenceRepository,
+  ReferenceRoutes,
+} from "@server/features/reference/reference.type";
 import { Hono } from "hono";
 
 export function referenceController(repository: ReferenceRepository) {
@@ -40,10 +38,14 @@ export function referenceController(repository: ReferenceRepository) {
     );
   });
   // Each registration returns its schema while mutating the same app instance.
-  type Routes = SchemaOf<typeof slugs> &
-    SchemaOf<typeof programs> &
-    SchemaOf<typeof entityTypes> &
-    SchemaOf<typeof countries> &
-    SchemaOf<typeof constants>;
-  return app as Hono<AuthEnv, Routes>;
+  return app as Hono<
+    AuthEnv,
+    ReferenceRoutes<
+      typeof slugs,
+      typeof programs,
+      typeof entityTypes,
+      typeof countries,
+      typeof constants
+    >
+  >;
 }

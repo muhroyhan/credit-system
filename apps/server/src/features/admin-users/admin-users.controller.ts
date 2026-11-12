@@ -8,15 +8,15 @@ import {
 import {
   AdminConflict,
   AdminNotFound,
-  type AdminRepository,
   adminUsersService,
 } from "@server/features/admin-users/admin-users.service";
-import {
-  type AuthEnv,
-  identityContext,
-} from "@server/features/auth/auth.controller";
+import type {
+  AdminRepository,
+  AdminUsersRoutes,
+} from "@server/features/admin-users/admin-users.type";
+import { identityContext } from "@server/features/auth/auth.controller";
 import { authService } from "@server/features/auth/auth.service";
-import type { SchemaOf } from "@server/infrastructure/rpc-types";
+import type { AuthEnv } from "@server/features/auth/auth.type";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 
@@ -106,10 +106,14 @@ export function adminUsersController(repository: AdminRepository) {
       return c.json({ id: input.data.id });
     },
   );
-  type Routes = SchemaOf<typeof list> &
-    SchemaOf<typeof detail> &
-    SchemaOf<typeof create> &
-    SchemaOf<typeof update> &
-    SchemaOf<typeof remove>;
-  return app as Hono<AuthEnv, Routes>;
+  return app as Hono<
+    AuthEnv,
+    AdminUsersRoutes<
+      typeof list,
+      typeof detail,
+      typeof create,
+      typeof update,
+      typeof remove
+    >
+  >;
 }

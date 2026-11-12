@@ -3,8 +3,8 @@ import { adminUsers, programs, roles } from "@credit/database/schema";
 import {
   AdminConflict,
   AdminNotFound,
-  type AdminRepository,
 } from "@server/features/admin-users/admin-users.service";
+import type { AdminRepository } from "@server/features/admin-users/admin-users.type";
 import { and, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
 export const adminUsersRepository: AdminRepository = {
   async list(query) {

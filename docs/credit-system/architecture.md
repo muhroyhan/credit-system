@@ -30,6 +30,7 @@ credit-system/
       <feature>.controller.ts
       <feature>.service.ts
       <feature>.repository.ts
+      <feature>.type.ts
     server/src/infrastructure/
     web/src/features/<feature>/{presentation,application,data}/
     web/src/app/

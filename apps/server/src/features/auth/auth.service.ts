@@ -1,3 +1,12 @@
+import type {
+  AccountLookup,
+  Identity,
+  IdentityResolver,
+  LoginInput,
+} from "@server/features/auth/auth.type";
+
+export type { Identity } from "@server/features/auth/auth.type";
+
 import { verify } from "hono/jwt";
 import { z } from "zod";
 
@@ -7,17 +16,6 @@ const claimsSchema = z.object({
   slug: z.string().min(1),
   exp: z.number().int().positive(),
 });
-export type Identity = {
-  id: number;
-  type: "admin" | "company" | "debitor";
-  slug: string;
-  permissions: { program: string | null; value: string | null }[];
-};
-export type IdentityResolver = (
-  type: Identity["type"],
-  id: number,
-  slug: string,
-) => Promise<Identity | null>;
 export async function authenticate(
   header: string | undefined,
   resolveIdentity: IdentityResolver,
@@ -56,26 +54,7 @@ export function belongsToCompany(identity: Identity, slug: string) {
 
 import { sign } from "hono/jwt";
 
-type Account = {
-  id: number;
-  slug: string;
-  password: string | null;
-  userData: Record<string, unknown>;
-};
-export type AccountLookup = (
-  type: "admin" | "company" | "debitor",
-  username: string,
-  slug?: string,
-) => Promise<Account | null>;
-export async function login(
-  input: {
-    type: "admin" | "company" | "debitor";
-    username: string;
-    password: string;
-    slug?: string;
-  },
-  findAccount: AccountLookup,
-) {
+export async function login(input: LoginInput, findAccount: AccountLookup) {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is required");
   const account = await findAccount(input.type, input.username, input.slug);

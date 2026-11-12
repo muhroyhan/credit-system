@@ -1,14 +1,10 @@
 import { loginSchema } from "@credit/contracts";
 import { authRepository } from "@server/features/auth/auth.repository";
-import {
-  type AccountLookup,
-  authService,
-  type Identity,
-} from "@server/features/auth/auth.service";
+import { authService } from "@server/features/auth/auth.service";
+import type { AccountLookup, AuthEnv } from "@server/features/auth/auth.type";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 
-export type AuthEnv = { Variables: { identity: Identity } };
 export const identityContext = createMiddleware<AuthEnv>(async (c, next) => {
   const identity = await authService.authenticate(
     c.req.header("Authorization"),

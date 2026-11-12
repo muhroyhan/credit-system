@@ -16,7 +16,7 @@ Berlaku untuk semua fitur backend. Aturan ini melengkapi [architecture.md](archi
 
 ## Penamaan file backend
 
-Setiap fitur memakai satu folder `apps/server/src/features/<feature>/` dengan tiga file `<feature>.controller.ts`, `<feature>.service.ts`, dan `<feature>.repository.ts`. Contoh: `reference.controller.ts`, `reference.service.ts`, `reference.repository.ts`; untuk folder `admin-users`, simbol utama masing-masing adalah `adminUsersController`, `adminUsersService`, dan `adminUsersRepository`. Simbol utama memakai `<featureCamelCase><Layer>`; helper dan tipe boleh memakai nama sesuai tugasnya. Middleware fitur berada di controller. Infrastruktur bersama tetap berada di `apps/server/src/infrastructure/`. Tidak ada folder terpisah untuk layer.
+Setiap fitur memakai satu folder `apps/server/src/features/<feature>/` dengan file `<feature>.controller.ts`, `<feature>.service.ts`, `<feature>.repository.ts`, dan `<feature>.type.ts`. Contoh: `reference.controller.ts`, `reference.service.ts`, `reference.repository.ts`; untuk folder `admin-users`, simbol utama masing-masing adalah `adminUsersController`, `adminUsersService`, dan `adminUsersRepository`. Simbol utama memakai `<featureCamelCase><Layer>`. Deklarasi type/interface fitur, termasuk tipe komposisi schema route, disimpan di `<feature>.type.ts` dan diimpor dengan `import type`; schema Zod bersama tetap di contracts. Middleware fitur berada di controller. Infrastruktur bersama tetap berada di `apps/server/src/infrastructure/`. Tidak ada folder terpisah untuk layer.
 
 ## Repository dan database
 
@@ -37,7 +37,7 @@ async function listSomething() {
 
 ## Service dan dependency
 
-- Repository menyediakan interface bertipe di service. Use case menerima dependency secara eksplisit; simbol utama service mengikuti `<featureCamelCase>Service` dan dapat berupa factory atau objek fungsi.
+- Repository menyediakan interface bertipe di `<feature>.type.ts` untuk dipakai service. Use case menerima dependency secara eksplisit; simbol utama service mengikuti `<featureCamelCase>Service` dan dapat berupa factory atau objek fungsi.
 - DTO request/response yang dipakai lintas layer bersumber dari `@credit/contracts`. `unknown` dipakai pada batas input yang belum divalidasi, bukan hasil repository publik.
 - Composition root `app.ts` membuat dan menghubungkan route fitur. Factory route tidak membuka koneksi database atau mengeksekusi query saat dibuat.
 - Import lintas package memakai `@credit/...`; internal server memakai `@server/...`. Type-only dependency memakai `import type`.
