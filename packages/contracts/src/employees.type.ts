@@ -54,3 +54,83 @@ export const employeeListSchema = z.object({
 });
 export type EmployeeAccount = z.infer<typeof employeeAccountSchema>;
 export type EmployeeQuery = z.infer<typeof employeeQuerySchema>;
+
+export const employeeProfileFields = [
+  ['employeeId', 'Nomor induk'],
+  ['noKtp', 'NIK'],
+  ['namaLengkap', 'Nama lengkap'],
+  ['jenisKelamin', 'Jenis kelamin'],
+  ['agama', 'Agama'],
+  ['tempatLahir', 'Tempat lahir'],
+  ['tanggalLahir', 'Tanggal lahir'],
+  ['statusMarital', 'Status perkawinan'],
+  ['namaIbuKandung', 'Nama ibu kandung'],
+  ['alamatKtp', 'Alamat KTP'],
+  ['provinsi', 'Provinsi'],
+  ['kota', 'Kota'],
+  ['kecamatan', 'Kecamatan'],
+  ['kelurahanDesa', 'Kelurahan/desa'],
+  ['kodePos', 'Kode pos'],
+  ['alamatDomisili', 'Alamat domisili'],
+] as const;
+const requiredText = z.string().trim().min(1, 'Wajib diisi').max(255);
+export const employeeProfileSchema = z
+  .object({
+    employeeId: requiredText,
+    noKtp: requiredText,
+    namaLengkap: requiredText,
+    jenisKelamin: requiredText,
+    agama: requiredText,
+    tempatLahir: requiredText,
+    tanggalLahir: z.iso.date(),
+    statusMarital: requiredText,
+    namaIbuKandung: requiredText,
+    alamatKtp: requiredText,
+    provinsi: requiredText,
+    kota: requiredText,
+    kecamatan: requiredText,
+    kelurahanDesa: requiredText,
+    kodePos: requiredText,
+    alamatDomisili: requiredText,
+    namaAlias: z.string().max(255),
+    noHp: z.string().max(255),
+    noTelp: z.string().max(255),
+    pekerjaan: z.string().max(255),
+    pendidikan: z.string().max(255),
+    kewarganegaraan: z.string().max(255),
+    npwp: z.string().max(255),
+    takehomePay: z
+      .string()
+      .regex(/^\d+$/, 'Pendapatan harus berupa angka')
+      .refine(
+        (v) => Number(v) <= 4294967295,
+        'Pendapatan melebihi batas integer',
+      ),
+  })
+  .strict();
+export const employeeProfileUpdateSchema = z
+  .object({ id: z.number().int().positive(), profile: employeeProfileSchema })
+  .strict();
+export const employeeDocumentKinds = [
+  'fotoUrl',
+  'selfieUrl',
+  'kkUrl',
+  'slipGajiUrl',
+  'tandaTanganUrl',
+  'npwpUrl',
+] as const;
+export const employeeDocumentLabels = {
+  fotoUrl: 'KTP',
+  selfieUrl: 'Selfie KTP',
+  kkUrl: 'KK',
+  slipGajiUrl: 'Slip gaji',
+  tandaTanganUrl: 'Tanda tangan',
+  npwpUrl: 'NPWP',
+} as const;
+export const employeeDocumentKindSchema = z.enum(employeeDocumentKinds);
+export const employeeDetailSchema = employeeRowSchema.extend({
+  profile: employeeProfileSchema.partial(),
+  documents: z.record(employeeDocumentKindSchema, z.string().nullable()),
+});
+export type EmployeeProfile = z.infer<typeof employeeProfileSchema>;
+export type EmployeeDocumentKind = z.infer<typeof employeeDocumentKindSchema>;

@@ -30,3 +30,5 @@ Bun memuat .env dari working directory. Untuk perintah Node seperti Vitest/Playw
 | Database | pnpm db:generate, pnpm db:migrate, pnpm db:seed |
 
 Cakupan/jadwal test bukan di runbook ini; ikuti testing.md dan development-plan.md dari peta sumber.
+
+Dokumen P05 disimpan privat pada .data/documents (override DOCUMENT_STORAGE_DIR). Direktori ini bukan aset web dan harus persisten pada deployment; unduhan melalui API berotorisasi.

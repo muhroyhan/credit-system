@@ -10,6 +10,10 @@ import { adminUsersRoutes } from '@web/features/admin-users/admin-users.routes';
 import { LoginPage } from '@web/features/auth/LoginPage';
 import { companiesRoutes } from '@web/features/companies/companies.routes';
 import { DashboardPage } from '@web/features/dashboard/DashboardPage';
+import {
+  employeesRoutes,
+  registrationRoutes,
+} from '@web/features/employees/employees.routes';
 
 const rootRoute = createRootRoute({
   component: Outlet,
@@ -40,12 +44,24 @@ const companyRoute = createRoute({
   path: '/companies',
   component: Outlet,
 });
+const employeeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/employees',
+  component: Outlet,
+});
+const registrationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/registration',
+  component: Outlet,
+});
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
     indexRoute,
     loginRoute,
     adminUsersRoutes(adminRoute),
     companiesRoutes(companyRoute),
+    employeesRoutes(employeeRoute),
+    registrationRoutes(registrationRoute),
   ]),
 });
 declare module '@tanstack/react-router' {

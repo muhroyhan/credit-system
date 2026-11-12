@@ -50,7 +50,7 @@ Footer task dapat ditelusuri dengan `git log --all --grep='Task: Pxx-Tyy'`. Refa
 
 ## P05 — Registrasi dan Master Karyawan
 
-Status: doing. P05-T01 done (60d9625); P05-T02: API akun dan scope siap, verifikasi pada P05-T04.
+Status: doing. P05-T01 done (60d9625); P05-T02 done (3a1ce1c); P05-T03: profil/dokumen dan UI siap, verifikasi pada P05-T04.
 
 Hasil: nasabah mendaftar melalui slug, login setelah registrasi dan melengkapi identitas/penghasilan/dokumen; HRD mengelola karyawan perusahaannya.
 

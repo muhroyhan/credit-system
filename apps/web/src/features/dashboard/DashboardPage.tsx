@@ -20,6 +20,9 @@ export function DashboardPage() {
         {crudaAccess(session, 'USC').read && (
           <Link to="/companies">Perusahaan</Link>
         )}
+        {crudaAccess(session, 'CGP').read && (
+          <Link to="/employees">Master Karyawan</Link>
+        )}
         <Button onClick={logout}>Keluar</Button>
       </Stack>
     </Container>

@@ -1,4 +1,8 @@
-import type { EmployeeQuery } from '@credit/contracts';
+import type {
+  EmployeeDocumentKind,
+  EmployeeProfile,
+  EmployeeQuery,
+} from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   debitorData,
@@ -12,7 +16,17 @@ import {
 } from '@credit/database/schema';
 import type { DatabaseTransaction } from '@server/constant/type';
 import type { EmployeeWrite } from '@server/features/employees/employees.type';
-import { and, asc, count, desc, eq, like, ne, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  like,
+  ne,
+  sql,
+} from 'drizzle-orm';
 
 const columns = {
   id: debitors.id,
@@ -127,6 +141,84 @@ export const employeesRepository = {
       .values({ ...input, userId, createdBy: actor, updatedBy: actor })
       .$returningId();
     return row?.id;
+  },
+  async profile(id: number, tx?: DatabaseTransaction) {
+    const db = tx ?? connectDatabase().db;
+    const { password: _password, ...publicColumns } = getTableColumns(debitors);
+    const [parent] = await db
+      .select(publicColumns)
+      .from(debitors)
+      .where(eq(debitors.id, id));
+    const [data] = await db
+      .select()
+      .from(debitorData)
+      .where(eq(debitorData.debitorId, id));
+    const [financial] = await db
+      .select({ takehomePay: debitorFinancial.takehomePay })
+      .from(debitorFinancial)
+      .where(eq(debitorFinancial.debitorId, id));
+    return { parent, data, financial };
+  },
+  async saveProfile(
+    id: number,
+    profile: EmployeeProfile,
+    actor: string,
+    tx: DatabaseTransaction,
+  ) {
+    const { npwp, takehomePay, ...parent } = profile;
+    await tx
+      .update(debitors)
+      .set({ ...parent, updatedBy: actor, updatedAt: new Date() })
+      .where(eq(debitors.id, id));
+    const old = await employeesRepository.profile(id, tx);
+    if (old.data) {
+      await tx
+        .update(debitorData)
+        .set({ npwp, updatedBy: actor, updatedAt: new Date() })
+        .where(eq(debitorData.debitorId, id));
+    } else {
+      await tx
+        .insert(debitorData)
+        .values({ debitorId: id, npwp, createdBy: actor, updatedBy: actor });
+    }
+    if (old.financial) {
+      await tx
+        .update(debitorFinancial)
+        .set({
+          takehomePay: Number(takehomePay),
+          updatedBy: actor,
+          updatedAt: new Date(),
+        })
+        .where(eq(debitorFinancial.debitorId, id));
+    } else {
+      await tx.insert(debitorFinancial).values({
+        debitorId: id,
+        takehomePay: Number(takehomePay),
+        createdBy: actor,
+        updatedBy: actor,
+      });
+    }
+  },
+  async saveDocuments(
+    id: number,
+    values: Partial<Record<EmployeeDocumentKind, string>>,
+    actor: string,
+    tx: DatabaseTransaction,
+  ) {
+    const old = await employeesRepository.profile(id, tx);
+    if (old.data) {
+      await tx
+        .update(debitorData)
+        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
+        .where(eq(debitorData.debitorId, id));
+    } else {
+      await tx.insert(debitorData).values({
+        ...values,
+        debitorId: id,
+        createdBy: actor,
+        updatedBy: actor,
+      });
+    }
   },
   async hasCredit(id: number, tx: DatabaseTransaction) {
     const [tables] = await tx.execute(

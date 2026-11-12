@@ -5,6 +5,15 @@ export function crudaAccess(
   session: Session | null,
   program: string,
 ): Record<CrudaAction, boolean> {
+  if (session && program === 'CGP' && session.type !== 'admin') {
+    return {
+      create: session.type === 'company',
+      read: true,
+      update: true,
+      delete: session.type === 'company',
+      approve: false,
+    };
+  }
   const roles: unknown = session?.userData.roles;
   const values =
     session?.type === 'admin' && Array.isArray(roles)

@@ -2,12 +2,12 @@ import { sql } from 'drizzle-orm';
 import {
   boolean,
   date,
+  datetime,
   decimal,
   double,
-  tinyint,
-  datetime,
   int,
   mysqlTable,
+  tinyint,
   varchar,
 } from 'drizzle-orm/mysql-core';
 
@@ -157,9 +157,21 @@ export const debitorFamily = mysqlTable('debitor_family', {
 
 export const debitorFinancial = mysqlTable('debitor_financial', {
   id: id(),
-  pengeluaranPerBulan: decimal('pengeluaran_per_bulan', { precision: 20, scale: 0, unsigned: true }),
-  penghasilanUtamaPerTahun: decimal('penghasilan_utama_per_tahun', { precision: 20, scale: 0, unsigned: true }),
-  potonganPerBulan: decimal('potongan_per_bulan', { precision: 20, scale: 0, unsigned: true }),
+  pengeluaranPerBulan: decimal('pengeluaran_per_bulan', {
+    precision: 20,
+    scale: 0,
+    unsigned: true,
+  }),
+  penghasilanUtamaPerTahun: decimal('penghasilan_utama_per_tahun', {
+    precision: 20,
+    scale: 0,
+    unsigned: true,
+  }),
+  potonganPerBulan: decimal('potongan_per_bulan', {
+    precision: 20,
+    scale: 0,
+    unsigned: true,
+  }),
   debitorId: ref('debitor_id'),
   frekTransPemasukan: ref('frek_trans_pemasukan'),
   frekTransPengeluaran: ref('frek_trans_pengeluaran'),
