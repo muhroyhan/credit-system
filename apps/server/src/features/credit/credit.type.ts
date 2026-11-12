@@ -7,6 +7,11 @@ import type {
   creditSpouse,
 } from '@credit/database/schema';
 
+export interface CreditRate {
+  jangkaWaktuBulan: string;
+  bungaPercentage: string;
+}
+
 export type CreditCollectionInput = Omit<
   typeof creditCollection.$inferInsert,
   'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'

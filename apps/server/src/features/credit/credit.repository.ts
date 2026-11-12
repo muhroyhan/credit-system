@@ -1,3 +1,4 @@
+import { connectDatabase } from '@credit/database/client';
 import {
   creditCollection,
   creditGuarantor,
@@ -5,6 +6,10 @@ import {
   creditPotongan,
   creditSlikBmpk,
   creditSpouse,
+  credits,
+  debitorFinancial,
+  debitors,
+  userBungaKredit,
 } from '@credit/database/schema';
 import type { DatabaseTransaction } from '@server/constant/type';
 import type {
@@ -15,9 +20,38 @@ import type {
   CreditSlikBmpkInput,
   CreditSpouseInput,
 } from '@server/features/credit/credit.type';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 export const creditRepository = {
+  async simulationData(debitorId: number) {
+    const db = connectDatabase().db;
+    const [debitor] = await db
+      .select({ userId: debitors.userId, income: debitorFinancial.takehomePay })
+      .from(debitors)
+      .leftJoin(debitorFinancial, eq(debitorFinancial.debitorId, debitors.id))
+      .where(eq(debitors.id, debitorId))
+      .limit(1);
+    if (!debitor || debitor.userId === null) {
+      return null;
+    }
+    const rates = await db
+      .select({
+        jangkaWaktuBulan: userBungaKredit.jangkaWaktuBulan,
+        bungaPercentage: userBungaKredit.bungaPercentage,
+      })
+      .from(userBungaKredit)
+      .where(eq(userBungaKredit.userId, debitor.userId));
+    const open = await db
+      .select({ amount: credits.jumlahPengajuan })
+      .from(credits)
+      .where(
+        and(
+          eq(credits.debitorId, debitorId),
+          inArray(credits.status, ['pending', 'approved']),
+        ),
+      );
+    return { income: debitor.income, rates, open };
+  },
   async collection(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx
       .select()
