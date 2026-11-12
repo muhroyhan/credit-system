@@ -16,7 +16,7 @@ Berlaku untuk semua fitur backend. Aturan ini melengkapi [architecture.md](archi
 
 ## Penamaan file backend
 
-Setiap fitur memakai satu folder `apps/server/src/features/<feature>/` dengan file `<feature>.controller.ts`, `<feature>.service.ts`, `<feature>.repository.ts`, dan `<feature>.type.ts`. Contoh: `reference.controller.ts`, `reference.service.ts`, `reference.repository.ts`; untuk folder `admin-users`, simbol utama masing-masing adalah `adminUsersController`, `adminUsersService`, dan `adminUsersRepository`. Simbol utama memakai `<featureCamelCase><Layer>`. Deklarasi type/interface fitur, termasuk tipe komposisi schema route, disimpan di `<feature>.type.ts` dan diimpor dengan `import type`; schema Zod bersama tetap di contracts. Middleware fitur berada di controller. Infrastruktur bersama tetap berada di `apps/server/src/infrastructure/`. Tidak ada folder terpisah untuk layer.
+Setiap fitur memakai satu folder `apps/server/src/features/<feature>/` dengan file `<feature>.controller.ts`, `<feature>.service.ts`, `<feature>.repository.ts`, dan `<feature>.type.ts`. Contoh: `reference.controller.ts`, `reference.service.ts`, `reference.repository.ts`; untuk folder `admin-users`, simbol utama masing-masing adalah `adminUsersController`, `adminUsersService`, dan `adminUsersRepository`. Simbol utama memakai `<featureCamelCase><Layer>`. Deklarasi type/interface fitur, termasuk tipe komposisi schema route, disimpan di `<feature>.type.ts` dan diimpor dengan `import type`; schema Zod bersama tetap di contracts. Semua middleware berada di `apps/server/src/middleware/`, satu fungsi per file `<nama>.middleware.ts`; middleware yang memerlukan aturan bisnis mengimpor service, bukan repository. Infrastruktur bersama tetap berada di `apps/server/src/infrastructure/`. Tidak ada folder terpisah untuk layer.
 
 ## Repository dan database
 
@@ -39,7 +39,7 @@ async function listSomething() {
 
 - Repository menyediakan interface bertipe di `<feature>.type.ts` untuk dipakai service. Service mengimpor repository fitur; simbol utama service mengikuti `<featureCamelCase>Service` dan menyediakan use case bagi controller.
 - DTO request/response yang dipakai lintas layer bersumber dari `@credit/contracts`. `unknown` dipakai pada batas input yang belum divalidasi, bukan hasil repository publik.
-- Urutan akses sekaligus import wajib `global routes → controller → service → repository`. Global routes (`routes.ts`) hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
+- Urutan akses sekaligus import wajib `global routes → controller → service → repository`. Global routes (`routes.ts`) mengimpor controller dan middleware; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
 - Controller menerima request dan mengirim response melalui service. Service menangani aturan bisnis; hanya repository yang mengeksekusi query. Middleware autentikasi mengikuti urutan yang sama. Type dan kontrak bersama boleh diimpor terpisah; test repository boleh mengimpor repository sebagai subjek pengujian.
 - Import lintas package memakai `@credit/...`; internal server memakai `@server/...`. Type-only dependency memakai `import type`.
 
@@ -54,7 +54,7 @@ export function routes() {
 }
 ```
 
-Contoh menunjukkan pembagian tanggung jawab. Semua method dan path HTTP didaftarkan di `routes.ts`; controller hanya menyediakan handler request/response dan middleware. Pertahankan `SchemaOf` untuk menggabungkan schema hasil pendaftaran dan tipe RPC untuk seluruh endpoint.
+Contoh menunjukkan pembagian tanggung jawab. Semua method dan path HTTP didaftarkan di `routes.ts`; controller hanya menyediakan handler request/response; middleware diimpor dari `src/middleware`. Pertahankan `SchemaOf` untuk menggabungkan schema hasil pendaftaran dan tipe RPC untuk seluruh endpoint.
 
 - Daftarkan handler dengan pemanggilan terpisah pada instance app; hindari chaining panjang. Path endpoint ditulis sekali bersama middleware dan handler. Prefix `/api` hanya dipasang di app utama.
 - Urutan handler: autentikasi, pemeriksaan izin/lingkup bila diperlukan, validasi request, service, response. Route publik tidak diberi autentikasi hanya untuk menyamakan tampilan kode.

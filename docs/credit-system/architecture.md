@@ -11,11 +11,11 @@
 
 | Frontend | Backend | Tanggung jawab |
 | --- | --- | --- |
-| `presentation` | `controller` | Komponen/form di frontend; handler request/response, middleware dan validasi di backend; method dan path didaftarkan di `routes.ts`. |
+| `presentation` | `controller` | Komponen/form di frontend; handler request/response dan validasi di backend; method/path didaftarkan di `routes.ts` dan middleware berada di `src/middleware`. |
 | `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
 | `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
 
-Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend tetap memakai folder layer seperti pada struktur di bawah. Alur backend wajib global routes → controller → service → repository. Global routes hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Controller menerima request dan mengirim response, service menjalankan aturan bisnis, dan repository menjalankan query. Repository tidak mengimpor layer di atasnya; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend tetap memakai folder layer seperti pada struktur di bawah. Alur backend wajib global routes → controller → service → repository. Global routes mengimpor controller serta middleware; controller mengimpor service; hanya service mengimpor repository. Controller menerima request dan mengirim response, service menjalankan aturan bisnis, dan repository menjalankan query. Repository tidak mengimpor layer di atasnya; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
 
 ## Struktur target
 
@@ -31,6 +31,7 @@ credit-system/
       <feature>.service.ts
       <feature>.repository.ts
       <feature>.type.ts
+    server/src/middleware/  # satu fungsi middleware per file
     server/src/infrastructure/
     web/src/features/<feature>/{presentation,application,data}/
     web/src/app/

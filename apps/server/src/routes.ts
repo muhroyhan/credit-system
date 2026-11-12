@@ -6,6 +6,9 @@ import { healthController } from "@server/features/health/health.controller";
 import { referenceController } from "@server/features/reference/reference.controller";
 import type { ReferenceRoutes } from "@server/features/reference/reference.type";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
+import { adminReadPermission } from "@server/middleware/admin-read.middleware";
+import { adminWritePermission } from "@server/middleware/admin-write.middleware";
+import { identityContext } from "@server/middleware/identity-context.middleware";
 import { Hono } from "hono";
 
 export function routes() {
@@ -15,52 +18,52 @@ export function routes() {
   const slugs = app.get("/user/slugs", referenceController.slugs);
   const programs = app.get(
     "/programs",
-    authController.identityContext,
+    identityContext,
     referenceController.programs,
   );
   const entityTypes = app.get(
     "/entity-types",
-    authController.identityContext,
+    identityContext,
     referenceController.entityTypes,
   );
   const countries = app.get(
     "/countries",
-    authController.identityContext,
+    identityContext,
     referenceController.countries,
   );
   const constants = app.get(
     "/constants",
-    authController.identityContext,
+    identityContext,
     referenceController.constants,
   );
   const list = app.get(
     "/admin-users",
-    authController.identityContext,
-    adminUsersController.readPermission,
+    identityContext,
+    adminReadPermission,
     adminUsersController.list,
   );
   const detail = app.get(
     "/admin-user",
-    authController.identityContext,
-    adminUsersController.readPermission,
+    identityContext,
+    adminReadPermission,
     adminUsersController.detail,
   );
   const create = app.post(
     "/admin-user/create",
-    authController.identityContext,
-    adminUsersController.writePermission,
+    identityContext,
+    adminWritePermission,
     adminUsersController.create,
   );
   const update = app.put(
     "/admin-user/update",
-    authController.identityContext,
-    adminUsersController.writePermission,
+    identityContext,
+    adminWritePermission,
     adminUsersController.update,
   );
   const remove = app.put(
     "/admin-user/delete",
-    authController.identityContext,
-    adminUsersController.writePermission,
+    identityContext,
+    adminWritePermission,
     adminUsersController.remove,
   );
   type ApiSchema = SchemaOf<typeof health> &

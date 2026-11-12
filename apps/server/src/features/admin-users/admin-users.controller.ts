@@ -10,21 +10,9 @@ import {
   AdminNotFound,
   adminUsersService,
 } from "@server/features/admin-users/admin-users.service";
-import { hasProgramPermission } from "@server/features/auth/auth.service";
 import type { AuthEnv } from "@server/features/auth/auth.type";
 import type { Context } from "hono";
-import { createMiddleware } from "hono/factory";
 
-const readPermission = createMiddleware<AuthEnv>(async (c, next) => {
-  if (!hasProgramPermission(c.get("identity"), "USA", "READ"))
-    return c.json({ error: "forbidden" }, 403);
-  await next();
-});
-const writePermission = createMiddleware<AuthEnv>(async (c, next) => {
-  if (!hasProgramPermission(c.get("identity"), "USA", "WRITE"))
-    return c.json({ error: "forbidden" }, 403);
-  await next();
-});
 const list = async (c: Context<AuthEnv>) => {
   const query = adminListQuerySchema.safeParse(c.req.query());
   if (!query.success) return c.json({ error: "invalid query" }, 400);
@@ -86,6 +74,4 @@ export const adminUsersController = {
   create,
   update,
   remove,
-  readPermission,
-  writePermission,
 };

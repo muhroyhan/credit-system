@@ -1,4 +1,3 @@
-import type { MiddlewareHandler } from "hono";
 export type Identity = {
   id: number;
   type: "admin" | "company" | "debitor";
@@ -35,4 +34,3 @@ export interface AuthRepository {
   findAccount: AccountLookup;
   resolveIdentity: IdentityResolver;
 }
-export type IdentityMiddleware = MiddlewareHandler<AuthEnv>;

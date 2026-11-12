@@ -1,10 +1,10 @@
 import { resolve } from "node:path";
 import { closeDatabase } from "@credit/database/client";
-import { serveStatic } from "hono/bun";
+import { staticAssets } from "@server/middleware/static-assets.middleware";
 import { app } from "./app";
 
 const webRoot = resolve(import.meta.dir, "../../web/dist");
-app.use("/*", serveStatic({ root: webRoot }));
+app.use("/*", staticAssets(webRoot));
 app.get("/*", async (c) => {
   const path = c.req.path;
   if (
