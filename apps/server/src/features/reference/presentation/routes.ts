@@ -7,47 +7,31 @@ import {
   slugSchema,
 } from "@credit/contracts";
 import {
+  type AuthEnv,
+  identityContext,
+} from "@server/features/auth/presentation/middleware";
+import {
   createReferenceService,
   type ReferenceRepository,
 } from "@server/features/reference/application/reference";
 import { Hono } from "hono";
-import type { BlankEnv } from "hono/types";
 
-export function createReferenceRoutes(
-  repository: ReferenceRepository,
-  authorize: () => boolean = () => false,
-) {
+export function createReferenceRoutes(repository: ReferenceRepository) {
   const service = createReferenceService(repository);
-  const app = new Hono();
+  const app = new Hono<AuthEnv>();
   const slugs = app.get("/user/slugs", async (c) =>
     c.json(slugSchema.array().parse(await service.slugs())),
   );
-  app.use("/programs", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  app.use("/entity-types", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  app.use("/countries", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  app.use("/constants", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  const programs = app.get("/programs", async (c) =>
+  const programs = app.get("/programs", identityContext, async (c) =>
     c.json(programSchema.array().parse(await service.programs())),
   );
-  const entityTypes = app.get("/entity-types", async (c) =>
+  const entityTypes = app.get("/entity-types", identityContext, async (c) =>
     c.json(referenceItemSchema.array().parse(await service.entityTypes())),
   );
-  const countries = app.get("/countries", async (c) =>
+  const countries = app.get("/countries", identityContext, async (c) =>
     c.json(countrySchema.array().parse(await service.countries())),
   );
-  const constants = app.get("/constants", async (c) => {
+  const constants = app.get("/constants", identityContext, async (c) => {
     const query = constantsQuerySchema.safeParse(c.req.query());
     if (!query.success) return c.json({ error: "invalid query" }, 400);
     return c.json(
@@ -61,5 +45,5 @@ export function createReferenceRoutes(
     SchemaOf<typeof entityTypes> &
     SchemaOf<typeof countries> &
     SchemaOf<typeof constants>;
-  return app as Hono<BlankEnv, Routes>;
+  return app as Hono<AuthEnv, Routes>;
 }
