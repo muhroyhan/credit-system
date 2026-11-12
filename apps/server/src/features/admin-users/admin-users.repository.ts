@@ -4,9 +4,9 @@ import {
   AdminConflict,
   AdminNotFound,
   type AdminRepository,
-} from "@server/features/admin-users/service.application";
+} from "@server/features/admin-users/admin-users.service";
 import { and, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
-export const adminRepository: AdminRepository = {
+export const adminUsersRepository: AdminRepository = {
   async list(query) {
     const db = connectDatabase().db;
     const conditions = [];

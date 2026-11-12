@@ -1,6 +1,6 @@
 import { closeDatabase } from "@credit/database/client";
-import { adminRepository } from "@server/features/admin-users/repository.data";
-import { AdminConflict } from "@server/features/admin-users/service.application";
+import { adminUsersRepository } from "@server/features/admin-users/admin-users.repository";
+import { AdminConflict } from "@server/features/admin-users/admin-users.service";
 import { afterAll, describe, expect, it } from "vitest";
 
 const url = process.env.DATABASE_URL;
@@ -24,27 +24,29 @@ describe.skipIf(!url)("administrator repository", () => {
       isActive: true,
       roles: [{ programId: 900001, value: "READ" as const }],
     };
-    const id = await adminRepository.save(input, "test");
+    const id = await adminUsersRepository.save(input, "test");
     try {
-      await expect(adminRepository.save(input, "test")).rejects.toBeInstanceOf(
-        AdminConflict,
-      );
       await expect(
-        adminRepository.save(
+        adminUsersRepository.save(input, "test"),
+      ).rejects.toBeInstanceOf(AdminConflict);
+      await expect(
+        adminUsersRepository.save(
           { ...input, roles: [{ programId: 123456, value: "WRITE" }] },
           "test",
           id,
         ),
       ).rejects.toBeInstanceOf(AdminConflict);
-      expect(await adminRepository.detail(id)).toMatchObject({
+      expect(await adminUsersRepository.detail(id)).toMatchObject({
         username: input.username,
         roles: [{ programId: 900001, value: "READ" }],
       });
-      await adminRepository.save({ ...input, roles: [] }, "test", id);
-      expect(await adminRepository.detail(id)).toMatchObject({ roles: [] });
+      await adminUsersRepository.save({ ...input, roles: [] }, "test", id);
+      expect(await adminUsersRepository.detail(id)).toMatchObject({
+        roles: [],
+      });
     } finally {
-      expect(await adminRepository.remove(id)).toBe(true);
+      expect(await adminUsersRepository.remove(id)).toBe(true);
     }
-    expect(await adminRepository.detail(id)).toBeNull();
+    expect(await adminUsersRepository.detail(id)).toBeNull();
   });
 });

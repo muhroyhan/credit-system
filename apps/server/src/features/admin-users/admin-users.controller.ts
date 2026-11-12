@@ -9,23 +9,23 @@ import {
   AdminConflict,
   AdminNotFound,
   type AdminRepository,
-  createAdminService,
-} from "@server/features/admin-users/service.application";
-import { hasProgramPermission } from "@server/features/auth/identity.application";
+  adminUsersService,
+} from "@server/features/admin-users/admin-users.service";
 import {
   type AuthEnv,
   identityContext,
-} from "@server/features/auth/middleware.presentation";
+} from "@server/features/auth/auth.controller";
+import { authService } from "@server/features/auth/auth.service";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 
-export function createAdminRoutes(repository: AdminRepository) {
+export function adminUsersController(repository: AdminRepository) {
   const app = new Hono<AuthEnv>();
-  const service = createAdminService(repository);
+  const service = adminUsersService(repository);
   const permission = (access: "READ" | "WRITE") =>
     createMiddleware<AuthEnv>(async (c, next) => {
-      if (!hasProgramPermission(c.get("identity"), "USA", access))
+      if (!authService.hasProgramPermission(c.get("identity"), "USA", access))
         return c.json({ error: "forbidden" }, 403);
       await next();
     });

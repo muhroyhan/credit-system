@@ -124,3 +124,5 @@ export async function resolveIdentity(
     .limit(1);
   return debitor ? { id, type, slug, permissions: [] } : null;
 }
+
+export const authRepository = { findAccount, resolveIdentity };

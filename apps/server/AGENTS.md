@@ -1,6 +1,6 @@
 # Backend credit-system
 
-- Terapkan tiga layer per fitur: `presentation` (Hono dan validasi), `application` (use case dan aturan bisnis), `data` (Drizzle dan adapter). Simpan file langsung di folder fitur dengan nama `<tanggung-jawab>.<layer>.ts`, misalnya `routes.presentation.ts`, `service.application.ts`, dan `repository.data.ts`; jangan buat subfolder per layer.
+- Terapkan tiga layer backend: `controller` (Hono, middleware dan validasi), `service` (use case dan aturan bisnis), `repository` (Drizzle dan adapter). Simpan langsung di folder fitur sebagai `<feature>.controller.ts`, `<feature>.service.ts`, dan `<feature>.repository.ts`; simbol utama mengikuti `<featureCamelCase>Controller`, `<featureCamelCase>Service`, dan `<featureCamelCase>Repository`. Jangan buat subfolder layer.
 - Validasi body, query dan parameter dengan Zod; gunakan kontrak bersama di `packages/contracts`.
 - Export tipe Hono RPC tanpa mengekspos koneksi database atau konfigurasi server ke bundle frontend.
 - Pertahankan status HRD/BPR, rumus dan urutan business flow di `docs/credit-system/business-flow.md`; catat perubahan perilaku dan logic hole di `docs/credit-system/logic-holes.md`.

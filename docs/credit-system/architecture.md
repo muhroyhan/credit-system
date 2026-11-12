@@ -9,13 +9,13 @@
 
 ## Tiga layer per fitur
 
-| Layer | Frontend | Backend |
+| Frontend | Backend | Tanggung jawab |
 | --- | --- | --- |
-| `presentation` | Halaman dan komponen Mantine, form dan navigasi; tidak memanggil RPC langsung. | Route Hono, validasi Zod, identity context, pemetaan response/error; tidak berisi query ORM. |
-| `application` | Hook/view model, state, use case UI, perhitungan dan aturan tampilan. | Use case, aturan bisnis, perhitungan murni, orchestration dan interface repository/provider. |
-| `data` | RPC gateway, mapping DTO/form, serialisasi dan state remote. | Drizzle repository dan adapter provider; tidak menentukan alur UI. |
+| `presentation` | `controller` | Komponen/form di frontend; route Hono, validasi dan pemetaan response di backend. |
+| `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
+| `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
 
-Di backend, file langsung berada dalam folder fitur dengan akhiran `.<layer>.ts`; tidak ada folder terpisah untuk layer. Frontend tetap memakai folder layer seperti pada struktur di bawah. Dependensi mengarah dari presentation ke application ke data melalui interface. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend tetap memakai folder layer seperti pada struktur di bawah. Dependensi backend mengarah dari controller ke service ke repository melalui interface; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
 
 ## Struktur target
 
@@ -27,9 +27,9 @@ credit-system/
   biome.json
   apps/
     server/src/features/<feature>/
-      routes.presentation.ts
-      service.application.ts
-      repository.data.ts
+      <feature>.controller.ts
+      <feature>.service.ts
+      <feature>.repository.ts
     server/src/infrastructure/
     web/src/features/<feature>/{presentation,application,data}/
     web/src/app/

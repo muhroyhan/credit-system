@@ -9,16 +9,16 @@ import {
 import {
   type AuthEnv,
   identityContext,
-} from "@server/features/auth/middleware.presentation";
+} from "@server/features/auth/auth.controller";
 import {
-  createReferenceService,
   type ReferenceRepository,
-} from "@server/features/reference/reference.application";
+  referenceService,
+} from "@server/features/reference/reference.service";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
 import { Hono } from "hono";
 
-export function createReferenceRoutes(repository: ReferenceRepository) {
-  const service = createReferenceService(repository);
+export function referenceController(repository: ReferenceRepository) {
+  const service = referenceService(repository);
   const app = new Hono<AuthEnv>();
   const slugs = app.get("/user/slugs", async (c) =>
     c.json(slugSchema.array().parse(await service.slugs())),

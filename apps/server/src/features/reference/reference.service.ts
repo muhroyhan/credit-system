@@ -13,7 +13,7 @@ export interface ReferenceRepository {
   listConstants(name?: string): Promise<z.infer<typeof constantSchema>[]>;
   listSlugs(): Promise<z.infer<typeof slugSchema>[]>;
 }
-export const createReferenceService = (repository: ReferenceRepository) => ({
+export const referenceService = (repository: ReferenceRepository) => ({
   programs: () => repository.listPrograms(),
   entityTypes: () => repository.listEntityTypes(),
   countries: () => repository.listCountries(),

@@ -6,7 +6,7 @@ import {
   programs,
   users,
 } from "@credit/database/schema";
-import type { ReferenceRepository } from "@server/features/reference/reference.application";
+import type { ReferenceRepository } from "@server/features/reference/reference.service";
 import { eq } from "drizzle-orm";
 
 export const referenceRepository: ReferenceRepository = {

@@ -15,7 +15,7 @@ export interface AdminRepository {
 }
 export class AdminConflict extends Error {}
 export class AdminNotFound extends Error {}
-export const createAdminService = (repository: AdminRepository) => ({
+export const adminUsersService = (repository: AdminRepository) => ({
   list: (query: AdminQuery) => repository.list(query),
   detail: (id: number) => repository.detail(id),
   async save(input: AdminInput, actor: string, id?: number) {

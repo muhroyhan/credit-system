@@ -2,7 +2,7 @@ import { createHmac } from "node:crypto";
 import { closeDatabase, connectDatabase } from "@credit/database/client";
 import { app } from "@credit/server/app";
 import { referenceRepository } from "@credit/server/reference-repository";
-import { createReferenceRoutes } from "@credit/server/reference-routes";
+import { referenceController } from "@credit/server/reference-routes";
 import { afterAll, describe, expect, it } from "vitest";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -37,7 +37,7 @@ describe.skipIf(!databaseUrl)("reference data on isolated mysql", () => {
     expect(await referenceRepository.listPrograms()).toBeDefined();
   });
   it("returns seeded data through routes and filters constants", async () => {
-    const authed = createReferenceRoutes(referenceRepository);
+    const authed = referenceController(referenceRepository);
     const denied = await authed.request("/programs");
     expect(denied.status).toBe(401);
     // Sign a fixture token; production middleware still validates it and resolves

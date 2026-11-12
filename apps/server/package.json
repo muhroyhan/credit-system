@@ -20,8 +20,8 @@
   },
   "exports": {
     "./app": "./src/app.ts",
-    "./reference-repository": "./src/features/reference/reference.data.ts",
-    "./reference-routes": "./src/features/reference/routes.presentation.ts",
-    "./identity": "./src/features/auth/identity.application.ts"
+    "./reference-repository": "./src/features/reference/reference.repository.ts",
+    "./reference-routes": "./src/features/reference/reference.controller.ts",
+    "./identity": "./src/features/auth/auth.service.ts"
   }
 }
