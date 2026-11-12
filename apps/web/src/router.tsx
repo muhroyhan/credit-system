@@ -11,6 +11,10 @@ import { AdminUsersEditPage } from "@web/features/admin-users/AdminUsersEditPage
 import { AdminUsersPage } from "@web/features/admin-users/AdminUsersPage";
 import { AdminUsersViewPage } from "@web/features/admin-users/AdminUsersViewPage";
 import { LoginPage } from "@web/features/auth/LoginPage";
+import { CompaniesAddPage } from "@web/features/companies/CompaniesAddPage";
+import { CompaniesEditPage } from "@web/features/companies/CompaniesEditPage";
+import { CompaniesPage } from "@web/features/companies/CompaniesPage";
+import { CompaniesViewPage } from "@web/features/companies/CompaniesViewPage";
 import { DashboardPage } from "@web/features/dashboard/DashboardPage";
 
 const rootRoute = createRootRoute({
@@ -52,8 +56,32 @@ const adminViewRoute = createRoute({
   path: "/admin-users/$id",
   component: AdminUsersViewPage,
 });
+const companyListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/companies",
+  component: CompaniesPage,
+});
+const companyAddRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/companies/add",
+  component: CompaniesAddPage,
+});
+const companyEditRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/companies/$id/edit",
+  component: CompaniesEditPage,
+});
+const companyViewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/companies/$id",
+  component: CompaniesViewPage,
+});
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
+    companyListRoute,
+    companyAddRoute,
+    companyEditRoute,
+    companyViewRoute,
     indexRoute,
     loginRoute,
     adminRoute,

@@ -58,6 +58,14 @@ export const companiesRepository = {
         : selection),
     };
   },
+  async bySlug(slug: string) {
+    const db = connectDatabase().db;
+    const [row] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.slug, slug));
+    return row?.id;
+  },
   async detail(id: number) {
     const db = connectDatabase().db;
     const [row] = await db
@@ -212,14 +220,12 @@ export const companiesRepository = {
               ),
             );
         else
-          await tx
-            .insert(userBungaKredit)
-            .values({
-              ...value,
-              userId: companyId,
-              createdBy: actor,
-              updatedBy: actor,
-            });
+          await tx.insert(userBungaKredit).values({
+            ...value,
+            userId: companyId,
+            createdBy: actor,
+            updatedBy: actor,
+          });
       }
       for (const { id: childId, ...value } of biaya) {
         if (childId)
@@ -230,14 +236,12 @@ export const companiesRepository = {
               and(eq(userBiaya.id, childId), eq(userBiaya.userId, companyId)),
             );
         else
-          await tx
-            .insert(userBiaya)
-            .values({
-              ...value,
-              userId: companyId,
-              createdBy: actor,
-              updatedBy: actor,
-            });
+          await tx.insert(userBiaya).values({
+            ...value,
+            userId: companyId,
+            createdBy: actor,
+            updatedBy: actor,
+          });
       }
       return companyId;
     });
