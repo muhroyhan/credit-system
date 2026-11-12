@@ -13,3 +13,6 @@
 - Semua akses halaman dan action mengikuti CRUDA (Create, Read, Update, Delete, Approval) sesuai izin API. Untuk Admin User: USA_READ memberi Read dan ekspor; USA_CREATE/UPDATE/DELETE memberi aksi masing-masing, dan USA_APPROVAL harus diberikan eksplisit. endpoint approval belum tersedia. Gate halaman harus mencegah mount/query konten terlarang termasuk saat akses URL langsung. Dashboard adalah fitur terpisah dari auth.
 
 - Simpan schema Zod, deklarasi type dan interface tiap fitur dalam satu file `<feature>.type.ts` di folder fitur; konsumen menggunakan `import type` untuk type dan import biasa untuk schema. Kontrak bersama tetap di `packages/contracts`.
+
+- Route fitur berada di `<feature>.routes.ts`, memakai `createCrudRoutes` untuk pola listing/add/edit/view. Root `router.tsx` hanya mendefinisikan `/`, `/login` dan prefix fitur; child route berada di fitur.
+- Empat page memakai komponen bersama dari `src/components/crud`: `CrudPage` (layout dan gate CRUDA), `ListingTable` (table/pagination/export), `RecordState` (loading/error/ID), `DetailFields` (detail teks), `DeleteAction` dan `FormActions`. Fitur baru menyediakan kolom, filter, field form, mapping data dan hook; jangan menyalin ulang layout atau komponen kontrol standar.

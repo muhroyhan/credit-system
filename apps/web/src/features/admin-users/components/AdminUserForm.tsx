@@ -1,15 +1,14 @@
 import { adminRoleSchema } from "@credit/contracts";
 import {
   Alert,
-  Button,
   Checkbox,
-  Group,
   MultiSelect,
   PasswordInput,
   Stack,
   TextInput,
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
+import { FormActions } from "@web/components/crud/FormActions";
 import type { AdminUserFormProps } from "@web/features/admin-users/admin-users.type";
 import { useAdminPrograms } from "@web/features/admin-users/hooks/useAdminDetail";
 import { useAdminForm } from "@web/features/admin-users/hooks/useAdminForm";
@@ -113,16 +112,11 @@ export function AdminUserForm({
             </>
           )}
         />
-        <Group>
-          <Button
-            type="submit"
-            loading={save.isPending}
-            disabled={!programs.isSuccess}
-          >
-            Simpan
-          </Button>
-          <Link to="/admin-users">Batal</Link>
-        </Group>
+        <FormActions
+          pending={save.isPending}
+          disabled={!programs.isSuccess}
+          cancel={<Link to="/admin-users">Batal</Link>}
+        />
       </Stack>
     </form>
   );

@@ -83,3 +83,9 @@ Gate halaman dan action mengikuti CRUDA: Create, Read, Update, Delete, Approval.
 Ekspor PDF/XLSX dibuat oleh utilitas bersama `apps/server/src/utils/export-file.ts`; service fitur menyiapkan data dan kolom. Ekspor Admin User dibuat oleh server melalui endpoint yang menerapkan filter dan sorting tanpa pagination. Endpoint memerlukan USA_READ dan menghasilkan PDF/XLSX tanpa password atau role.
 
 Form frontend menggunakan React Hook Form dengan Zod resolver, menampilkan kesalahan per field, dan memvalidasi sebelum memanggil mutation. Schema bersama tetap digunakan sebagai dasar validasi; variasi form berada di `<feature>.type.ts`.
+
+## Komposisi frontend per fitur
+
+Root `apps/web/src/router.tsx` mendefinisikan `/`, `/login` dan prefix fitur. Masing-masing `<feature>.routes.ts` memasang child listing (`/`), tambah (`add`), edit (`$id/edit`) dan detail (`$id`) melalui `createCrudRoutes`, sambil mempertahankan tipe parameter/link TanStack Router. Pola ini mengikuti [code-based routing TanStack](https://tanstack.com/router/latest/docs/routing/code-based-routing).
+
+Empat page fitur mengomposisikan komponen bersama dalam `src/components/crud`. `CrudPage` menangani container, title dan gate CRUDA sebelum konten dimount. `ListingTable` menangani tabel, export, loading/error, kondisi kosong dan pagination; kolom/filter/aksi diberikan fitur. `RecordState` menangani ID, loading dan error detail; `DetailFields` menampilkan teks. `DeleteAction` dan `FormActions` menangani kontrol standar. Validasi dan mapping bisnis tetap di fitur dan hooks; jangan menyalin ulang komponen bersama saat menambah fitur.

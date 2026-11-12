@@ -10,6 +10,7 @@ import {
   Title,
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
+import { FormActions } from "@web/components/crud/FormActions";
 import type { CompanyFormProps } from "@web/features/companies/companies.type";
 import {
   useCompanyForm,
@@ -162,14 +163,11 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         >
           Tambah biaya
         </Button>
-        <Button
-          type="submit"
-          loading={save.isPending}
+        <FormActions
+          pending={save.isPending}
           disabled={!entity.isSuccess}
-        >
-          Simpan
-        </Button>
-        <Link to="/companies">Batal</Link>
+          cancel={<Link to="/companies">Batal</Link>}
+        />
       </Stack>
     </form>
   );

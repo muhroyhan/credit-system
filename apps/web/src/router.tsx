@@ -6,15 +6,9 @@ import {
   Link,
   Outlet,
 } from "@tanstack/react-router";
-import { AdminUsersAddPage } from "@web/features/admin-users/AdminUsersAddPage";
-import { AdminUsersEditPage } from "@web/features/admin-users/AdminUsersEditPage";
-import { AdminUsersPage } from "@web/features/admin-users/AdminUsersPage";
-import { AdminUsersViewPage } from "@web/features/admin-users/AdminUsersViewPage";
+import { adminUsersRoutes } from "@web/features/admin-users/admin-users.routes";
 import { LoginPage } from "@web/features/auth/LoginPage";
-import { CompaniesAddPage } from "@web/features/companies/CompaniesAddPage";
-import { CompaniesEditPage } from "@web/features/companies/CompaniesEditPage";
-import { CompaniesPage } from "@web/features/companies/CompaniesPage";
-import { CompaniesViewPage } from "@web/features/companies/CompaniesViewPage";
+import { companiesRoutes } from "@web/features/companies/companies.routes";
 import { DashboardPage } from "@web/features/dashboard/DashboardPage";
 
 const rootRoute = createRootRoute({
@@ -39,55 +33,19 @@ const loginRoute = createRoute({
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin-users",
-  component: AdminUsersPage,
+  component: Outlet,
 });
-const adminAddRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/admin-users/add",
-  component: AdminUsersAddPage,
-});
-const adminEditRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/admin-users/$id/edit",
-  component: AdminUsersEditPage,
-});
-const adminViewRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/admin-users/$id",
-  component: AdminUsersViewPage,
-});
-const companyListRoute = createRoute({
+const companyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/companies",
-  component: CompaniesPage,
-});
-const companyAddRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/companies/add",
-  component: CompaniesAddPage,
-});
-const companyEditRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/companies/$id/edit",
-  component: CompaniesEditPage,
-});
-const companyViewRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/companies/$id",
-  component: CompaniesViewPage,
+  component: Outlet,
 });
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
-    companyListRoute,
-    companyAddRoute,
-    companyEditRoute,
-    companyViewRoute,
     indexRoute,
     loginRoute,
-    adminRoute,
-    adminAddRoute,
-    adminEditRoute,
-    adminViewRoute,
+    adminUsersRoutes(adminRoute),
+    companiesRoutes(companyRoute),
   ]),
 });
 declare module "@tanstack/react-router" {

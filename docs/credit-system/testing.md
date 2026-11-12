@@ -39,3 +39,5 @@ Audit layer setelah P04: error bisnis dan orkestrasi transaksi dipindahkan ke se
 Audit route/ACL: migrasi dan seed MySQL disposable, 10 unit, 6 integration dan 12 E2E lulus; E2E mencakup ACL CREATE dan APPROVAL pada program yang sama, izin DELETE/READ ditolak, serta role WRITE lama.
 
 Penghapusan WRITE: migration 0001 diuji pada MySQL disposable dengan role WRITE dan READ yang sudah ada; hasil masing-masing CREATE/READ/UPDATE/DELETE tepat satu dan tanpa APPROVAL. Migration dan seed dua kali pada data sintetis menghasilkan nol duplikasi role; 6 integration dan 12 E2E lulus.
+
+Frontend route/page composition: lint/typecheck/build dan 12 E2E lulus pada MySQL disposable credit_pages_test. Memverifikasi child route per fitur, listing/add/edit/view Admin User dan Perusahaan, validasi form, ACL, ekspor dan detail teks setelah memakai komponen bersama.
