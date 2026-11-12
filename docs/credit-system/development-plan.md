@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P04 selesai; P05–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P04 selesai; P05 sedang dikerjakan; P06–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -49,6 +49,8 @@ P03 dan P04 independen setelah P02. P12 tidak membutuhkan P09–P11; regresi lin
 Footer task dapat ditelusuri dengan `git log --all --grep='Task: Pxx-Tyy'`. Refactor setelah phase tercatat dalam histori git; tidak disalin sebagai log task baru di sini. Standar teknis dan kontrak terkini mengungguli struktur awal pada commit historis.
 
 ## P05 — Registrasi dan Master Karyawan
+
+Status: doing. P05-T01: schema/migration disiapkan; verifikasi pada P05-T04.
 
 Hasil: nasabah mendaftar melalui slug, login setelah registrasi dan melengkapi identitas/penghasilan/dokumen; HRD mengelola karyawan perusahaannya.
 
