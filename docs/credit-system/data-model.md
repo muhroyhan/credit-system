@@ -262,3 +262,7 @@ erDiagram
         string value
     }
 ```
+
+## Rancangan database baru P01
+
+Migration P01 adalah rancangan untuk database baru, bukan salinan DDL yang telah diverifikasi. Semua ID termasuk `program`, `role` dan `entity_type` menggunakan integer unsigned auto-increment; seed sintetis dapat menentukan ID eksplisit. String memakai varchar(255), kolom bisnis nullable, tanggal audit datetime dengan default waktu database. Tidak ada FK, unique atau index tambahan yang dianggap telah ada; tipe, panjang, nullable, default dan constraint harus dibandingkan dengan DDL/data lama sebelum migrasi kompatibilitas. `debitor.user_id` dipetakan ke integer unsigned dan tabel debitor hanya memuat field akun minimum; field profil diselesaikan P05. Tidak ada perubahan formula bisnis.
