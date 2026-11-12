@@ -1,0 +1,16 @@
+{
+  "name": "@credit/database",
+  "dependencies": {
+    "drizzle-orm": "^0.44.0",
+    "mysql2": "^3.14.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.0",
+    "@types/bun": "^1.2.0"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

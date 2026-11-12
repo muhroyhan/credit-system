@@ -1,0 +1,16 @@
+{
+  "name": "@credit/server",
+  "dependencies": {
+    "hono": "^4.10.0",
+    "zod": "^4.1.0",
+    "@credit/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.0"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

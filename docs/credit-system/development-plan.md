@@ -216,6 +216,6 @@ Format catatan pelaksanaan yang dapat ditambahkan per task:
 
 | Kode task | Status | Branch / hash commit | Keluaran / keputusan | Hasil verifikasi akhir phase |
 | --- | --- | --- | --- | --- |
-| P00-T01 | todo | — | — | menunggu P00-T05 |
+| P00-T01 | done | lihat commit Task: P00-T01 | Workspace dan dependensi dasar; belum diuji | menunggu P00-T05 |
 
 Keseluruhan rencana selesai setelah semua phase lulus task verifikasi terakhirnya, termasuk regresi lintas fitur pada phase yang dikerjakan paling akhir.
