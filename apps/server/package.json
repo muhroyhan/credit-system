@@ -1,9 +1,11 @@
 {
   "name": "@credit/server",
   "dependencies": {
+    "@credit/contracts": "workspace:*",
+    "@credit/database": "workspace:*",
+    "drizzle-orm": "^0.44.7",
     "hono": "^4.10.0",
-    "zod": "^4.1.0",
-    "@credit/contracts": "workspace:*"
+    "zod": "^4.1.0"
   },
   "devDependencies": {
     "@types/bun": "^1.2.0"

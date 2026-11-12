@@ -66,3 +66,5 @@ Daftar ini mencatat risiko dari analisis statis; dampak runtime, tingkat keparah
 - Kolom database dan daftar field respons tidak selalu sama; jangan mengekspos password atau mengasumsikan semua field model tersedia pada semua respons.
 - Penghapusan data debitor perlu mempertimbangkan child yang tidak ikut dihapus dan kemungkinan orphan atau penolakan constraint. Pertahankan aturan tidak menghapus debitor yang memiliki kredit.
 - Pastikan mapping nama kolom fisik, nama property dan alias relasi tidak menghasilkan kolom ganda atau perubahan bentuk payload.
+
+P01: SUPPORT-11 belum diselesaikan; daftar slug publik mempertahankan seluruh perusahaan tanpa filter status. Pengungkapan slug tenant inactive/blocked merupakan dampak yang memerlukan keputusan produk sebelum filter diubah. Referensi nonpublik menolak semua request sementara autentikasi P02 belum diimplementasikan.

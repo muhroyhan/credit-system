@@ -32,6 +32,12 @@ importers:
       '@credit/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@credit/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      drizzle-orm:
+        specifier: ^0.44.7
+        version: 0.44.7(bun-types@1.4.4)(mysql2@3.24.6(@types/node@26.6.6))
       hono:
         specifier: ^4.10.0
         version: 4.13.18
