@@ -25,6 +25,7 @@
     "drizzle-kit": "^0.31.0",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.0",
+    "@credit/database": "workspace:*"
   }
 }

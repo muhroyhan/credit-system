@@ -1,7 +1,8 @@
+import { closeDatabase, connectDatabase } from "@credit/database/client";
 import { app } from "@credit/server/app";
 import { referenceRepository } from "@credit/server/reference-repository";
 import { createReferenceRoutes } from "@credit/server/reference-routes";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (databaseUrl) {
@@ -14,6 +15,10 @@ if (databaseUrl) {
       "Reference integration tests require an isolated local test database",
     );
 }
+afterAll(async () => {
+  if (databaseUrl) await closeDatabase();
+});
+
 describe.skipIf(!databaseUrl)("reference data on isolated mysql", () => {
   it("blocks all private routes even with untrusted authorization header", async () => {
     for (const path of ["programs", "entity-types", "countries", "constants"]) {
@@ -22,6 +27,13 @@ describe.skipIf(!databaseUrl)("reference data on isolated mysql", () => {
       });
       expect(response.status).toBe(401);
     }
+  });
+  it("reuses the pool across repository calls", async () => {
+    const first = connectDatabase();
+    await referenceRepository.listPrograms();
+    await referenceRepository.listCountries();
+    expect(connectDatabase().pool).toBe(first.pool);
+    expect(await referenceRepository.listPrograms()).toBeDefined();
   });
   it("returns seeded data through routes and filters constants", async () => {
     const authed = createReferenceRoutes(referenceRepository, () => true);

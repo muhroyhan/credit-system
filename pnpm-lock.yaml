@@ -14,6 +14,9 @@ importers:
       '@credit/contracts':
         specifier: workspace:*
         version: link:packages/contracts
+      '@credit/database':
+        specifier: workspace:*
+        version: link:packages/database
       '@credit/server':
         specifier: workspace:*
         version: link:apps/server
