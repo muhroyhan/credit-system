@@ -6,7 +6,10 @@ import {
   Link,
   Outlet,
 } from "@tanstack/react-router";
-import { AdminPage } from "@web/features/auth/presentation/Dashboard";
+import {
+  AdminPage,
+  Dashboard,
+} from "@web/features/auth/presentation/Dashboard";
 import { Login } from "@web/features/auth/presentation/Login";
 
 const rootRoute = createRootRoute({
@@ -21,6 +24,11 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  component: Dashboard,
+});
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
   component: Login,
 });
 const adminRoute = createRoute({
@@ -29,7 +37,7 @@ const adminRoute = createRoute({
   component: AdminPage,
 });
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([indexRoute, adminRoute]),
+  routeTree: rootRoute.addChildren([indexRoute, loginRoute, adminRoute]),
 });
 declare module "@tanstack/react-router" {
   interface Register {

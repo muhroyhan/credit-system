@@ -9,9 +9,9 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { Navigate } from "@tanstack/react-router";
 import { useCompanies } from "@web/features/auth/application/useCompanies";
 import { useSession } from "@web/features/auth/application/useSession";
-import { Dashboard } from "@web/features/auth/presentation/Dashboard";
 import { useState } from "react";
 export function Login() {
   const { session, loading, error, login } = useSession();
@@ -20,7 +20,7 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [slug, setSlug] = useState<string | null>(null);
   const { companies, companyError } = useCompanies(type);
-  if (session) return <Dashboard />;
+  if (session) return <Navigate to="/" replace />;
   return (
     <Container size="xs">
       <Stack>

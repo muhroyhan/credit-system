@@ -4,7 +4,7 @@ import { AdminUsers } from "@web/features/admin-users/presentation/AdminUsers";
 import { useSession } from "@web/features/auth/application/useSession";
 export function Dashboard() {
   const { session, logout } = useSession();
-  if (!session) return <Navigate to="/" />;
+  if (!session) return <Navigate to="/login" replace />;
   return (
     <Container>
       <Stack>
@@ -19,7 +19,7 @@ export function Dashboard() {
 }
 export function AdminPage({ embedded = false }: { embedded?: boolean }) {
   const { session } = useSession();
-  if (!session) return <Navigate to="/" />;
+  if (!session) return <Navigate to="/login" replace />;
   const roles = Array.isArray(session.userData.roles)
     ? (session.userData.roles as { program?: string; value?: string }[])
     : [];
