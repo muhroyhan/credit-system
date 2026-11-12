@@ -65,3 +65,9 @@ P01 menyediakan array DTO: program `{id, name, abbreviation}`, jenis entitas `{i
 ## Implementasi autentikasi P02
 
 Login menerima `{type, username, password, slug?}`; slug wajib untuk perusahaan dan debitor. Response `{authToken, type, userData}` tidak menyertakan hash password. Input tidak valid menghasilkan 400 dan kredensial salah menghasilkan 401. Referensi privat memverifikasi token dan memuat status akun serta role terkini pada setiap request. `JWT_SECRET` harus disediakan melalui environment. Session UI berada dalam memori dan berakhir saat reload atau keluar.
+
+## Implementasi Admin User P03
+
+`GET /api/admin-users` menerima filter `email`, `username`, `active`, serta `page` dan `limit`. Sorting opsional: `sortBy` (`createdAt`, `username`, `email`, `isActive`; default `createdAt`) dan `sortDirection` (`asc`/`desc`; default `desc`), dengan id menurun sebagai tie-breaker; respons `{count, data}` tidak menyertakan password. `GET /api/admin-user?id=...` menyertakan `roles` berisi `{programId, value}`. Create menerima `{username, email, password, isActive, roles}`; update menambahkan `id` dan password opsional; delete menerima `{id}`. Penulisan dan penggantian role dilakukan dalam transaksi. Endpoint membaca memerlukan USA_READ, endpoint menulis memerlukan USA_WRITE; WRITE juga memberikan READ. Input salah menghasilkan 400, identitas tidak valid 401, izin tidak cukup 403, data tidak ditemukan 404, dan konflik akun/program 409. Pemeriksaan konflik belum menjamin keunikan saat request paralel tanpa constraint database terverifikasi.
+
+`GET /api/admin-users/export` menerima `format=pdf|xlsx` dan filter serta sorting yang sama dengan listing; seluruh hasil yang cocok diekspor tanpa pagination. Membutuhkan USA_READ atau USA_WRITE.

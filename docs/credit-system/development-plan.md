@@ -31,7 +31,7 @@ Acuan ruang lingkup dan acceptance:
 5. Catat untuk setiap task: status (`todo`, `doing`, `blocked`, `done`), hash commit, keluaran dan keputusan terkait. Commit implementasi sebelum task akhir phase diberi catatan belum diuji; phase baru selesai setelah task verifikasi terakhir lulus. Setelah commit, catat hash dalam laporan pelaksanaan atau task berikutnya agar tidak memerlukan hash commit itu sendiri di dalam commit.
 6. Jalankan test hanya pada task terakhir setiap phase, setelah seluruh task implementasi phase selesai. Task implementasi boleh menyiapkan test permanen, tetapi tidak menjalankannya. Pada task terakhir, jalankan lint, typecheck, build dan suite relevan yang sudah didefinisikan; perbaikan dan pengulangan test tetap bagian task terakhir. Jangan menjalankan suite otomatis pada tiap task melalui hook atau pipeline branch; sediakan pemicu verifikasi akhir phase. Laporkan hasil aktual, bukan target.
 7. File test permanen Vitest/Playwright dan fixture tetap disimpan. Jika membuat file script sementara untuk membantu test, hapus file tersebut sebelum commit task verifikasi; catat hasilnya. Jangan menghapus `seed.ts`, `migrate.ts`, atau test permanen karena aturan cleanup ini.
-8. Setiap phase fitur mencakup backend dan frontend dalam layer `presentation`, `application`, `data`, kontrak Zod bersama, akses API sesuai aktor, serta UI loading/sukses/gagal. Ketergantungan hanya ke phase yang sudah selesai; fitur yang belum ada tidak boleh menjadi prasyarat tersembunyi. Data sintetis boleh disediakan melalui seed sebagai pengganti layar pengelolaan yang belum ada.
+8. Setiap phase fitur mencakup backend dengan layer `controller`, `service`, `repository` dan frontend dengan tanggung jawab komponen, hook/use case di `<feature>/hooks` serta komponen dan API dalam folder fitur tanpa subfolder layer, kontrak Zod bersama, akses API sesuai aktor, serta UI loading/sukses/gagal. Ketergantungan hanya ke phase yang sudah selesai; fitur yang belum ada tidak boleh menjadi prasyarat tersembunyi. Data sintetis boleh disediakan melalui seed sebagai pengganti layar pengelolaan yang belum ada.
 9. Catat keputusan dan dampak kompatibilitas di `logic-holes.md` pada task yang menyentuhnya. Perbaikan teknis tidak otomatis mengizinkan perubahan rumus, persetujuan, status atau syarat bisnis. Keputusan bisnis yang belum tersedia memblokir task terkait, sementara task independen dapat dilanjutkan.
 
 ## Database dan lingkungan pengembangan
@@ -216,6 +216,9 @@ Format catatan pelaksanaan yang dapat ditambahkan per task:
 
 | Kode task | Status | Branch / hash commit | Keluaran / keputusan | Hasil verifikasi akhir phase |
 | --- | --- | --- | --- | --- |
+| P03-T03 | done | lihat commit Task: P03-T03 | lint, typecheck, build, Vitest dan E2E MySQL terisolasi lulus | lulus |
+| P03-T02 | done | e400994 | route dan form admin | lulus P03-T03 |
+| P03-T01 | done | cf18ce5 | service dan transaksi admin | lulus P03-T03 |
 | P02-T04 | done | lihat commit Task: P02-T04 | lint, typecheck, build, unit, integration MySQL dan E2E lulus | lulus |
 | P02-T03 | done | ad2cb5f | form login dan shell awal | lulus P02-T04 |
 | P02-T02 | done | 983acc2 | identitas dan helper izin | lulus P02-T04 |

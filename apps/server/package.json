@@ -4,7 +4,9 @@
     "@credit/contracts": "workspace:*",
     "@credit/database": "workspace:*",
     "drizzle-orm": "^0.44.7",
+    "exceljs": "^4.4.0",
     "hono": "^4.10.0",
+    "jspdf": "^4.2.1",
     "zod": "^4.1.0"
   },
   "devDependencies": {
@@ -20,8 +22,8 @@
   },
   "exports": {
     "./app": "./src/app.ts",
-    "./reference-repository": "./src/features/reference/data/reference.ts",
-    "./reference-routes": "./src/features/reference/presentation/routes.ts",
-    "./identity": "./src/features/auth/application/identity.ts"
+    "./reference-repository": "./src/features/reference/reference.repository.ts",
+    "./reference-routes": "./src/features/reference/reference.controller.ts",
+    "./identity": "./src/features/auth/auth.service.ts"
   }
 }

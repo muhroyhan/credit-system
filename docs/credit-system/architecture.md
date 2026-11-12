@@ -9,13 +9,13 @@
 
 ## Tiga layer per fitur
 
-| Layer | Frontend | Backend |
+| Frontend | Backend | Tanggung jawab |
 | --- | --- | --- |
-| `presentation` | Halaman dan komponen Mantine, form dan navigasi; tidak memanggil RPC langsung. | Route Hono, validasi Zod, identity context, pemetaan response/error; tidak berisi query ORM. |
-| `application` | Hook/view model, state, use case UI, perhitungan dan aturan tampilan. | Use case, aturan bisnis, perhitungan murni, orchestration dan interface repository/provider. |
-| `data` | RPC gateway, mapping DTO/form, serialisasi dan state remote. | Drizzle repository dan adapter provider; tidak menentukan alur UI. |
+| `presentation` | `controller` | Komponen/form di frontend; handler request/response dan validasi di backend; method/path didaftarkan di `routes.ts` dan middleware berada di `src/middleware`. |
+| `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
+| `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
 
-Dependensi mengarah dari presentation ke application ke data melalui interface. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend menyimpan hook di `<feature>/hooks` dan file lainnya langsung di folder fitur: halaman yang diimpor router bernama `FeaturePage.tsx` dan akses API bernama `feature.api.ts`, dan schema Zod lokal serta deklarasi type/interface disimpan dalam satu `feature.type.ts` per fitur; kontrak bersama tetap di `packages/contracts`. Subfolder digunakan untuk komponen atau utilitas khusus fitur; komponen dan utilitas bersama berada di `src/components` dan `src/utils`. Alur backend wajib global routes â†’ controller â†’ service â†’ repository. Global routes mengimpor controller serta middleware; controller mengimpor service; hanya service mengimpor repository. Controller menerima request dan mengirim response, service menjalankan aturan bisnis, dan repository menjalankan query. Repository tidak mengimpor layer di atasnya; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
 
 ## Struktur target
 
@@ -26,9 +26,16 @@ credit-system/
   turbo.json
   biome.json
   apps/
-    server/src/features/<feature>/{presentation,application,data}/
+    server/src/features/<feature>/
+      <feature>.controller.ts
+      <feature>.service.ts
+      <feature>.repository.ts
+      <feature>.type.ts
+    server/src/middleware/  # satu fungsi middleware per file
     server/src/infrastructure/
-    web/src/features/<feature>/{presentation,application,data}/
+    web/src/features/<feature>/  # halaman, hook, dan <feature>.api.ts
+    web/src/components/  # komponen bersama
+    web/src/utils/       # utilitas bersama
     web/src/app/
   packages/
     contracts/       # Zod schemas dan DTO bersama
@@ -65,3 +72,13 @@ Konfigurasi Docker, port, kredensial lokal, dan perintah menjalankan service mas
 Build web menghasilkan aset yang disajikan server Bun/Hono. Fallback SPA berlaku untuk route frontend, bukan untuk kesalahan `/api` atau aset yang hilang. Tool development dapat membutuhkan Node yang kompatibel, meski server berjalan pada Bun; Vitest tetap dipakai untuk test yang diminta.
 
 Gunakan `.env.example` berisi placeholder untuk database, JWT, storage, WhatsApp, URL aplikasi dan PDF. Jangan menaruh kredensial dalam repository. Pemilihan versi dependency dan detail deploy ditetapkan dan diuji saat implementasi.
+
+## Halaman frontend dan CRUDA
+
+Setiap fitur CRUD memisahkan listing (`FeaturePage.tsx`), tambah (`FeatureAddPage.tsx`), edit (`FeatureEditPage.tsx`) dan detail teks (`FeatureViewPage.tsx`). Listing menyediakan filter, sorting, pagination, row actions dan ekspor PDF/XLSX. Hook berada dalam `<feature>/hooks`; komponen form khusus fitur berada dalam `<feature>/components`. Dashboard berada dalam fitur `dashboard`, terpisah dari `auth`.
+
+Gate halaman dan action mengikuti CRUDA: Create, Read, Update, Delete, Approval. Pemetaan Admin User sesuai API: USA_READ atau USA_WRITE untuk Read dan ekspor, USA_WRITE untuk Create/Update/Delete. Approval belum memiliki endpoint/permission pada fitur ini dan selalu ditolak. Pemetaan fitur lain harus mengikuti endpoint server masing-masing; WRITE tidak otomatis memberi Approval. Frontend memakai snapshot role dari login; API tetap memverifikasi izin terkini setiap request.
+
+Ekspor PDF/XLSX dibuat oleh utilitas bersama `apps/server/src/utils/export-file.ts`; service fitur menyiapkan data dan kolom. Ekspor Admin User dibuat oleh server melalui endpoint yang menerapkan filter dan sorting tanpa pagination. Endpoint memerlukan USA_READ atau USA_WRITE dan menghasilkan PDF/XLSX tanpa password atau role.
+
+Form frontend menggunakan React Hook Form dengan Zod resolver, menampilkan kesalahan per field, dan memvalidasi sebelum memanggil mutation. Schema bersama tetap digunakan sebagai dasar validasi; variasi form berada di `<feature>.type.ts`.
