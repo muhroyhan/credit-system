@@ -59,6 +59,33 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
   });
   expect(created.status()).toBe(201);
   const { id } = await created.json();
+  expect(
+    (await request.get("/api/admin-users/export?format=pdf")).status(),
+  ).toBe(401);
+  expect(
+    (
+      await request.get("/api/admin-users/export?format=csv", {
+        headers: readHeaders,
+      })
+    ).status(),
+  ).toBe(400);
+  const pdf = await request.get(
+    "/api/admin-users/export?format=pdf&username=p03_admin&limit=1",
+    { headers: readHeaders },
+  );
+  expect(pdf.status()).toBe(200);
+  expect(pdf.headers()["content-type"]).toContain("application/pdf");
+  const pdfText = (await pdf.body()).toString("latin1");
+  expect(pdfText).toContain("p03_admin");
+  expect(pdfText).not.toContain("admin_sintetis");
+  const unlimited = await request.get(
+    "/api/admin-users/export?format=pdf&username=admin_&limit=1",
+    { headers: readHeaders },
+  );
+  const unlimitedText = (await unlimited.body()).toString("latin1");
+  expect(unlimitedText).toContain("admin_sintetis");
+  expect(unlimitedText).toContain("admin_baca");
+
   const detail = await request.get(`/api/admin-user?id=${id}`, {
     headers: readHeaders,
   });

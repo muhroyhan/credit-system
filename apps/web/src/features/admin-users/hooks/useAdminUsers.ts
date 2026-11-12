@@ -4,7 +4,6 @@ import {
   exportAdmins,
   listAdmins,
 } from "@web/features/admin-users/admin-users.api";
-import { exportTable } from "@web/utils/export-table";
 import { useState } from "react";
 export function useAdminUsers(token: string) {
   const client = useQueryClient();
@@ -39,20 +38,7 @@ export function useAdminUsers(token: string) {
   });
   const exporting = useMutation({
     mutationFn: async (format: "pdf" | "xlsx") => {
-      const rows = await exportAdmins(token, new URLSearchParams(filters));
-      await exportTable(
-        {
-          title: "Admin User",
-          filename: "admin-users",
-          columns: ["Username", "Email", "Status"],
-          rows: rows.map((row) => [
-            row.username ?? "",
-            row.email ?? "",
-            row.isActive ? "Aktif" : "Tidak aktif",
-          ]),
-        },
-        format,
-      );
+      await exportAdmins(token, new URLSearchParams(filters), format);
     },
   });
   return {

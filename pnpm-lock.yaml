@@ -50,9 +50,15 @@ importers:
       drizzle-orm:
         specifier: ^0.44.7
         version: 0.44.7(bun-types@1.4.4)(mysql2@3.24.6(@types/node@26.6.6))
+      exceljs:
+        specifier: ^4.4.0
+        version: 4.4.0
       hono:
         specifier: ^4.10.0
         version: 4.13.18
+      jspdf:
+        specifier: ^4.2.1
+        version: 4.2.1
       zod:
         specifier: ^4.1.0
         version: 4.6.7
@@ -81,15 +87,9 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.170.46
         version: 1.170.46(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      exceljs:
-        specifier: ^4.4.0
-        version: 4.4.0
       hono:
         specifier: ^4.13.18
         version: 4.13.18
-      jspdf:
-        specifier: ^4.2.1
-        version: 4.2.1
       react:
         specifier: ^19.1.0
         version: 19.3.1

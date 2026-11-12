@@ -42,6 +42,12 @@ export function routes() {
     adminReadPermission,
     adminUsersController.list,
   );
+  const exportFile = app.get(
+    "/admin-users/export",
+    identityContext,
+    adminReadPermission,
+    adminUsersController.exportFile,
+  );
   const detail = app.get(
     "/admin-user",
     identityContext,
@@ -80,7 +86,8 @@ export function routes() {
       typeof detail,
       typeof create,
       typeof update,
-      typeof remove
+      typeof remove,
+      typeof exportFile
     >;
   return app as Hono<AuthEnv, ApiSchema>;
 }

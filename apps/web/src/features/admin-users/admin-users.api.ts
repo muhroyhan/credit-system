@@ -79,15 +79,18 @@ export async function deleteAdmin(token: string, id: number) {
 export async function exportAdmins(
   token: string,
   filters: URLSearchParams,
-): Promise<Admin[]> {
-  const query = new URLSearchParams(filters);
-  query.set("page", "1");
-  query.set("limit", "100");
-  const first = await listAdmins(token, query);
-  const rows = [...first.data];
-  for (let page = 2; page <= Math.ceil(first.count / 100); page++) {
-    query.set("page", String(page));
-    rows.push(...(await listAdmins(token, query)).data);
-  }
-  return rows;
+  format: "pdf" | "xlsx",
+): Promise<void> {
+  filters.set("format", format);
+  const response = await client.api["admin-users"].export.$get(
+    { query: Object.fromEntries(filters) } as never,
+    options(token),
+  );
+  if (!response.ok) throw new Error("Gagal mengekspor administrator");
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `admin-users.${format}`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

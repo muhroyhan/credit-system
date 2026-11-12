@@ -63,6 +63,28 @@ export const adminUsersRepository: AdminRepository = {
       })),
     };
   },
+  async exportRows(query) {
+    const db = connectDatabase().db;
+    const conditions = [];
+    if (query.email)
+      conditions.push(like(adminUsers.email, `%${query.email}%`));
+    if (query.username)
+      conditions.push(like(adminUsers.username, `%${query.username}%`));
+    if (query.active !== undefined)
+      conditions.push(eq(adminUsers.isActive, query.active === "true"));
+    return db
+      .select({
+        username: adminUsers.username,
+        email: adminUsers.email,
+        isActive: adminUsers.isActive,
+      })
+      .from(adminUsers)
+      .where(and(...conditions))
+      .orderBy(
+        (query.sortDirection === "asc" ? asc : desc)(adminUsers[query.sortBy]),
+        desc(adminUsers.id),
+      );
+  },
   async detail(id) {
     const db = connectDatabase().db;
     const [user] = await db

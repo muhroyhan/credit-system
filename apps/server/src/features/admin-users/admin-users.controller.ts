@@ -18,6 +18,29 @@ const list = async (c: Context<AuthEnv>) => {
   if (!query.success) return c.json({ error: "invalid query" }, 400);
   return c.json(await adminUsersService.list(query.data));
 };
+const exportFile = async (c: Context<AuthEnv>) => {
+  const query = adminListQuerySchema
+    .omit({ page: true, limit: true })
+    .safeParse(c.req.query());
+  const format = c.req.query("format");
+  if (!query.success || (format !== "pdf" && format !== "xlsx"))
+    return c.json({ error: "invalid query" }, 400);
+  const data = await adminUsersService.exportFile(
+    { ...query.data, page: 1, limit: 20 },
+    format,
+  );
+  c.header(
+    "Content-Type",
+    format === "pdf"
+      ? "application/pdf"
+      : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  );
+  c.header(
+    "Content-Disposition",
+    `attachment; filename="admin-users.${format}"`,
+  );
+  return c.body(data);
+};
 const detail = async (c: Context<AuthEnv>) => {
   const id = idQuerySchema.safeParse(c.req.query());
   if (!id.success) return c.json({ error: "invalid id" }, 400);
@@ -70,6 +93,7 @@ const remove = async (c: Context<AuthEnv>) => {
 };
 export const adminUsersController = {
   list,
+  exportFile,
   detail,
   create,
   update,
