@@ -11,11 +11,11 @@
 
 | Frontend | Backend | Tanggung jawab |
 | --- | --- | --- |
-| `presentation` | `controller` | Komponen/form di frontend; handler request/response dan validasi di backend; method/path didaftarkan di `routes.ts` dan middleware berada di `src/middleware`. |
+| `presentation` | `controller` | Komponen/form di frontend; handler request/response dan validasi di backend; method/path didaftarkan di `<feature>.routes.ts` dan middleware berada di `src/middleware`. |
 | `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
 | `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
 
-Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend menyimpan hook di `<feature>/hooks` dan file lainnya langsung di folder fitur: halaman yang diimpor router bernama `FeaturePage.tsx` dan akses API bernama `feature.api.ts`, dan schema Zod lokal serta deklarasi type/interface disimpan dalam satu `feature.type.ts` per fitur; kontrak bersama tetap di `packages/contracts`. Subfolder digunakan untuk komponen atau utilitas khusus fitur; komponen dan utilitas bersama berada di `src/components` dan `src/utils`. Alur backend wajib global routes â†’ controller â†’ service â†’ repository. Global routes mengimpor controller serta middleware; controller mengimpor service; hanya service mengimpor repository. Controller menerima request dan mengirim response, service menjalankan aturan bisnis, dan repository menjalankan query. Repository tidak mengimpor layer di atasnya; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend menyimpan hook di `<feature>/hooks` dan file lainnya langsung di folder fitur: halaman yang diimpor router bernama `FeaturePage.tsx` dan akses API bernama `feature.api.ts`, dan schema Zod lokal serta deklarasi type/interface disimpan dalam satu `feature.type.ts` per fitur; kontrak bersama tetap di `packages/contracts`. Subfolder digunakan untuk komponen atau utilitas khusus fitur; komponen dan utilitas bersama berada di `src/components` dan `src/utils`. Alur backend wajib global routes → feature routes → controller → service → repository. Global routes menggabungkan feature routes; feature routes mengimpor controller serta middleware; controller mengimpor service; hanya service mengimpor repository. Controller menerima request dan mengirim response, service menjalankan aturan bisnis, dan repository menjalankan query. Repository tidak mengimpor layer di atasnya; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
 
 ## Struktur target
 
@@ -27,6 +27,7 @@ credit-system/
   biome.json
   apps/
     server/src/features/<feature>/
+      <feature>.routes.ts
       <feature>.controller.ts
       <feature>.service.ts
       <feature>.repository.ts

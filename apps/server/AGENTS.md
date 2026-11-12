@@ -12,14 +12,14 @@
 
 - Ikuti `docs/credit-system/api-code-standards.md` untuk pola repository, service, global routes, validasi, error, dan tipe RPC. Ambil `const db = connectDatabase().db` sekali di setiap fungsi repository dan gunakan `db` untuk query.
 
-- Urutan akses dan import wajib `global routes → controller → service → repository`. Global routes hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service/controller dan controller tidak mengimpor repository/database. Type dan kontrak bersama boleh diimpor terpisah. Middleware juga mengakses database melalui service. Test repository boleh mengimpor repository sebagai subjek pengujian.
+- Urutan akses dan import wajib `global routes → feature routes → controller → service → repository`. Global routes mengimpor feature routes, feature routes mengimpor controller dan middleware; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service/controller dan controller tidak mengimpor repository/database. Type dan kontrak bersama boleh diimpor terpisah. Middleware juga mengakses database melalui service. Test repository boleh mengimpor repository sebagai subjek pengujian.
 
-- Daftarkan semua method dan path HTTP dalam satu fungsi `routes()` di `apps/server/src/routes.ts`. Controller mengekspor handler/middleware tanpa mendaftarkan route; `app.ts` hanya memasang hasilnya pada prefix `/api` dan mengekspor tipe RPC.
+- Daftarkan method dan path HTTP di `<feature>.routes.ts`; `apps/server/src/routes.ts` menggabungkan route fitur. Controller mengekspor handler/middleware tanpa mendaftarkan route; `app.ts` hanya memasang hasilnya pada prefix `/api` dan mengekspor tipe RPC.
 
-- Semua middleware backend berada di `apps/server/src/middleware/`, satu fungsi middleware per file bernama `<nama>.middleware.ts`. Global routes mengimpor middleware langsung; middleware yang membutuhkan aturan bisnis hanya mengakses service, bukan repository. Middleware bawaan dibungkus di folder yang sama.
+- Semua middleware backend berada di `apps/server/src/middleware/`, satu fungsi middleware per file bernama `<nama>.middleware.ts`. Feature routes mengimpor middleware langsung; middleware yang membutuhkan aturan bisnis hanya mengakses service, bukan repository. Middleware bawaan dibungkus di folder yang sama.
 
 - Setiap service yang menangani API non-GET menjalankan seluruh operasi database dalam satu transaksi Drizzle melalui `withTransaction`; teruskan transaction ke repository dan gunakan transaction tersebut untuk setiap query. Kegagalan harus dilempar agar rollback; jangan membuka atau menutup pool per request.
 
 - Hanya service yang melempar error bisnis. Repository mengembalikan hasil query (data/null/boolean/ID) dan tidak membuat error bisnis atau membuka transaksi. Error teknis Drizzle/driver diteruskan secara alami. Satu service boleh menggunakan banyak repository; seluruh query penulisan memakai transaksi service yang sama.
 
-- Kelompokkan route fitur dengan satu `app.route` per prefix fitur; method dan path tetap didaftarkan di `routes.ts`. Gunakan `permission("PROGRAM_CREATE|READ|UPDATE|DELETE|APPROVAL")` untuk otorisasi aksi, dengan string sebenarnya seperti `USA_CREATE`. Role READ/WRITE lama tetap didukung; Approval harus eksplisit.
+- Kelompokkan route fitur dengan satu `app.route` per prefix fitur; method dan path didaftarkan di `<feature>.routes.ts`. Gunakan `permission("PROGRAM_CREATE|READ|UPDATE|DELETE|APPROVAL")` untuk otorisasi aksi, dengan string sebenarnya seperti `USA_CREATE`. Role READ/WRITE lama tetap didukung; Approval harus eksplisit.

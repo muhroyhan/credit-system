@@ -7,7 +7,7 @@ Berlaku untuk semua fitur backend. Aturan ini melengkapi [architecture.md](archi
 | Area | Perbedaan yang ditemukan | Standar |
 | --- | --- | --- |
 | Akses database | Reference memanggil `connectDatabase().db.select`, admin/auth menyimpan `db` | Setiap fungsi repository mengambil `const db = connectDatabase().db` satu kali, lalu memakai `db` |
-| Pembuatan route | Method/path tersebar di controller | global routes mendaftarkan method/path; controller mengekspor handler, controller mengimpor service, service mengimpor repository |
+| Pembuatan route | Method/path tersebar di controller | feature routes mendaftarkan method/path; global routes menggabungkan feature routes; controller mengekspor handler, controller mengimpor service, service mengimpor repository |
 | Hasil repository | Interface reference/admin memakai `Promise<unknown>` | Gunakan DTO konkret dari contracts; null menandakan detail tidak ditemukan, bukan `unknown` |
 | Validasi ID | Admin menulis Zod ID langsung di route | Schema request/query di contracts, termasuk `idQuerySchema` |
 | Tipe RPC | `SchemaOf` didefinisikan ulang pada beberapa file | Gunakan helper bersama dari infrastructure; schema semua route ikut dalam `AppType` |
@@ -39,14 +39,14 @@ async function listSomething() {
 
 - Repository menyediakan interface bertipe di `<feature>.type.ts` untuk dipakai service. Service mengimpor repository fitur; simbol utama service mengikuti `<featureCamelCase>Service` dan menyediakan use case bagi controller.
 - DTO request/response yang dipakai lintas layer bersumber dari `@credit/contracts`. `unknown` dipakai pada batas input yang belum divalidasi, bukan hasil repository publik.
-- Urutan akses sekaligus import wajib `global routes → controller → service → repository`. Global routes (`routes.ts`) mengimpor controller dan middleware; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
+- Urutan akses sekaligus import wajib `global routes → feature routes → controller → service → repository`. Global routes (`routes.ts`) mengimpor feature routes; feature routes mengimpor controller dan middleware; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
 - Controller menerima request dan mengirim response melalui service. Service menangani aturan bisnis; hanya repository yang mengeksekusi query. Middleware autentikasi mengikuti urutan yang sama. Type dan kontrak bersama boleh diimpor terpisah; test repository boleh mengimpor repository sebagai subjek pengujian.
 - Import lintas package memakai `@credit/...`; internal server memakai `@server/...`. Type-only dependency memakai `import type`.
 
 ## Route dan validasi
 
 ```ts
-export function routes() {
+export function itemRoutes() {
   const app = new Hono<AuthEnv>();
   const list = app.get("/items", identityContext, featureController.list);
   // Gabungkan schema hasil pendaftaran untuk tipe RPC.
@@ -54,7 +54,7 @@ export function routes() {
 }
 ```
 
-Contoh menunjukkan pembagian tanggung jawab. Semua method dan path HTTP didaftarkan di `routes.ts`; controller hanya menyediakan handler request/response; middleware diimpor dari `src/middleware`. Pertahankan `SchemaOf` untuk menggabungkan schema hasil pendaftaran dan tipe RPC untuk seluruh endpoint.
+Contoh menunjukkan pembagian tanggung jawab. Method dan path HTTP didaftarkan di `<feature>.routes.ts`; `routes.ts` menggabungkan route fitur; controller hanya menyediakan handler request/response; middleware diimpor dari `src/middleware`. Pertahankan `SchemaOf` untuk menggabungkan schema hasil pendaftaran dan tipe RPC untuk seluruh endpoint.
 
 - Daftarkan handler dengan pemanggilan terpisah pada instance app; hindari chaining panjang. Path endpoint ditulis sekali bersama middleware dan handler. Prefix `/api` hanya dipasang di app utama.
 - Urutan handler: autentikasi, pemeriksaan izin/lingkup bila diperlukan, validasi request, service, response. Route publik tidak diberi autentikasi hanya untuk menyamakan tampilan kode.
