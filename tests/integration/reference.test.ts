@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { closeDatabase, connectDatabase } from "@credit/database/client";
 import { app } from "@credit/server/app";
 import { referenceRepository } from "@credit/server/reference-repository";
@@ -36,8 +37,32 @@ describe.skipIf(!databaseUrl)("reference data on isolated mysql", () => {
     expect(await referenceRepository.listPrograms()).toBeDefined();
   });
   it("returns seeded data through routes and filters constants", async () => {
-    const authed = createReferenceRoutes(referenceRepository, () => true);
-    const response = await authed.request("/programs");
+    const authed = createReferenceRoutes(referenceRepository);
+    const denied = await authed.request("/programs");
+    expect(denied.status).toBe(401);
+    // Sign a fixture token; production middleware still validates it and resolves
+    // the seeded account from MySQL. Login with bcrypt is covered by Bun E2E.
+    const secret = process.env.JWT_SECRET;
+    if (!secret)
+      throw new Error("JWT_SECRET is required for integration tests");
+    const header = Buffer.from(
+      JSON.stringify({ alg: "HS256", typ: "JWT" }),
+    ).toString("base64url");
+    const payload = Buffer.from(
+      JSON.stringify({
+        id: 900001,
+        slug: "admin",
+        type: "admin",
+        exp: Math.floor(Date.now() / 1000) + 60,
+      }),
+    ).toString("base64url");
+    const signature = createHmac("sha256", secret)
+      .update(`${header}.${payload}`)
+      .digest("base64url");
+    const session = { authToken: `${header}.${payload}.${signature}` };
+    const response = await app.request("/api/programs", {
+      headers: { authorization: `Bearer ${session.authToken}` },
+    });
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual(
       expect.arrayContaining([
@@ -45,18 +70,36 @@ describe.skipIf(!databaseUrl)("reference data on isolated mysql", () => {
         expect.objectContaining({ abbreviation: "CGP" }),
       ]),
     );
-    const countries = await (await authed.request("/countries")).json();
+    const countries = await (
+      await app.request("/api/countries", {
+        headers: { authorization: `Bearer ${session.authToken}` },
+      })
+    ).json();
     expect(countries).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: "ID" })]),
     );
     expect(
-      (await (await authed.request("/entity-types")).json()).length,
+      (
+        await (
+          await app.request("/api/entity-types", {
+            headers: { authorization: `Bearer ${session.authToken}` },
+          })
+        ).json()
+      ).length,
     ).toBeGreaterThan(0);
     expect(
-      await (await authed.request("/constants?name=absent")).json(),
+      await (
+        await app.request("/api/constants?name=absent", {
+          headers: { authorization: `Bearer ${session.authToken}` },
+        })
+      ).json(),
     ).toEqual([]);
     expect(
-      await (await authed.request("/constants?name=contoh")).json(),
+      await (
+        await app.request("/api/constants?name=contoh", {
+          headers: { authorization: `Bearer ${session.authToken}` },
+        })
+      ).json(),
     ).toEqual([expect.objectContaining({ name: "contoh" })]);
     const slugs = await (await app.request("/api/user/slugs")).json();
     expect(slugs).toEqual(

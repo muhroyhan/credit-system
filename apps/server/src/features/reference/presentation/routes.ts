@@ -7,41 +7,25 @@ import {
   slugSchema,
 } from "@credit/contracts";
 import {
+  type AuthEnv,
+  identityContext,
+} from "@server/features/auth/presentation/middleware";
+import {
   createReferenceService,
   type ReferenceRepository,
 } from "@server/features/reference/application/reference";
 import { Hono } from "hono";
-import type { BlankEnv } from "hono/types";
 
-export function createReferenceRoutes(
-  repository: ReferenceRepository,
-  authorize: (header?: string) => boolean | Promise<boolean> = () => false,
-) {
+export function createReferenceRoutes(repository: ReferenceRepository) {
   const service = createReferenceService(repository);
-  const app = new Hono();
+  const app = new Hono<AuthEnv>();
   const slugs = app.get("/user/slugs", async (c) =>
     c.json(slugSchema.array().parse(await service.slugs())),
   );
-  app.use("/programs", async (c, next) => {
-    if (!(await authorize(c.req.header("Authorization"))))
-      return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  app.use("/entity-types", async (c, next) => {
-    if (!(await authorize(c.req.header("Authorization"))))
-      return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  app.use("/countries", async (c, next) => {
-    if (!(await authorize(c.req.header("Authorization"))))
-      return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
-  app.use("/constants", async (c, next) => {
-    if (!(await authorize(c.req.header("Authorization"))))
-      return c.json({ error: "unauthorized" }, 401);
-    await next();
-  });
+  app.use("/programs", identityContext);
+  app.use("/entity-types", identityContext);
+  app.use("/countries", identityContext);
+  app.use("/constants", identityContext);
   const programs = app.get("/programs", async (c) =>
     c.json(programSchema.array().parse(await service.programs())),
   );
@@ -65,5 +49,5 @@ export function createReferenceRoutes(
     SchemaOf<typeof entityTypes> &
     SchemaOf<typeof countries> &
     SchemaOf<typeof constants>;
-  return app as Hono<BlankEnv, Routes>;
+  return app as Hono<AuthEnv, Routes>;
 }
