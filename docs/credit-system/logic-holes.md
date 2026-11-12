@@ -1,6 +1,6 @@
 # Risiko dan keputusan kompatibilitas
 
-Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisis sumber bisnis awal, bukan bukti bahwa implementasi sekarang masih memiliki semua celah tersebut. Fitur P05–P12 belum tersedia; evaluasi ID terkait sebelum mengimplementasikannya. Status perbaikan P00–P04 dan isu teknis terkini ada setelah tabel.
+Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisis sumber bisnis awal, bukan bukti bahwa implementasi sekarang masih memiliki semua celah tersebut. Fitur P06–P12 belum tersedia; evaluasi ID terkait sebelum mengimplementasikannya. Status perbaikan P00–P04 dan isu teknis terkini ada setelah tabel.
 
 | ID | Risiko acuan yang harus diperiksa pada phase pemilik |
 | --- | --- |
@@ -52,7 +52,7 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 
 ## Isu teknis terbuka
 
-- Dua belas assertion as never di gateway RPC menutup pemeriksaan input end-to-end. Pasang validator Hono bertipe sebelum mengklaim request type safe.
+- Enam belas assertion as never (empat query baru P05 memakai pola validasi controller manual) di gateway RPC menutup pemeriksaan input end-to-end. Pasang validator Hono bertipe sebelum mengklaim request type safe.
 - Frontend masih membutuhkan ambient Bun melalui graph tipe AppType. Deklarasi RPC mandiri diperlukan untuk isolasi tipe browser penuh.
 - skipLibCheck tetap true: probe tanpa flag ini gagal pada deklarasi dependency Bun/Node, optional driver Drizzle dan tipe DOM Hono/jsPDF. Jangan menutupnya dengan ambient stub palsu.
 - JSDoc seluruh ekspor fitur dan preferensi function declaration untuk beberapa factory lokal belum lengkap. Cast komposisi schema Hono dan output jsPDF belum menjadi pembuktian tipe runtime.
@@ -62,3 +62,11 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 ## Risiko pemetaan data
 
 Pemetaan NUMBER/telepon, koordinat unsigned, precision nominal, nullable DTO, kardinalitas child serta orphan memerlukan verifikasi sebelum phase terkait. Kamus dan status DDL hanya di [data-model.md](data-model.md); nilai turunan seperti score/agregat bukan otomatis kolom persistence. Jangan mengubah rumus atau menganggap relasi konseptual sebagai FK/unique fisik.
+
+## P05 — kompatibilitas profil dan dokumen
+
+FLOW-12/SUPPORT-13: child profil ditulis di transaksi dengan lock debitor, slipGajiUrl dan tandaTanganUrl dipetakan terpisah. Kolom URL menyimpan key privat yang dihasilkan server; DTO memetakannya ke endpoint unduhan berotorisasi, bukan public-read. File lama berbentuk URL eksternal tidak di-fetch oleh adapter ini dan memerlukan migrasi storage tersendiri. File maksimum 10 MB dan request 64 MB adalah batas teknis upload. Signature/MIME/extension diperiksa; belum mencakup antivirus. Storage di luar transaksi SQL memakai kompensasi file baru; crash proses atau kegagalan cleanup dapat meninggalkan orphan disk untuk rekonsiliasi operasional.
+
+FE-02/09/10/16: form memakai RHF/Zod per field, tidak mengirim URL/base64 lama sebagai file, password regex tanpa flag global, tanggal kalender tanpa tambah tujuh jam. Profil memerlukan isian menurut kebutuhan bisnis; tidak menambah aturan NIK 16 digit/email TLD lama secara diam-diam. Field model keluarga/GPS/SLIK tetap opsional dan belum menjadi form wajib.
+
+Registrasi/HRD create mengikuti slug/scope tenant dan username unik per tenant. Lock perusahaan dan pembacaan FOR UPDATE menyerialisasi create/update akun lewat service; child profil juga memakai current read saat transaksi agar snapshot lama tidak menggandakan child; writer eksternal yang melewati service tetap membutuhkan constraint setelah audit data. Status tenant mengikuti kompatibilitas SUPPORT-03/11 yang masih terbuka. Guard delete memeriksa tabel credit bila sudah ada; test dengan kredit nyata dilakukan P06.

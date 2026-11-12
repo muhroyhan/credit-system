@@ -1,15 +1,15 @@
 # Frontend
 
-Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Hook dalam feature/hooks. Dashboard terpisah dari auth.
+Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Setiap hook dalam feature/hooks memiliki file sendiri dengan nama persis nama hook, misalnya useEmployeeDetail.ts untuk useEmployeeDetail. Tipe yang sudah diekspor package diimpor langsung dari ekspor publik package oleh file pemakai; jangan meneruskannya melalui feature.type.ts. Dashboard terpisah dari auth.
 
 Root router.tsx mendefinisikan /, /login dan prefix fitur. Child route di feature.routes.ts melalui createCrudRoutes. Empat halaman standar:
 
-| Page | Tugas |
-| --- | --- |
-| FeaturePage | Listing dengan filter/sort/pagination, aksi baris, tambah dan ekspor |
-| FeatureAddPage | Form tambah |
-| FeatureEditPage | Form edit, boleh berbagi komponen form dengan tambah |
-| FeatureViewPage | Detail berupa teks; bukan input disabled |
+| Page            | Tugas                                                                |
+| --------------- | -------------------------------------------------------------------- |
+| FeaturePage     | Listing dengan filter/sort/pagination, aksi baris, tambah dan ekspor |
+| FeatureAddPage  | Form tambah                                                          |
+| FeatureEditPage | Form edit, boleh berbagi komponen form dengan tambah                 |
+| FeatureViewPage | Detail berupa teks; bukan input disabled                             |
 
 Pakai komponen bersama src/components/crud: CrudPage (layout/ACL), ListingTable (tabel/pagination/export), RecordState (ID/loading/error), DetailFields, DeleteAction dan FormActions. Fitur menyediakan kolom, filter, mapping, field dan hook; jangan menyalin layout/kontrol yang sama.
 

@@ -9,7 +9,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { Navigate } from '@tanstack/react-router';
+import { Link, Navigate } from '@tanstack/react-router';
 
 import { useCompanies } from '@web/features/auth/hooks/useCompanies';
 import { useLoginForm } from '@web/features/auth/hooks/useLoginForm';
@@ -26,6 +26,7 @@ export function LoginPage() {
     formState: { errors },
   } = useLoginForm();
   const type = useWatch({ control, name: 'type' });
+  const slug = useWatch({ control, name: 'slug' });
   const { companies, companyError } = useCompanies(type);
   if (session) {
     return <Navigate to="/" replace />;
@@ -97,6 +98,11 @@ export function LoginPage() {
             </Button>
           </Stack>
         </form>
+        {type === 'debitor' && slug && (
+          <Link to="/registration/$slug" params={{ slug }}>
+            Daftar nasabah
+          </Link>
+        )}
       </Stack>
     </Container>
   );

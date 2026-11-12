@@ -94,9 +94,11 @@ try {
       ...['CREATE', 'READ', 'UPDATE', 'DELETE'].flatMap((value) => [
         { adminUserId: 900001, programId: 900001, value },
         { adminUserId: 900001, programId: 900004, value },
+        { adminUserId: 900001, programId: 900003, value },
       ]),
       { adminUserId: 900002, programId: 900001, value: 'READ' },
       { adminUserId: 900002, programId: 900004, value: 'READ' },
+      { adminUserId: 900002, programId: 900003, value: 'READ' },
     ];
     for (const role of seededRoles) {
       const [existing] = await tx

@@ -11,8 +11,8 @@ import { Link } from '@tanstack/react-router';
 import { FormActions } from '@web/components/crud/FormActions';
 import { PERMISSION_OPTIONS } from '@web/constant/constant';
 import type { AdminUserFormProps } from '@web/features/admin-users/admin-users.type';
-import { useAdminPrograms } from '@web/features/admin-users/hooks/useAdminDetail';
 import { useAdminForm } from '@web/features/admin-users/hooks/useAdminForm';
+import { useAdminPrograms } from '@web/features/admin-users/hooks/useAdminPrograms';
 import { useAdminSave } from '@web/features/admin-users/hooks/useAdminSave';
 import { Controller } from 'react-hook-form';
 

@@ -224,12 +224,18 @@ Kardinalitas menunjukkan kebutuhan model. Nullability, keunikan dan enforcement 
 
 `credit_score`, `sum_pengajuan`, `total_angsuran` dan `company_entity` merupakan hasil turunan, bukan kolom yang perlu ditambahkan hanya karena tersedia pada DTO.
 
-## Skema yang sudah diimplementasikan
+## Skema awal P01
 
-`packages/database/src/schema.ts` dan migration 0000 mendefinisikan sepuluh tabel: admin_user, role, program, entity_type, constant, country, user, user_bunga_kredit, user_biaya dan debitor minimum. Entitas profil/kredit pada kamus di atas menunggu phase pemilik; jangan menganggapnya tabel aktif.
+Migration 0000 mendefinisikan sepuluh tabel awal: admin_user, role, program, entity_type, constant, country, user, user_bunga_kredit, user_biaya dan debitor minimum. Perluasan profil pada P05 dijelaskan di bawah; entitas kredit masih menunggu P06.
 
-Schema database baru memakai ID integer unsigned auto-increment termasuk program/role/entity_type, varchar(255), kolom bisnis nullable, audit datetime default database. debitor.user_id adalah integer unsigned; field akun minimum saja tersedia. Tidak ada FK/unique/index tambahan. Ini rancangan baru yang telah diuji di database disposable, bukan bukti kompatibilitas DDL/data lama.
+Schema database baru memakai ID integer unsigned auto-increment termasuk program/role/entity_type, varchar(255), kolom bisnis nullable, audit datetime default database. debitor.user_id adalah integer unsigned; field akun minimum tersedia pada migration awal. Tidak ada FK/unique/index tambahan. Ini rancangan baru yang telah diuji di database disposable, bukan bukti kompatibilitas DDL/data lama.
 
 Migration 0001 hanya mengubah data ACL: setiap WRITE menjadi CREATE/READ/UPDATE/DELETE tanpa APPROVAL, mempertahankan aksi yang sudah ada tanpa menambah duplikasi, lalu menghapus WRITE. Jalankan migration sebelum versi aplikasi yang menolak WRITE digunakan pada database lama. Cara menjalankan migration/seed hanya pada local-development.md.
 
 Sebelum menambah constraint atau mengubah tipe, verifikasi DDL tujuan, duplikasi/orphan, precision/scale, nullable dan mapping DTO. Simpan keputusan/dampak pada logic-holes.md; jangan menganggap data turunan seperti score/agregat sebagai kolom tanpa keputusan.
+
+## Pemetaan P05
+
+Migration 0002 melengkapi debitor dan menambah enam tabel child profil sesuai kamus. Telepon no_hp/no_telp memakai varchar(255), flag NUMBER menjadi boolean, user_id integer unsigned. Tanggal pribadi memakai DATE string YYYY-MM-DD tanpa offset zona waktu. Nominal BIGINT dipetakan DECIMAL(20,0) unsigned agar presisi tidak hilang di JavaScript; takehome_pay tetap integer unsigned. Koordinat memakai DOUBLE bertanda agar lintang/bujur negatif valid.
+
+Relasi child 0..1 dikelola melalui transaksi dan lock baris debitor; belum menambahkan FK/unique fisik tanpa verifikasi data tujuan. Kolom baru nullable agar akun seed/migration lama tetap valid. Tabel credit belum tersedia; guard kredit diaktifkan P06 sebelum fitur kredit dipakai.

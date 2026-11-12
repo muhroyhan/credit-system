@@ -3,17 +3,19 @@ import type { ReactNode } from 'react';
 
 export function FormActions({
   pending,
+  label = 'Simpan',
   disabled,
   cancel,
 }: {
   pending: boolean;
+  label?: string;
   disabled?: boolean;
   cancel: ReactNode;
 }) {
   return (
     <Group>
       <Button type="submit" loading={pending} disabled={disabled}>
-        Simpan
+        {label}
       </Button>
       {cancel}
     </Group>

@@ -1,6 +1,6 @@
 # Kontrak API
 
-Sumber tunggal path, payload, DTO dan otorisasi. Bagian berjalan sudah diimplementasikan P00–P04; bagian rancangan belum menjamin endpoint tersedia. Semua path berprefix /api dan persistence dipetakan ke camelCase. Perubahan kompatibilitas dicatat di logic-holes.md.
+Sumber tunggal path, payload, DTO dan otorisasi. Bagian berjalan sudah diimplementasikan P00–P05; bagian rancangan belum menjamin endpoint tersedia. Semua path berprefix /api dan persistence dipetakan ke camelCase. Perubahan kompatibilitas dicatat di logic-holes.md.
 
 ## Ketentuan umum dan ACL
 
@@ -12,7 +12,7 @@ ACL berbentuk PROGRAM_ACTION, dengan aksi CREATE, READ, UPDATE, DELETE, APPROVAL
 | --- | --- | --- |
 | USA | Admin User | Berjalan; belum ada endpoint Approval |
 | USC | Perusahaan | Berjalan; belum ada endpoint Approval |
-| CGP | Master Karyawan dan Pengajuan Kredit | Rancangan; jangan memisahkan kode tanpa keputusan |
+| CGP | Master Karyawan dan Pengajuan Kredit | Karyawan berjalan P05, kredit rancangan; jangan memisahkan kode tanpa keputusan |
 | DKN | Review BPR/Daftar Kredit Karyawan | Rancangan |
 
 List/detail/export administratif memerlukan PROGRAM_READ; create/update/delete memakai aksi masing-masing. UI bukan sumber otorisasi; scope aktor/tenant tetap diperiksa server.
@@ -51,13 +51,20 @@ Admin detail menyertakan roles. Save mengganti seluruh daftar role. Perusahaan s
 
 GET /user/bunga-kredits?slug=... memerlukan JWT; company/debitor hanya slug sendiri. Admin boleh membaca konfigurasi untuk simulasi. Respons array bunga/tenor; route ini bukan akses CRUD perusahaan.
 
-## Rancangan API P05–P12 (belum tersedia)
+### Registrasi dan Master Karyawan (P05)
+
+Prefix /debitor: POST /register publik menerima {slug, namaLengkap, username, password}; POST /create privat menerima akun dan userId opsional (wajib untuk admin); PUT /update menerima {id, namaLengkap, username, password?}. Payload strict: field internal/audit/approval ditolak. Registrasi menyimpan akun lalu client melakukan login biasa; kegagalan login tidak diklaim sebagai registrasi gagal.
+
+GET /list menerima namaLengkap, namaAlias, userId, sortBy id/employeeId/namaLengkap/createdAt, sortDirection, page/limit; GET /detail?id dan PUT /delete {id}. Admin memerlukan CGP aksi terkait. HRD mengelola perusahaan sendiri; debitor hanya membaca/mengubah akun sendiri, tanpa create/delete privat. Filter tidak dapat menimpa scope. Username unik per tenant diperiksa sambil lock perusahaan; password di-hash dan tidak pernah dikirim kembali. Delete membersihkan keenam child, menolak kredit ketika tabel credit tersedia; verifikasi kredit nyata pada P06.
+
+PUT /profile menerima {id, profile}: identitas wajib sesuai business-flow, takehomePay string integer nonnegatif maksimum 4294967295, field profil opsional string kosong. Tanggal YYYY-MM-DD dikirim tanpa offset; nomor telepon string. POST /documents memakai multipart id dan file fotoUrl/selfieUrl/kkUrl/slipGajiUrl/tandaTanganUrl serta npwpUrl opsional. Lima dokumen harus tersedia dari simpan lama atau file baru; satu file per jenis, JPEG/PNG/PDF dengan signature/MIME/extension sesuai, maksimum 10 MB/file, total request 64 MB. Client tidak dapat mengirim URL/file key.
+
+Detail menambahkan profile dan documents (URL unduhan privat atau null). GET /document?id&kind memeriksa READ dan ownership sebelum mengirim attachment no-store. File disimpan lewat adapter disk privat; kegagalan upload/SQL membersihkan file baru, SQL rollback. GET /export?format=pdf|xlsx memakai query listing yang sama tanpa pagination/batas data dan scope identik. CSV mengikuti P11.
+
+## Rancangan API P06–P12 (belum tersedia)
 
 | Method dan path | Fungsi |
 | --- | --- |
-| `POST /debitor/create` | Pendaftaran debitor; return id; username diperiksa dan password di-hash. |
-| `GET /debitor/list`, `GET /debitor/detail` | Daftar/filter dan detail debitor beserta data terkait. |
-| `PUT /debitor/update`, `PUT /debitor/delete` | Update profil, finansial/dokumen; tolak hapus jika mempunyai kredit. |
 | `GET /debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
 | `POST /credit/create` | Membuat pengajuan; return id. |
 | `GET /credit/list`, `GET /credit/detail` | Daftar/detail, filter, pagination, total angsuran dan skor untuk admin. |

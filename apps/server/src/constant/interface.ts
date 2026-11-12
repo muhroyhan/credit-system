@@ -13,3 +13,9 @@ export interface Identity {
 export interface AuthEnv {
   Variables: { identity: Identity };
 }
+
+export interface DocumentStorage {
+  put(key: string, bytes: Uint8Array): Promise<void>;
+  get(key: string): Promise<Uint8Array | null>;
+  remove(key: string): Promise<void>;
+}

@@ -3,10 +3,8 @@ import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
-import {
-  useAdminDetail,
-  useAdminPrograms,
-} from '@web/features/admin-users/hooks/useAdminDetail';
+import { useAdminDetail } from '@web/features/admin-users/hooks/useAdminDetail';
+import { useAdminPrograms } from '@web/features/admin-users/hooks/useAdminPrograms';
 import { useSession } from '@web/features/auth/hooks/useSession';
 
 export function AdminUsersViewPage() {

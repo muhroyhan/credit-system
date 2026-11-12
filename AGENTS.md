@@ -11,18 +11,18 @@ Instruksi utama proyek; instruksi direktori melengkapi file ini. Dokumen menyimp
 
 Satu deployment Bun/Hono melayani API serta aset React/Vite. Database MySQL melalui Drizzle; UI Mantine; validasi Zod; pnpm workspace, Turbo, Biome dan TypeScript strict. Tooling dan lingkungan ada di [local-development.md](docs/credit-system/local-development.md).
 
-| Lokasi | Isi |
-| --- | --- |
-| apps/server/src/features/feature | feature.routes.ts, feature.controller.ts, feature.service.ts, feature.repository.ts, feature.type.ts; feature.error.ts bila diperlukan |
-| apps/server/src/middleware | Satu fungsi middleware per file nama.middleware.ts |
-| apps/web/src/features/feature | FeaturePage.tsx, FeatureAddPage.tsx, FeatureEditPage.tsx, FeatureViewPage.tsx, feature.routes.ts, feature.api.ts, feature.type.ts; hooks/ dan components/ atau utils/ khusus fitur |
-| apps/web/src/components, src/utils | Komponen dan utilitas frontend lintas fitur |
-| apps/*/src/constant | constant.ts, type.ts, interface.ts, schema.ts untuk definisi lintas fitur sesuai jenisnya |
-| packages/contracts | Schema Zod dan DTO lintas package |
-| packages/database | Schema fisik, koneksi, migration dan seed |
-| packages/test-utils | Adapter dan fixture sintetis |
+| Lokasi                             | Isi                                                                                                                                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| apps/server/src/features/feature   | feature.routes.ts, feature.controller.ts, feature.service.ts, feature.repository.ts, feature.type.ts; feature.error.ts bila diperlukan                                             |
+| apps/server/src/middleware         | Satu fungsi middleware per file nama.middleware.ts                                                                                                                                 |
+| apps/web/src/features/feature      | FeaturePage.tsx, FeatureAddPage.tsx, FeatureEditPage.tsx, FeatureViewPage.tsx, feature.routes.ts, feature.api.ts, feature.type.ts; hooks/ dan components/ atau utils/ khusus fitur |
+| apps/web/src/components, src/utils | Komponen dan utilitas frontend lintas fitur                                                                                                                                        |
+| apps/*/src/constant                | constant.ts, type.ts, interface.ts, schema.ts untuk definisi lintas fitur sesuai jenisnya                                                                                          |
+| packages/contracts                 | Schema Zod dan DTO lintas package                                                                                                                                                  |
+| packages/database                  | Schema fisik, koneksi, migration dan seed                                                                                                                                          |
+| packages/test-utils                | Adapter dan fixture sintetis                                                                                                                                                       |
 
-Import lintas package melalui @credit/... dan ekspor publik; dalam aplikasi melalui @server/* atau @web/*. Selaraskan tsconfig, runtime dan test resolver. Simbol utama backend memakai featureCamelCaseLayer. Definisi khusus fitur tetap di feature.type.ts; schema runtime memakai .ts, deklarasi tanpa implementasi dapat memakai .d.ts. Gunakan import/export type untuk dependency tipe.
+Import lintas package melalui @credit/... dan ekspor publik; dalam aplikasi melalui @server/* atau @web/*. Selaraskan tsconfig, runtime dan test resolver. Simbol utama backend memakai featureCamelCaseLayer. Tipe dan schema khusus fitur berada di feature.type.ts; konstanta khusus fitur berada di feature.constant.ts. Schema runtime memakai .ts, deklarasi tanpa implementasi dapat memakai .d.ts. Gunakan import/export type untuk dependency tipe.
 
 ## TypeScript, Biome dan gaya
 
