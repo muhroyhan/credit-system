@@ -1,39 +1,24 @@
-# credit-system — instruksi untuk agent
+# credit-system — instruksi agent
 
-## Tujuan dan batasan
+## Cara bekerja
 
-- Bangun sistem kredit monolitik dengan alur bisnis dalam `docs/credit-system/business-flow.md` dan fitur dalam `docs/credit-system/features.md`.
-- Pertahankan persetujuan HRD dan BPR, rumus, ketentuan rekening dan dokumen. Jangan menambah alur bisnis tanpa instruksi pengguna.
-- Catat logic hole dan dampak kompatibilitas di `docs/credit-system/logic-holes.md`; jangan mengubah perilaku bisnis secara diam-diam.
-- Bedakan kebutuhan, rancangan, data yang sudah diverifikasi dan hasil test. Jangan mengklaim script, skema atau fitur telah ada sebelum terbukti.
+- Jangan mengubah aturan bisnis tanpa instruksi pengguna. Catat keputusan/risiko pada sumbernya; bedakan kebutuhan, implementasi dan hasil verifikasi. Jangan mengklaim fitur atau test sudah tersedia tanpa bukti.
+- Gunakan peta sumber di bawah. Tiap konteks memiliki satu dokumen pemilik; dokumen lain cukup menautkannya. Instruksi khusus direktori berlaku bersama instruksi ini.
+- Jadwal task/commit/test mengikuti development-plan.md. Rahasia dan data produksi tidak digunakan untuk pengembangan/test.
 
-## Stack dan arsitektur
+## Peta sumber
 
-- TypeScript strict; pnpm workspace, Turborepo, Biome dan runtime Bun.
-- Frontend React + Vite + Mantine; backend Hono RPC + Drizzle ORM + MySQL; Zod di frontend dan backend.
-- Backend memakai layer `controller`, `service`, `repository`: aturan bisnis di service dan akses data di repository. Simpan langsung di folder fitur sebagai `<feature>.<layer>.ts`, dengan simbol utama `<featureCamelCase><Layer>`. Deklarasi type/interface fitur disimpan di `<feature>.type.ts`. Frontend mempertahankan tanggung jawab komponen, hook/use case dan API, dengan hook di `<feature>/hooks` dan file lainnya langsung di folder fitur. Halaman router bernama `FeaturePage.tsx` dan file API bernama `feature.api.ts`; komponen dan utilitas bersama berada di `src/components` dan `src/utils`.
-- Alur dan import backend wajib `global routes → feature routes → controller → service → repository`: global routes menggabungkan `<feature>.routes.ts`, feature routes mengimpor controller serta middleware dari `src/middleware`, controller mengimpor service, dan repository hanya diimpor oleh service. Controller menerima request dan mengirim response; service menjalankan aturan bisnis; repository menjalankan query. Type dan kontrak bersama boleh diimpor sebagai dependency tipe. Semua middleware backend berada di `apps/server/src/middleware`, satu fungsi middleware per file.
-- Import lintas aplikasi/package menggunakan nama workspace `@credit/...` dan ekspor publik; gunakan alias tsconfig `@server/*` atau `@web/*` untuk import dalam aplikasi dan selaraskan resolusi runtime/test.
-- Satu deployment monolit: server Hono/Bun melayani API dan aset frontend. Baca `docs/credit-system/architecture.md` untuk batas layer dan struktur target.
-- Untuk lingkungan lokal, Docker hanya untuk service database MySQL; semua aplikasi dan tooling dijalankan secara native di host, termasuk server Bun/Hono dan Vite.
-- Gunakan `docs/credit-system/api-contract.md` untuk perubahan API dan `docs/credit-system/data-model.md` untuk perubahan model atau relasi. Verifikasi DDL sebelum menetapkan constraint fisik.
+| Konteks | Sumber tunggal |
+| --- | --- |
+| Alur, rumus, status, kebutuhan fitur | [business-flow.md](docs/credit-system/business-flow.md) |
+| Stack, struktur, layer, penamaan dan gaya kode | [architecture.md](docs/credit-system/architecture.md) |
+| Endpoint, payload, DTO dan otorisasi | [api-contract.md](docs/credit-system/api-contract.md) |
+| Kamus data dan batas skema fisik | [data-model.md](docs/credit-system/data-model.md) |
+| Phase, task, dependensi, aturan commit | [development-plan.md](docs/credit-system/development-plan.md) |
+| Risiko terbuka dan keputusan kompatibilitas | [logic-holes.md](docs/credit-system/logic-holes.md) |
+| Acceptance dan bukti test | [testing.md](docs/credit-system/testing.md) |
+| Setup, perintah dan lifecycle lokal | [local-development.md](docs/credit-system/local-development.md) |
 
-## Test dan perintah
+## Instruksi direktori
 
-- Gunakan Vitest untuk unit dan integration test frontend/backend serta Playwright untuk E2E fullstack. Gunakan data sintetis dan database test terisolasi.
-- Cakupan dan acceptance ada di `docs/credit-system/testing.md`; jalankan pemeriksaan yang relevan untuk perubahan dan laporkan hasil aktual.
-- Target script workspace: `pnpm dev`, `pnpm build`, `pnpm typecheck`, `pnpm lint`, `pnpm test:unit`, `pnpm test:integration`, `pnpm test:e2e`. Script baru dapat dijalankan setelah didefinisikan dan diverifikasi.
-- Migration tidak berjalan otomatis saat build. Jangan menyimpan kredensial atau memakai sistem produksi untuk test.
-
-## Instruksi khusus direktori
-
-- `apps/server/AGENTS.md`: route, service, repository dan integrasi backend.
-- `apps/web/AGENTS.md`: komponen, state dan RPC frontend.
-- `packages/database/AGENTS.md`: model Drizzle dan migration.
-- `tests/e2e/AGENTS.md`: fixture dan skenario Playwright fullstack.
-
-## Standar TypeScript
-
-- Ikuti `docs/credit-system/typescript-audit.md` untuk batas declaration/module. `pnpm typecheck` wajib mencakup workspace, tooling dan test; jangan menonaktifkan strict atau menambah ambient stub palsu untuk melewati error. Schema runtime tetap dalam `.ts`; `.d.ts` hanya untuk deklarasi tanpa implementasi.
-
-- Gunakan profil Google TypeScript yang didokumentasikan dalam `docs/credit-system/google-typescript-audit.md`: Biome menjadi sumber format, dengan pengecualian framework dan standar nama/import proyek yang dinyatakan eksplisit.
+[Server](apps/server/AGENTS.md) · [Web](apps/web/AGENTS.md) · [Database](packages/database/AGENTS.md) · [E2E](tests/e2e/AGENTS.md)

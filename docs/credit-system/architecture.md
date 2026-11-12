@@ -1,94 +1,66 @@
-# Arsitektur credit-system
+# Arsitektur dan standar kode
 
-## Target
+Sumber tunggal standar implementasi. Aturan bisnis, transport API, data, eksekusi lokal dan verifikasi masing-masing berada di dokumen yang ditautkan dari AGENTS.md; jangan menyalin aturannya ke sini.
 
-- Aplikasi monolitik: satu deployment dan proses Bun/Hono, satu database MySQL, frontend React statis disajikan oleh server yang sama. Vite development server dapat memakai proxy `/api`.
-- pnpm workspace dan Turborepo untuk organisasi package; pnpm mengelola dependency dan satu `pnpm-lock.yaml`. Bun adalah runtime aplikasi.
-- Frontend: React, Vite, Mantine dan Zod. Backend: Hono RPC, Zod dan Drizzle ORM. TypeScript strict di kedua sisi.
-- Biome untuk format dan lint. Vitest untuk unit/integration frontend dan backend; Playwright untuk E2E fullstack.
+## Stack dan struktur
 
-## Tiga layer per fitur
+Satu deployment Bun/Hono melayani API serta aset React/Vite. Database MySQL melalui Drizzle; UI Mantine; validasi Zod; pnpm workspace, Turbo, Biome dan TypeScript strict. Tooling dan lingkungan ada di [local-development.md](local-development.md).
 
-| Frontend | Backend | Tanggung jawab |
-| --- | --- | --- |
-| `presentation` | `controller` | Komponen/form di frontend; handler request/response dan validasi di backend; method/path didaftarkan di `<feature>.routes.ts` dan middleware berada di `src/middleware`. |
-| `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
-| `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
+| Lokasi | Isi |
+| --- | --- |
+| apps/server/src/features/feature | feature.routes.ts, feature.controller.ts, feature.service.ts, feature.repository.ts, feature.type.ts; feature.error.ts bila diperlukan |
+| apps/server/src/middleware | Satu fungsi middleware per file nama.middleware.ts |
+| apps/web/src/features/feature | FeaturePage.tsx, FeatureAddPage.tsx, FeatureEditPage.tsx, FeatureViewPage.tsx, feature.routes.ts, feature.api.ts, feature.type.ts; hooks/ dan components/ atau utils/ khusus fitur |
+| apps/web/src/components, src/utils | Komponen dan utilitas frontend lintas fitur |
+| apps/*/src/constant | constant.ts, type.ts, interface.ts, schema.ts untuk definisi lintas fitur sesuai jenisnya |
+| packages/contracts | Schema Zod dan DTO lintas package |
+| packages/database | Schema fisik, koneksi, migration dan seed |
+| packages/test-utils | Adapter dan fixture sintetis |
 
-Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend menyimpan hook di `<feature>/hooks` dan file lainnya langsung di folder fitur: halaman yang diimpor router bernama `FeaturePage.tsx` dan akses API bernama `feature.api.ts`, dan schema Zod lokal serta deklarasi type/interface disimpan dalam satu `feature.type.ts` per fitur; kontrak bersama tetap di `packages/contracts`. Subfolder digunakan untuk komponen atau utilitas khusus fitur; komponen dan utilitas bersama berada di `src/components` dan `src/utils`. Alur backend wajib global routes → feature routes → controller → service → repository. Global routes menggabungkan feature routes; feature routes mengimpor controller serta middleware; controller mengimpor service; hanya service mengimpor repository. Controller menerima request dan mengirim response, service menjalankan aturan bisnis, dan repository menjalankan query. Repository tidak mengimpor layer di atasnya; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Import lintas package melalui @credit/... dan ekspor publik; dalam aplikasi melalui @server/* atau @web/*. Selaraskan tsconfig, runtime dan test resolver. Simbol utama backend memakai featureCamelCaseLayer. Definisi khusus fitur tetap di feature.type.ts; schema runtime memakai .ts, deklarasi tanpa implementasi dapat memakai .d.ts. Gunakan import/export type untuk dependency tipe.
 
-## Struktur target
+## Backend
 
-```text
-credit-system/
-  AGENTS.md
-  pnpm-workspace.yaml
-  turbo.json
-  biome.json
-  apps/
-    server/src/features/<feature>/
-      <feature>.routes.ts
-      <feature>.controller.ts
-      <feature>.service.ts
-      <feature>.repository.ts
-      <feature>.type.ts
-    server/src/middleware/  # satu fungsi middleware per file
-    server/src/constant/{constant,type,interface,schema}.ts  # definisi lintas fitur
-    web/src/constant/{constant,type,interface,schema}.ts  # definisi lintas fitur
-    web/src/features/<feature>/  # halaman, hook, dan <feature>.api.ts
-    web/src/components/  # komponen bersama
-    web/src/utils/       # utilitas bersama
-    web/src/app/
-  packages/
-    contracts/       # Zod schemas dan DTO bersama
-    database/        # Drizzle schema, koneksi, migration
-    config/          # Konfigurasi TypeScript bersama
-    test-utils/      # Fixture sintetis dan adapter test
-  tests/e2e/
-  docs/credit-system/
-```
+Urutan akses sekaligus import: global routes → feature routes → controller → service → repository. Global routes menggabungkan feature.routes.ts; route fitur mengimpor controller dan middleware; controller mengimpor service; hanya service yang mengimpor repository. Type/kontrak bersama merupakan dependency tersendiri. Test boleh mengimpor unit yang sedang diuji.
 
-Feature: auth, admin users, companies, debtors, credits, credit review, confirmation, documents, dashboard dan reference data. Penamaan package dapat disesuaikan selama batas layer dan satu deployment dipertahankan. Struktur ini adalah rancangan; keberadaan folder, scripts dan dependency harus diperiksa ketika implementasi dimulai.
+- app.ts hanya memasang /api sekali dan mengekspor AppType. Definisikan method/path pada feature.routes.ts, controller hanya handler. Gunakan const app = new Hono() dan pemanggilan method terpisah, bukan chaining panjang; pasang satu prefix fitur dan tulis path endpoint sekali bersama middleware/handler.
+- Urutan request: autentikasi, izin/scope yang diperlukan, validasi Zod, service, respons. Route publik tetap publik. JSON malformed menjadi input invalid; kegagalan internal tidak disamarkan sebagai validasi.
+- Controller menerima request dan mengirim respons. Gunakan input untuk body tervalidasi, query untuk filter dan result untuk hasil service. Detail bentuk respons/status hanya di [api-contract.md](api-contract.md).
+- Service berisi aturan bisnis dan satu-satunya tempat throw error bisnis. Satu service boleh memakai banyak repository. Service non-GET membuka satu withTransaction dan meneruskan transaksi yang sama ke seluruh operasi DB; error harus keluar dari callback agar rollback. Pekerjaan non-DB dapat dilakukan sebelum transaksi.
+- Repository hanya query dan mapping data dengan interface bertipe di feature.type.ts. Terima transaksi service untuk penulisan; jangan membuka transaksi sendiri atau membuat error bisnis. Error teknis driver diteruskan. Kembalikan DTO konkret/null/boolean/ID, bukan unknown; pilih kolom publik secara eksplisit dan jangan sertakan hash password.
+- Untuk pembacaan tanpa transaksi ambil const db = connectDatabase().db sekali per fungsi. Jangan menutup pool per repository; tutup hanya saat aplikasi/runner mandiri berakhir. Audit dan updatedAt berasal server.
+- Middleware hanya dibuat ketika dipakai, diimpor route fitur dan mengakses aturan bisnis melalui service. Bungkus middleware bawaan di folder middleware yang sama. ACL berupa PROGRAM_ACTION melalui permission(...); daftar aksi dan mapping program hanya di kontrak API.
+- Pertahankan tipe Hono RPC saat route digabung. Tipe AppType boleh diimpor frontend dengan import type; jangan memasukkan kode server atau kredensial ke bundle browser.
+- Ekspor PDF/XLSX dibentuk di server memakai utils/export-file.ts. Service menyiapkan kolom/data, memakai repository listing yang sama tanpa pagination atau batas jumlah data, menerapkan filter/sort/scope. Frontend hanya mengunduh hasil.
 
-## Kontrak dan data
+## Frontend
 
-- Export `AppType` dari route Hono yang dirangkai; frontend menggunakan `hc<AppType>` dengan type-only import. Jangan membawa server entry point, konfigurasi rahasia, atau driver database ke bundle browser.
-- Definisikan schema request/response Zod di package contracts, dan terapkan validasi runtime di frontend dan backend. Kontrak tidak mengimpor aplikasi atau database.
-- Jaga konversi persistence `snake_case` ke DTO `camelCase`, input numerik/nominal, tanggal, upload dan status. Perubahan format atau pembatasan input yang memengaruhi flow harus dicatat.
-- Model data dan relasi dijelaskan di [data-model.md](data-model.md). Jangan menganggap relasi Drizzle sebagai bukti adanya constraint database. Verifikasi DDL, index, nullability, unique, FK, seed, presisi dan data sebelum menyiapkan migration untuk data yang sudah ada.
-- Tipe nominal campuran memerlukan keputusan presisi dan pembulatan; jangan mengganti formula bisnis secara diam-diam. Tetap dukung verifikasi hash bcrypt yang digunakan akun.
-- Storage, WhatsApp dan PDF berada di adapter infrastruktur. Hindari menjadikan kegagalan adapter sebagai alasan perubahan urutan business flow tanpa keputusan yang didokumentasikan.
+Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Hook dalam feature/hooks. Dashboard terpisah dari auth.
 
-## Build dan konfigurasi
+Root router.tsx mendefinisikan /, /login dan prefix fitur. Child route di feature.routes.ts melalui createCrudRoutes. Empat halaman standar:
 
-Target script root: `dev`, `build`, `typecheck`, `lint`, `format`, `test:unit`, `test:integration`, `test:e2e`, `db:generate`, `db:migrate`, `start`. Script ini baru dapat dijalankan setelah dibuat dan diverifikasi pada implementasi. Turbo tidak boleh menjalankan migration sebagai efek samping build; test yang bergantung state database dan migration tidak di-cache.
+| Page | Tugas |
+| --- | --- |
+| FeaturePage | Listing dengan filter/sort/pagination, aksi baris, tambah dan ekspor |
+| FeatureAddPage | Form tambah |
+| FeatureEditPage | Form edit, boleh berbagi komponen form dengan tambah |
+| FeatureViewPage | Detail berupa teks; bukan input disabled |
 
-## Lingkungan lokal
+Pakai komponen bersama src/components/crud: CrudPage (layout/ACL), ListingTable (tabel/pagination/export), RecordState (ID/loading/error), DetailFields, DeleteAction dan FormActions. Fitur menyediakan kolom, filter, mapping, field dan hook; jangan menyalin layout/kontrol yang sama.
 
-Docker hanya digunakan untuk menjalankan service database MySQL lokal. Jalankan server Bun/Hono, Vite saat development, serta perintah build, migration dan test secara native di host; jangan memasukkan aplikasi atau tooling ke container. Server mengakses MySQL melalui alamat dan port host yang dikonfigurasi di environment. Untuk integration dan E2E, gunakan database test terisolasi dan disposable yang terpisah dari database development.
+TanStack Router mengelola routing; TanStack Query mengelola data API. Query key mencakup sesi/parameter, mutation menginvalidasi query terkait, cache dibersihkan saat logout. React Hook Form memakai Zod resolver, menampilkan error per field, dan tidak meneruskan data invalid ke mutation. UI menampilkan loading/kosong/sukses/gagal sesuai hasil operasi.
 
-Konfigurasi Docker, port, kredensial lokal, dan perintah menjalankan service masih perlu dibuat dan diverifikasi saat implementasi; dokumen ini tidak menyatakan bahwa file Compose atau script tersebut sudah tersedia. Migration dijalankan secara eksplisit setelah database siap, bukan otomatis saat build.
+Gate CRUDA melindungi halaman dan aksi sebelum konten/query dimount, termasuk akses URL langsung. Hak UI memakai snapshot login; otorisasi API tetap wajib. Kontrak sesi/izin hanya di api-contract.md.
 
-## Aset dan environment
+## TypeScript, Biome dan gaya
 
-Build web menghasilkan aset yang disajikan server Bun/Hono. Fallback SPA berlaku untuk route frontend, bukan untuk kesalahan `/api` atau aset yang hilang. Tool development dapat membutuhkan Node yang kompatibel, meski server berjalan pada Bun; Vitest tetap dipakai untuk test yang diminta.
+Profil proyek mengadaptasi [TypeScript Declaration Files](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html) dan [Google TS/JS Style Guide](https://google.github.io/styleguide/tsguide.html), bukan sertifikasi kepatuhan Google penuh.
 
-Gunakan `.env.example` berisi placeholder untuk database, JWT, storage, WhatsApp, URL aplikasi dan PDF. Jangan menaruh kredensial dalam repository. Pemilihan versi dependency dan detail deploy ditetapkan dan diuji saat implementasi.
+- Biome menjadi sumber format: dua spasi, single quote TS/JS, semicolon eksplisit, lebar target 80; semua blok kontrol memakai braces. Object alias yang dapat dimodelkan sebagai interface menggunakan interface; union/conditional/infer Zod tetap type. Array sederhana T[], elemen kompleks Array<T> (review manual).
+- Import berada di awal modul, named export menjadi default. Pengecualian default export hanya *.config.ts dan entry Bun index.ts; default import dependency eksternal boleh sesuai API-nya. Factory/handler bernama mengutamakan function declaration; callback boleh arrow.
+- Biome menolak var, CommonJS, namespace, explicit any, wrapper type terlarang, non-null assertion dan unsafe declaration merging. Jangan menambah blanket suppression, ambient stub palsu atau menonaktifkan strict untuk melewati error.
+- tsconfig mempertahankan strict, isolatedModules, verbatimModuleSyntax, noUncheckedIndexedAccess, unused/casing/override/fallthrough checks. pnpm typecheck mencakup lima workspace, tooling dan test. lib/types ditentukan per lingkungan; konfigurasi adalah sumber nilai flag persisnya.
+- Return type boleh diinferensikan, khususnya komposisi Hono/TanStack. Dokumentasikan ekspor/utilitas publik dengan JSDoc yang menjelaskan batas penggunaan, bukan mengulang nama.
+- Package masih private dan mengekspor source .ts untuk Bun/Vite. Distribusi publik memerlukan desain artefak JS/declaration yang cocok. Alias/import serta nama file mengikuti standar proyek, bukan menyalin seluruh konvensi lingkungan internal Google.
 
-## Halaman frontend dan CRUDA
-
-Setiap fitur CRUD memisahkan listing (`FeaturePage.tsx`), tambah (`FeatureAddPage.tsx`), edit (`FeatureEditPage.tsx`) dan detail teks (`FeatureViewPage.tsx`). Listing menyediakan filter, sorting, pagination, row actions dan ekspor PDF/XLSX. Hook berada dalam `<feature>/hooks`; komponen form khusus fitur berada dalam `<feature>/components`. Dashboard berada dalam fitur `dashboard`, terpisah dari `auth`.
-
-Gate halaman dan action mengikuti CRUDA: Create, Read, Update, Delete, Approval. Pemetaan Admin User sesuai API: USA_READ untuk Read dan ekspor, USA_CREATE/UPDATE/DELETE untuk aksi masing-masing; setiap izin harus diberikan secara terpisah. Approval harus diberikan eksplisit dan belum memiliki endpoint pada fitur ini. Pemetaan fitur lain harus mengikuti endpoint server masing-masing. Frontend memakai snapshot role dari login; API tetap memverifikasi izin terkini setiap request.
-
-Ekspor PDF/XLSX dibuat oleh utilitas bersama `apps/server/src/utils/export-file.ts`; service fitur menyiapkan data dan kolom. Ekspor Admin User dibuat oleh server melalui endpoint yang menerapkan filter dan sorting tanpa pagination. Endpoint memerlukan USA_READ dan menghasilkan PDF/XLSX tanpa password atau role.
-
-Form frontend menggunakan React Hook Form dengan Zod resolver, menampilkan kesalahan per field, dan memvalidasi sebelum memanggil mutation. Schema bersama tetap digunakan sebagai dasar validasi; variasi form berada di `<feature>.type.ts`.
-
-## Komposisi frontend per fitur
-
-Root `apps/web/src/router.tsx` mendefinisikan `/`, `/login` dan prefix fitur. Masing-masing `<feature>.routes.ts` memasang child listing (`/`), tambah (`add`), edit (`$id/edit`) dan detail (`$id`) melalui `createCrudRoutes`, sambil mempertahankan tipe parameter/link TanStack Router. Pola ini mengikuti [code-based routing TanStack](https://tanstack.com/router/latest/docs/routing/code-based-routing).
-
-Empat page fitur mengomposisikan komponen bersama dalam `src/components/crud`. `CrudPage` menangani container, title dan gate CRUDA sebelum konten dimount. `ListingTable` menangani tabel, export, loading/error, kondisi kosong dan pagination; kolom/filter/aksi diberikan fitur. `RecordState` menangani ID, loading dan error detail; `DetailFields` menampilkan teks. `DeleteAction` dan `FormActions` menangani kontrol standar. Validasi dan mapping bisnis tetap di fitur dan hooks; jangan menyalin ulang komponen bersama saat menambah fitur.
-
-Definisi lintas fitur untuk masing-masing aplikasi disimpan pada `src/constant/` dalam `constant.ts`, `type.ts`, `interface.ts` dan `schema.ts` sesuai jenisnya. Schema/type khusus fitur tetap dalam `<feature>.type.ts`; kontrak lintas package tetap di `@credit/contracts`.
+Temuan audit yang belum selesai hanya dicatat pada [logic-holes.md](logic-holes.md), hasil pemeriksaan hanya pada [testing.md](testing.md).

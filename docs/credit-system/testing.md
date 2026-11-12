@@ -1,43 +1,30 @@
-# Pengujian credit-system
+# Verifikasi dan acceptance
 
-Ini adalah rencana acceptance; test, script, fixture dan infrastruktur test belum tersedia sampai implementasi dibuat. Gunakan database disposable dan data sintetis untuk seluruh test. Jangan mengirim notifikasi atau file test ke layanan produksi.
+Sumber tunggal cakupan test dan bukti hasil. Jadwal task verifikasi ada pada development-plan.md; cara menyiapkan lingkungan/perintah pada local-development.md.
 
-Jalankan Vitest, Playwright, browser dan aplikasi yang diuji secara native di host. Docker dapat menjalankan service MySQL lokal untuk test, dengan database test disposable yang terisolasi dari database development; jangan menjalankan aplikasi atau test runner dalam container. Konfigurasi dan perintahnya masih perlu dibuat dan diverifikasi.
+## Cakupan acceptance
 
-## Vitest unit
+| Area | Vitest/unit/integration | E2E fullstack |
+| --- | --- | --- |
+| Fondasi, referensi, auth | DTO nullable, bcrypt/JWT, akun nonaktif, ACL aksi tepat, dua tenant, token salah/kedaluwarsa, fallback API/aset | Login tiga aktor, logout, URL langsung, halaman tidak ditemukan |
+| CRUD admin/perusahaan | Konflik, role, ownership child, array kosong, rollback SQL child, deletion guard seeded debitor | Empat page, field error, save gagal/sukses, filter/sort/pagination, unduhan PDF/XLSX |
+| Registrasi/profil (P05) | Validasi/mapping, isolasi tenant, dokumen wajib, gagal upload, guard kredit setelah P06 | Registrasi-login-profil-dokumen dan HRD CRUD |
+| Pengajuan/approval (P06–P08) | Contoh hitung independen, batas tenor, pembagi nol, nominal, field/peran, transisi, snapshot/notifikasi idempoten dan rollback | HRD/BPR approve/reject/completed, lock form dan request lintas tenant |
+| Konfirmasi/dokumen/ekspor (P09–P11) | Precondition dua approval, nama/rekening, waktu server, nomor/rerender/konkurensi, PDF nyata, filter/scope CSV/ZIP, gagal storage | Pembatalan, rekening, PDF tersimpan, unduhan/ZIP termasuk kosong/gagal |
+| Dashboard (P12) | Agregasi status dan nominal sesuai aktor | Ringkasan serta regresi seluruh fitur tersedia |
 
-- Uji rumus angsuran dan total, score, penjumlahan status `pending`/`approved`, biaya `%`/`x`/nilai langsung, perhitungan biaya dan pembulatan dengan contoh numerik independen.
-- Uji Zod request/response, mapping nominal/tanggal/DTO, permission menu, filter tenor dan batas Rp8.000.000; sertakan tenor yang tidak tersedia dan pembagi nol.
-- Periksa perbedaan perilaku yang tercatat di [logic-holes.md](logic-holes.md). Karakterisasi tidak berarti celah keamanan wajib dipertahankan.
+Test bisnis memakai contoh numerik independen dari implementasi. Adapter storage/WhatsApp/PDF deterministik digunakan pada suite umum; renderer nyata diuji terpisah. Jangan mengirim notifikasi atau dokumen sintetis ke provider produksi.
 
-## Vitest integration backend dan frontend
+Integration menggunakan MySQL disposable dan data sintetis. Uji service untuk aturan bisnis/rollback, repository untuk query/mapping, dan API langsung untuk otorisasi; tombol tersembunyi bukan bukti keamanan. Frontend menggunakan provider aplikasi dan memeriksa loading/kosong/gagal/sukses.
 
-- Backend: Hono app dan Drizzle terhadap MySQL disposable; bcrypt dan JWT nyata; fixture dua perusahaan dan seluruh aktor. Uji auth, konfigurasi perusahaan, profil/dokumen, create/update kredit, kedua approval, snapshot biaya, rekening, perjanjian, ekspor dan deletion guard.
-- Gunakan adapter storage, WhatsApp dan PDF deterministik dalam test umum. Uji renderer PDF yang sebenarnya secara terpisah dengan data sintetis, termasuk konten dan hasil unduhan.
-- Frontend: render dengan provider yang dipakai aplikasi dan test boundary jaringan; uji form, permission, validasi, loading, sukses/gagal, filter, pagination, acknowledgment dan navigasi.
-- Uji efek kegagalan upload/notifikasi/PDF dan request berulang; catat hasil yang menjadi keputusan kompatibilitas. Test isolasi tenant dan batas akses harus menguji API langsung, bukan hanya menu.
+Playwright memakai aplikasi, database dan API nyata; jangan mock API aplikasi pada skenario fullstack. Clock/timezone dan fixture dibuat deterministik; cleanup data/resource agar dapat diulang, simpan trace kegagalan. Runner native dan isolasi DB mengikuti runbook lokal.
 
-## Playwright E2E fullstack
+## Bukti terakhir
 
-Jalankan browser terhadap server monolit dan database test yang berjalan; API aplikasi tetap nyata. Provider eksternal dapat digantikan adapter lokal deterministik. Verifikasi:
+| Verifikasi | Hasil tercatat |
+| --- | --- |
+| Audit Google TypeScript, 12 November 2026, commit 73deb33 | Lint, typecheck seluruh workspace/tooling/test dan build lulus; 10 unit, 6 integration, 12 E2E lulus pada MySQL disposable credit_style_test setelah migration/seed. |
+| Migration ACL 0001 | Role WRITE lama dengan READ yang sudah ada menghasilkan tepat satu aksi CRUD per program tanpa Approval; seed dua kali tidak menggandakan role. |
+| Probe declaration dependency | Pemeriksaan tanpa skipLibCheck gagal; rincian masalah aktif hanya di logic-holes.md. |
 
-1. Registrasi, login, profil dan dokumen, pengajuan dan status HRD awal.
-2. HRD menyetujui, BPR meninjau dan menyetujui, snapshot biaya dan notifikasi tercatat.
-3. Debitor mengisi rekening dan menyetujui; PDF terbentuk, URL tersimpan dan dokumen dapat diunduh.
-4. HRD menolak; BPR menolak; debitor membatalkan; BPR menandai `completed`.
-5. CRUD perusahaan/admin/debitor, hak program, filter/sort/pagination, CSV, PDF individual dan ZIP terfilter.
-6. Isolasi dua tenant, request langsung, kegagalan simpan, unggah, notifikasi dan PDF, serta submit ulang.
-
-Gunakan clock dan timezone terkontrol. Simpan trace ketika gagal dan pastikan fixture dibersihkan agar suite dapat diulang. Setelah script tersedia, jalankan lint, typecheck, unit/integration, build dan E2E yang relevan, lalu laporkan hasil aktual.
-
-## Hasil P04
-
-Task P04-T03: MySQL 8.4 disposable `credit_p04_test`; migration berhasil dan seed sintetis dijalankan dua kali. Lint, typecheck, build lulus; 8 unit, 6 integration, 11 E2E lulus. Cakupan baru: validasi bunga/tenor, password create, konflik perusahaan, penolakan ID child tenant lain, rollback setelah kegagalan SQL child, array kosong menghapus seluruh konfigurasi, deletion guard seeded debitor, USC READ/WRITE dan scope bunga tenant. E2E mengisi bunga/biaya, memeriksa error field, detail teks dan menyimpan array kosong. Selektor password wajib diperbaiki setelah kegagalan awal; regresi seluruh E2E kemudian lulus. Tidak ada script test sementara atau migration baru.
-
-Audit layer setelah P04: error bisnis dan orkestrasi transaksi dipindahkan ke service; integration Admin User/Perusahaan memanggil service untuk konflik, ownership dan rollback SQL child. Lint/typecheck/build, 8 unit, 6 integration dan 11 E2E lulus dengan MySQL disposable credit_layer_test. Tidak ada throw eksplisit atau pembukaan transaksi dalam repository. Error teknis driver tetap diteruskan agar transaksi rollback.
-
-Audit route/ACL: migrasi dan seed MySQL disposable, 10 unit, 6 integration dan 12 E2E lulus; E2E mencakup ACL CREATE dan APPROVAL pada program yang sama, izin DELETE/READ ditolak, serta role WRITE lama.
-
-Penghapusan WRITE: migration 0001 diuji pada MySQL disposable dengan role WRITE dan READ yang sudah ada; hasil masing-masing CREATE/READ/UPDATE/DELETE tepat satu dan tanpa APPROVAL. Migration dan seed dua kali pada data sintetis menghasilkan nol duplikasi role; 6 integration dan 12 E2E lulus.
-
-Frontend route/page composition: lint/typecheck/build dan 12 E2E lulus pada MySQL disposable credit_pages_test. Memverifikasi child route per fitur, listing/add/edit/view Admin User dan Perusahaan, validasi form, ACL, ekspor dan detail teks setelah memakai komponen bersama.
+Ini bukti pada revisi tersebut, bukan jaminan test telah dijalankan ulang setelah perubahan selanjutnya. Histori hasil phase ada pada commit task di development-plan.md, bukan diulang sebagai log panjang di sini. Pekerjaan P05–P12 belum diklaim lulus. Perapian dokumentasi setelah audit ini hanya diperiksa untuk konsistensi dan tautan; tidak menjalankan ulang suite aplikasi.
