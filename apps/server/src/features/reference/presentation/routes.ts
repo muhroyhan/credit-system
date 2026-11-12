@@ -6,11 +6,11 @@ import {
   referenceItemSchema,
   slugSchema,
 } from "@credit/contracts";
-import { Hono } from "hono";
 import {
   createReferenceService,
   type ReferenceRepository,
-} from "../application/reference";
+} from "@server/features/reference/application/reference";
+import { Hono } from "hono";
 
 export function createReferenceRoutes(
   repository: ReferenceRepository,

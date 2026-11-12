@@ -1,13 +1,13 @@
-import { eq } from "drizzle-orm";
-import { connectDatabase } from "../../../../../../packages/database/src/client";
+import { connectDatabase } from "@credit/database/client";
 import {
   constants,
   countries,
   entityTypes,
   programs,
   users,
-} from "../../../../../../packages/database/src/schema";
-import type { ReferenceRepository } from "../application/reference";
+} from "@credit/database/schema";
+import type { ReferenceRepository } from "@server/features/reference/application/reference";
+import { eq } from "drizzle-orm";
 
 export const referenceRepository: ReferenceRepository = {
   async listPrograms() {

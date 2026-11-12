@@ -1,8 +1,5 @@
+import { constantsQuerySchema, slugSchema } from "@credit/contracts";
 import { expect, it } from "vitest";
-import {
-  constantsQuerySchema,
-  slugSchema,
-} from "../../packages/contracts/src/index";
 
 it("maps public slugs and validates query", () => {
   expect(

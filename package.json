@@ -18,6 +18,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
+    "@credit/contracts": "workspace:*",
+    "@credit/server": "workspace:*",
+    "@credit/test-utils": "workspace:*",
     "@playwright/test": "^1.65.0",
     "drizzle-kit": "^0.31.0",
     "turbo": "^2.5.8",

@@ -1,7 +1,7 @@
+import { app } from "@credit/server/app";
+import { referenceRepository } from "@credit/server/reference-repository";
+import { createReferenceRoutes } from "@credit/server/reference-routes";
 import { describe, expect, it } from "vitest";
-import { app } from "../../apps/server/src/app";
-import { referenceRepository } from "../../apps/server/src/features/reference/data/reference";
-import { createReferenceRoutes } from "../../apps/server/src/features/reference/presentation/routes";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (databaseUrl) {
