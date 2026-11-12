@@ -17,5 +17,24 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noBannedTypes": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noUnsafeDeclarationMerging": "error"
+      },
+      "style": {
+        "noNamespace": "error",
+        "useImportType": "error",
+        "useExportType": "error",
+        "noNonNullAssertion": "error"
+      },
+      "preset": "recommended"
+    }
   }
 }

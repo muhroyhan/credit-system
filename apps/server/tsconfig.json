@@ -4,6 +4,7 @@
   "compilerOptions": {
     "paths": {
       "@server/*": ["./src/*"]
-    }
+    },
+    "types": ["bun"]
   }
 }

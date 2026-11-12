@@ -31,3 +31,7 @@
 - `apps/web/AGENTS.md`: komponen, state dan RPC frontend.
 - `packages/database/AGENTS.md`: model Drizzle dan migration.
 - `tests/e2e/AGENTS.md`: fixture dan skenario Playwright fullstack.
+
+## Standar TypeScript
+
+- Ikuti `docs/credit-system/typescript-audit.md` untuk batas declaration/module. `pnpm typecheck` wajib mencakup workspace, tooling dan test; jangan menonaktifkan strict atau menambah ambient stub palsu untuk melewati error. Schema runtime tetap dalam `.ts`; `.d.ts` hanya untuk deklarasi tanpa implementasi.

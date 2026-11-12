@@ -4,5 +4,8 @@
   "type": "module",
   "exports": {
     "./adapters": "./src/adapters.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   }
 }

@@ -39,7 +39,7 @@ describe.skipIf(!url)("company service transaction and ownership", () => {
           {
             ...input,
             companyName: "Must rollback",
-            biaya: [{ ...input.biaya[0], id: 900001 }],
+            biaya: [{ expenseType: "Admin", type: "%", value: 1, id: 900001 }],
           },
           "test",
           id,
