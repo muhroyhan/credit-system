@@ -1,8 +1,8 @@
+import { resolveIdentity } from "@server/features/auth/accounts.data";
 import {
   authenticate,
   type Identity,
-} from "@server/features/auth/application/identity";
-import { resolveIdentity } from "@server/features/auth/data/accounts";
+} from "@server/features/auth/identity.application";
 import { createMiddleware } from "hono/factory";
 
 export type AuthEnv = { Variables: { identity: Identity } };

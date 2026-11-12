@@ -10,12 +10,12 @@ import {
   AdminNotFound,
   type AdminRepository,
   createAdminService,
-} from "@server/features/admin-users/application/service";
-import { hasProgramPermission } from "@server/features/auth/application/identity";
+} from "@server/features/admin-users/service.application";
+import { hasProgramPermission } from "@server/features/auth/identity.application";
 import {
   type AuthEnv,
   identityContext,
-} from "@server/features/auth/presentation/middleware";
+} from "@server/features/auth/middleware.presentation";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";

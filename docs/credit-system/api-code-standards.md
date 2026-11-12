@@ -14,6 +14,10 @@ Berlaku untuk semua fitur backend. Aturan ini melengkapi [architecture.md](archi
 | Error | Login invalid credentials, admin conflict/not found, reference invalid query | Bentuk `{error: string}`; pesan tetap sesuai konteks, status HTTP konsisten |
 | Autentikasi | Middleware dan pembatasan program memiliki kebutuhan berbeda | Middleware identitas pada route privat; izin program hanya pada endpoint yang memang membutuhkannya |
 
+## Penamaan file backend
+
+Setiap fitur memakai satu folder `apps/server/src/features/<feature>/`. Simpan file langsung di folder fitur dan gunakan `<tanggung-jawab>.<layer>.ts`, dengan layer `presentation`, `application`, atau `data`. Contoh: `routes.presentation.ts`, `middleware.presentation.ts`, `service.application.ts`, `identity.application.ts`, dan `repository.data.ts`. Infrastruktur bersama tetap berada di `apps/server/src/infrastructure/`. Layer tetap merupakan batas tanggung jawab dan dependency; namanya tidak mensyaratkan folder terpisah.
+
 ## Repository dan database
 
 ```ts

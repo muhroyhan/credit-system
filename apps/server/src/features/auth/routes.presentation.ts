@@ -2,7 +2,7 @@ import { loginSchema } from "@credit/contracts";
 import {
   type AccountLookup,
   login,
-} from "@server/features/auth/application/login";
+} from "@server/features/auth/login.application";
 import { Hono } from "hono";
 export function createAuthRoutes(findAccount: AccountLookup) {
   const app = new Hono();

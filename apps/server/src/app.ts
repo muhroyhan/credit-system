@@ -1,9 +1,9 @@
-import { adminRepository } from "@server/features/admin-users/data/repository";
-import { createAdminRoutes } from "@server/features/admin-users/presentation/routes";
-import { findAccount } from "@server/features/auth/data/accounts";
-import { createAuthRoutes } from "@server/features/auth/presentation/routes";
-import { referenceRepository } from "@server/features/reference/data/reference";
-import { createReferenceRoutes } from "@server/features/reference/presentation/routes";
+import { adminRepository } from "@server/features/admin-users/repository.data";
+import { createAdminRoutes } from "@server/features/admin-users/routes.presentation";
+import { findAccount } from "@server/features/auth/accounts.data";
+import { createAuthRoutes } from "@server/features/auth/routes.presentation";
+import { referenceRepository } from "@server/features/reference/reference.data";
+import { createReferenceRoutes } from "@server/features/reference/routes.presentation";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
 import { Hono } from "hono";
 import type { BlankEnv, MergeSchemaPath } from "hono/types";

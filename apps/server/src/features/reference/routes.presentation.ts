@@ -9,11 +9,11 @@ import {
 import {
   type AuthEnv,
   identityContext,
-} from "@server/features/auth/presentation/middleware";
+} from "@server/features/auth/middleware.presentation";
 import {
   createReferenceService,
   type ReferenceRepository,
-} from "@server/features/reference/application/reference";
+} from "@server/features/reference/reference.application";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
 import { Hono } from "hono";
 

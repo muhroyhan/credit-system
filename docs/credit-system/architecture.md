@@ -15,7 +15,7 @@
 | `application` | Hook/view model, state, use case UI, perhitungan dan aturan tampilan. | Use case, aturan bisnis, perhitungan murni, orchestration dan interface repository/provider. |
 | `data` | RPC gateway, mapping DTO/form, serialisasi dan state remote. | Drizzle repository dan adapter provider; tidak menentukan alur UI. |
 
-Dependensi mengarah dari presentation ke application ke data melalui interface. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Di backend, file langsung berada dalam folder fitur dengan akhiran `.<layer>.ts`; tidak ada folder terpisah untuk layer. Frontend tetap memakai folder layer seperti pada struktur di bawah. Dependensi mengarah dari presentation ke application ke data melalui interface. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
 
 ## Struktur target
 
@@ -26,7 +26,10 @@ credit-system/
   turbo.json
   biome.json
   apps/
-    server/src/features/<feature>/{presentation,application,data}/
+    server/src/features/<feature>/
+      routes.presentation.ts
+      service.application.ts
+      repository.data.ts
     server/src/infrastructure/
     web/src/features/<feature>/{presentation,application,data}/
     web/src/app/
