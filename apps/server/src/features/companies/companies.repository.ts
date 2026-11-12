@@ -6,10 +6,6 @@ import {
   userBungaKredit,
   users,
 } from "@credit/database/schema";
-import {
-  CompanyConflict,
-  CompanyNotFound,
-} from "@server/features/companies/companies.error";
 import type {
   CompanyInput,
   CompanyQuery,
@@ -101,179 +97,168 @@ export const companiesRepository = {
       .where(eq(userBiaya.userId, id));
     return { ...row, bungaKredits, biaya };
   },
-  async save(
+  async lock(id: number, tx: DatabaseTransaction) {
+    const [row] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, id))
+      .for("update");
+    return row ?? null;
+  },
+  async conflict(
+    input: CompanyInput,
+    id: number | undefined,
+    tx: DatabaseTransaction,
+  ) {
+    const [conflict] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(
+          or(
+            eq(users.username, input.username),
+            eq(users.email, input.email),
+            eq(users.slug, input.slug),
+            and(
+              eq(users.companyName, input.companyName),
+              eq(users.entityTypeId, input.entityTypeId),
+            ),
+          ),
+          id ? ne(users.id, id) : undefined,
+        ),
+      )
+      .limit(1);
+    return !!conflict;
+  },
+  async entity(id: number, tx: DatabaseTransaction) {
+    const [entity] = await tx
+      .select({ id: entityTypes.id })
+      .from(entityTypes)
+      .where(eq(entityTypes.id, id));
+    return entity ?? null;
+  },
+  async children(id: number | undefined, tx: DatabaseTransaction) {
+    const oldInterests = id
+      ? await tx
+          .select({ id: userBungaKredit.id })
+          .from(userBungaKredit)
+          .where(eq(userBungaKredit.userId, id))
+      : [];
+    const oldExpenses = id
+      ? await tx
+          .select({ id: userBiaya.id })
+          .from(userBiaya)
+          .where(eq(userBiaya.userId, id))
+      : [];
+    return { oldInterests, oldExpenses };
+  },
+  async saveParent(
     input: CompanyInput,
     actor: string,
-    id?: number,
-    transaction?: DatabaseTransaction,
+    id: number | undefined,
+    tx: DatabaseTransaction,
   ) {
-    const db = connectDatabase().db;
-    const work = async (tx: DatabaseTransaction) => {
-      const { bungaKredits, biaya, password, ...parent } = input;
-      if (id) {
-        const [found] = await tx
-          .select({ id: users.id })
-          .from(users)
-          .where(eq(users.id, id))
-          .for("update");
-        if (!found) throw new CompanyNotFound();
-      }
-      const [conflict] = await tx
-        .select({ id: users.id })
-        .from(users)
+    const {
+      bungaKredits: _interests,
+      biaya: _expenses,
+      password,
+      ...parent
+    } = input;
+    let companyId = id;
+    if (id)
+      await tx
+        .update(users)
+        .set({
+          ...parent,
+          ...(password ? { password } : {}),
+          updatedBy: actor,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, id));
+    else {
+      const [created] = await tx
+        .insert(users)
+        .values({ ...parent, password, createdBy: actor, updatedBy: actor })
+        .$returningId();
+      companyId = created?.id;
+    }
+    return companyId;
+  },
+  async saveChildren(
+    input: CompanyInput,
+    actor: string,
+    companyId: number,
+    removeInterests: number[],
+    removeExpenses: number[],
+    tx: DatabaseTransaction,
+  ) {
+    const { bungaKredits, biaya } = input;
+    if (removeInterests.length)
+      await tx
+        .delete(userBungaKredit)
         .where(
           and(
-            or(
-              eq(users.username, input.username),
-              eq(users.email, input.email),
-              eq(users.slug, input.slug),
-              and(
-                eq(users.companyName, input.companyName),
-                eq(users.entityTypeId, input.entityTypeId),
-              ),
-            ),
-            id ? ne(users.id, id) : undefined,
+            eq(userBungaKredit.userId, companyId),
+            inArray(userBungaKredit.id, removeInterests),
           ),
-        )
-        .limit(1);
-      if (conflict)
-        throw new CompanyConflict("Identitas perusahaan sudah digunakan");
-      const [entity] = await tx
-        .select({ id: entityTypes.id })
-        .from(entityTypes)
-        .where(eq(entityTypes.id, input.entityTypeId));
-      if (!entity) throw new CompanyConflict("Badan usaha tidak tersedia");
-      const oldInterests = id
-        ? await tx
-            .select({ id: userBungaKredit.id })
-            .from(userBungaKredit)
-            .where(eq(userBungaKredit.userId, id))
-        : [];
-      const oldExpenses = id
-        ? await tx
-            .select({ id: userBiaya.id })
-            .from(userBiaya)
-            .where(eq(userBiaya.userId, id))
-        : [];
-      if (
-        bungaKredits.some(
-          (v) => v.id !== undefined && !oldInterests.some((o) => o.id === v.id),
-        ) ||
-        biaya.some(
-          (v) => v.id !== undefined && !oldExpenses.some((o) => o.id === v.id),
-        )
-      )
-        throw new CompanyConflict("Konfigurasi bukan milik perusahaan");
-      if (
-        new Set(bungaKredits.filter((v) => v.id).map((v) => v.id)).size !==
-          bungaKredits.filter((v) => v.id).length ||
-        new Set(biaya.filter((v) => v.id).map((v) => v.id)).size !==
-          biaya.filter((v) => v.id).length
-      )
-        throw new CompanyConflict("ID konfigurasi duplikat");
-      let companyId = id;
-      if (id)
+        );
+    if (removeExpenses.length)
+      await tx
+        .delete(userBiaya)
+        .where(
+          and(
+            eq(userBiaya.userId, companyId),
+            inArray(userBiaya.id, removeExpenses),
+          ),
+        );
+    for (const { id: childId, ...value } of bungaKredits) {
+      if (childId)
         await tx
-          .update(users)
-          .set({
-            ...parent,
-            ...(password ? { password } : {}),
-            updatedBy: actor,
-            updatedAt: new Date(),
-          })
-          .where(eq(users.id, id));
-      else {
-        const [created] = await tx
-          .insert(users)
-          .values({ ...parent, password, createdBy: actor, updatedBy: actor })
-          .$returningId();
-        companyId = created?.id;
-      }
-      if (!companyId) throw new Error("Gagal membuat perusahaan");
-      const removeInterests = oldInterests
-        .filter((o) => !bungaKredits.some((v) => v.id === o.id))
-        .map((o) => o.id);
-      const removeExpenses = oldExpenses
-        .filter((o) => !biaya.some((v) => v.id === o.id))
-        .map((o) => o.id);
-      if (removeInterests.length)
-        await tx
-          .delete(userBungaKredit)
+          .update(userBungaKredit)
+          .set({ ...value, updatedBy: actor, updatedAt: new Date() })
           .where(
             and(
+              eq(userBungaKredit.id, childId),
               eq(userBungaKredit.userId, companyId),
-              inArray(userBungaKredit.id, removeInterests),
             ),
           );
-      if (removeExpenses.length)
+      else
+        await tx.insert(userBungaKredit).values({
+          ...value,
+          userId: companyId,
+          createdBy: actor,
+          updatedBy: actor,
+        });
+    }
+    for (const { id: childId, ...value } of biaya) {
+      if (childId)
         await tx
-          .delete(userBiaya)
+          .update(userBiaya)
+          .set({ ...value, updatedBy: actor, updatedAt: new Date() })
           .where(
-            and(
-              eq(userBiaya.userId, companyId),
-              inArray(userBiaya.id, removeExpenses),
-            ),
+            and(eq(userBiaya.id, childId), eq(userBiaya.userId, companyId)),
           );
-      for (const { id: childId, ...value } of bungaKredits) {
-        if (childId)
-          await tx
-            .update(userBungaKredit)
-            .set({ ...value, updatedBy: actor, updatedAt: new Date() })
-            .where(
-              and(
-                eq(userBungaKredit.id, childId),
-                eq(userBungaKredit.userId, companyId),
-              ),
-            );
-        else
-          await tx.insert(userBungaKredit).values({
-            ...value,
-            userId: companyId,
-            createdBy: actor,
-            updatedBy: actor,
-          });
-      }
-      for (const { id: childId, ...value } of biaya) {
-        if (childId)
-          await tx
-            .update(userBiaya)
-            .set({ ...value, updatedBy: actor, updatedAt: new Date() })
-            .where(
-              and(eq(userBiaya.id, childId), eq(userBiaya.userId, companyId)),
-            );
-        else
-          await tx.insert(userBiaya).values({
-            ...value,
-            userId: companyId,
-            createdBy: actor,
-            updatedBy: actor,
-          });
-      }
-      return companyId;
-    };
-    return transaction ? work(transaction) : db.transaction(work);
+      else
+        await tx.insert(userBiaya).values({
+          ...value,
+          userId: companyId,
+          createdBy: actor,
+          updatedBy: actor,
+        });
+    }
   },
-  async remove(id: number, transaction?: DatabaseTransaction) {
-    const db = connectDatabase().db;
-    const work = async (tx: DatabaseTransaction) => {
-      const [row] = await tx
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.id, id))
-        .for("update");
-      if (!row) return false;
-      const [debitor] = await tx
-        .select({ id: debitors.id })
-        .from(debitors)
-        .where(eq(debitors.userId, id))
-        .limit(1);
-      if (debitor)
-        throw new CompanyConflict("Perusahaan masih memiliki debitor");
-      await tx.delete(userBiaya).where(eq(userBiaya.userId, id));
-      await tx.delete(userBungaKredit).where(eq(userBungaKredit.userId, id));
-      await tx.delete(users).where(eq(users.id, id));
-      return true;
-    };
-    return transaction ? work(transaction) : db.transaction(work);
+  async hasDebitors(id: number, tx: DatabaseTransaction) {
+    const [row] = await tx
+      .select({ id: debitors.id })
+      .from(debitors)
+      .where(eq(debitors.userId, id))
+      .limit(1);
+    return !!row;
+  },
+  async remove(id: number, tx: DatabaseTransaction) {
+    await tx.delete(userBiaya).where(eq(userBiaya.userId, id));
+    await tx.delete(userBungaKredit).where(eq(userBungaKredit.userId, id));
+    await tx.delete(users).where(eq(users.id, id));
+    return true;
   },
 };

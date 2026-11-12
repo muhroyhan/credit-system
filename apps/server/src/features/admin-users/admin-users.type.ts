@@ -9,6 +9,13 @@ import type { z } from "zod";
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type AdminQuery = z.infer<typeof adminListQuerySchema>;
 export interface AdminRepository {
+  conflict(
+    input: AdminInput,
+    id: number | undefined,
+    tx: DatabaseTransaction,
+  ): Promise<boolean>;
+  programs(ids: number[], tx: DatabaseTransaction): Promise<{ id: number }[]>;
+  lock(id: number, tx: DatabaseTransaction): Promise<{ id: number } | null>;
   list(
     query: AdminQuery,
     paginate?: boolean,
@@ -17,10 +24,10 @@ export interface AdminRepository {
   save(
     input: AdminInput,
     actor: string,
-    id?: number,
-    transaction?: DatabaseTransaction,
+    id: number | undefined,
+    transaction: DatabaseTransaction,
   ): Promise<number>;
-  remove(id: number, transaction?: DatabaseTransaction): Promise<boolean>;
+  remove(id: number, transaction: DatabaseTransaction): Promise<boolean>;
 }
 
 import type { SchemaOf } from "@server/infrastructure/rpc-types";

@@ -19,3 +19,5 @@
 - Semua middleware backend berada di `apps/server/src/middleware/`, satu fungsi middleware per file bernama `<nama>.middleware.ts`. Global routes mengimpor middleware langsung; middleware yang membutuhkan aturan bisnis hanya mengakses service, bukan repository. Middleware bawaan dibungkus di folder yang sama.
 
 - Setiap service yang menangani API non-GET menjalankan seluruh operasi database dalam satu transaksi Drizzle melalui `withTransaction`; teruskan transaction ke repository dan gunakan transaction tersebut untuk setiap query. Kegagalan harus dilempar agar rollback; jangan membuka atau menutup pool per request.
+
+- Hanya service yang melempar error bisnis. Repository mengembalikan hasil query (data/null/boolean/ID) dan tidak membuat error bisnis atau membuka transaksi. Error teknis Drizzle/driver diteruskan secara alami. Satu service boleh menggunakan banyak repository; seluruh query penulisan memakai transaksi service yang sama.

@@ -1,3 +1,7 @@
+import {
+  AdminConflict,
+  AdminNotFound,
+} from "@server/features/admin-users/admin-users.error";
 import { adminUsersRepository } from "@server/features/admin-users/admin-users.repository";
 import type {
   AdminInput,
@@ -29,10 +33,20 @@ export const adminUsersService = {
           cost: 10,
         })
       : undefined;
-    return withTransaction((tx) =>
-      adminUsersRepository.save({ ...input, password }, actor, id, tx),
-    );
+    return withTransaction(async (tx) => {
+      if (await adminUsersRepository.conflict(input, id, tx))
+        throw new AdminConflict("Username atau email sudah digunakan");
+      const ids = input.roles.map((role) => role.programId);
+      if ((await adminUsersRepository.programs(ids, tx)).length !== ids.length)
+        throw new AdminConflict("Program tidak tersedia");
+      if (id && !(await adminUsersRepository.lock(id, tx)))
+        throw new AdminNotFound();
+      return adminUsersRepository.save({ ...input, password }, actor, id, tx);
+    });
   },
   remove: (id: number) =>
-    withTransaction((tx) => adminUsersRepository.remove(id, tx)),
+    withTransaction(async (tx) => {
+      if (!(await adminUsersRepository.lock(id, tx))) return false;
+      return adminUsersRepository.remove(id, tx);
+    }),
 };

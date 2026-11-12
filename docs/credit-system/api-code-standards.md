@@ -73,4 +73,6 @@ Verifikasi mengikuti testing.md dan aturan akhir phase pada development-plan.md.
 
 ## Transaksi service non-GET
 
-Service untuk setiap endpoint non-GET menggunakan `withTransaction` dan meneruskan transaksi yang sama ke repository untuk seluruh query dalam operasi tersebut. Error harus keluar dari callback agar Drizzle melakukan rollback. Pekerjaan yang tidak memakai database boleh dikerjakan sebelum transaksi; login memakai transaksi untuk pembacaan data akun. Repository mendukung transaksi mandiri saat dipanggil langsung dalam integration test.
+Service untuk setiap endpoint non-GET menggunakan `withTransaction` dan meneruskan transaksi yang sama ke repository untuk seluruh query dalam operasi tersebut. Error harus keluar dari callback agar Drizzle melakukan rollback. Pekerjaan yang tidak memakai database boleh dikerjakan sebelum transaksi; login memakai transaksi untuk pembacaan data akun. Repository penulisan wajib menerima transaksi service; tidak membuka transaksi sendiri. Test aturan bisnis dan rollback memanggil service.
+
+- Hanya service yang melempar error bisnis. Repository mengembalikan hasil query (data/null/boolean/ID) dan tidak membuat error bisnis atau membuka transaksi. Error teknis Drizzle/driver diteruskan secara alami. Satu service boleh menggunakan banyak repository; seluruh query penulisan memakai transaksi service yang sama.

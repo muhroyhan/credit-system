@@ -1,6 +1,6 @@
 import { closeDatabase } from "@credit/database/client";
 import { CompanyConflict } from "@server/features/companies/companies.error";
-import { companiesRepository } from "@server/features/companies/companies.repository";
+import { companiesService } from "@server/features/companies/companies.service";
 import { afterAll, describe, expect, it } from "vitest";
 
 const url = process.env.DATABASE_URL;
@@ -15,7 +15,7 @@ if (url) {
 afterAll(async () => {
   if (url) await closeDatabase();
 });
-describe.skipIf(!url)("company transaction and ownership", () => {
+describe.skipIf(!url)("company service transaction and ownership", () => {
   it("reconciles children, rejects conflicts and foreign IDs without partial updates", async () => {
     const input = {
       entityTypeId: 900001,
@@ -27,15 +27,15 @@ describe.skipIf(!url)("company transaction and ownership", () => {
       bungaKredits: [{ bungaPercentage: "0.75", jangkaWaktuBulan: "12" }],
       biaya: [{ expenseType: "Admin", type: "%", value: 1 }],
     };
-    const id = await companiesRepository.save(input, "test");
+    const id = await companiesService.save(input, "test");
     try {
-      await expect(
-        companiesRepository.save(input, "test"),
-      ).rejects.toBeInstanceOf(CompanyConflict);
-      const detail = await companiesRepository.detail(id);
+      await expect(companiesService.save(input, "test")).rejects.toBeInstanceOf(
+        CompanyConflict,
+      );
+      const detail = await companiesService.detail(id);
       expect(detail?.bungaKredits).toHaveLength(1);
       await expect(
-        companiesRepository.save(
+        companiesService.save(
           {
             ...input,
             companyName: "Must rollback",
@@ -45,11 +45,11 @@ describe.skipIf(!url)("company transaction and ownership", () => {
           id,
         ),
       ).rejects.toBeInstanceOf(CompanyConflict);
-      expect((await companiesRepository.detail(id))?.companyName).toBe(
+      expect((await companiesService.detail(id))?.companyName).toBe(
         input.companyName,
       );
       await expect(
-        companiesRepository.save(
+        companiesService.save(
           {
             ...input,
             companyName: "DB rollback",
@@ -59,26 +59,24 @@ describe.skipIf(!url)("company transaction and ownership", () => {
           id,
         ),
       ).rejects.toThrow();
-      expect((await companiesRepository.detail(id))?.companyName).toBe(
+      expect((await companiesService.detail(id))?.companyName).toBe(
         input.companyName,
       );
-      expect((await companiesRepository.detail(id))?.bungaKredits).toHaveLength(
-        1,
-      );
-      await companiesRepository.save(
+      expect((await companiesService.detail(id))?.bungaKredits).toHaveLength(1);
+      await companiesService.save(
         { ...input, bungaKredits: [], biaya: [] },
         "test",
         id,
       );
-      expect(await companiesRepository.detail(id)).toMatchObject({
+      expect(await companiesService.detail(id)).toMatchObject({
         bungaKredits: [],
         biaya: [],
       });
-      await expect(companiesRepository.remove(900001)).rejects.toBeInstanceOf(
+      await expect(companiesService.remove(900001)).rejects.toBeInstanceOf(
         CompanyConflict,
       );
     } finally {
-      await companiesRepository.remove(id);
+      await companiesService.remove(id);
     }
   });
 });
