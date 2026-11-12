@@ -84,3 +84,43 @@ export async function findAccount(
     },
   };
 }
+
+export async function resolveIdentity(
+  type: "admin" | "company" | "debitor",
+  id: number,
+  slug: string,
+) {
+  const db = connectDatabase().db;
+  if (type === "admin") {
+    if (slug !== "admin") return null;
+    const [account] = await db
+      .select({ id: adminUsers.id, active: adminUsers.isActive })
+      .from(adminUsers)
+      .where(eq(adminUsers.id, id))
+      .limit(1);
+    if (!account?.active) return null;
+    const permissions = await db
+      .select({ program: programs.abbreviation, value: roles.value })
+      .from(roles)
+      .innerJoin(programs, eq(roles.programId, programs.id))
+      .where(eq(roles.adminUserId, id));
+    return { id, type, slug, permissions };
+  }
+  if (type === "company") {
+    const [company] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(eq(users.id, id), eq(users.slug, slug), eq(users.status, "active")),
+      )
+      .limit(1);
+    return company ? { id, type, slug, permissions: [] } : null;
+  }
+  const [debitor] = await db
+    .select({ id: debitors.id })
+    .from(debitors)
+    .innerJoin(users, eq(debitors.userId, users.id))
+    .where(and(eq(debitors.id, id), eq(users.slug, slug)))
+    .limit(1);
+  return debitor ? { id, type, slug, permissions: [] } : null;
+}

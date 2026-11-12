@@ -15,7 +15,7 @@ import type { BlankEnv } from "hono/types";
 
 export function createReferenceRoutes(
   repository: ReferenceRepository,
-  authorize: () => boolean = () => false,
+  authorize: (header?: string) => boolean | Promise<boolean> = () => false,
 ) {
   const service = createReferenceService(repository);
   const app = new Hono();
@@ -23,19 +23,23 @@ export function createReferenceRoutes(
     c.json(slugSchema.array().parse(await service.slugs())),
   );
   app.use("/programs", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
+    if (!(await authorize(c.req.header("Authorization"))))
+      return c.json({ error: "unauthorized" }, 401);
     await next();
   });
   app.use("/entity-types", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
+    if (!(await authorize(c.req.header("Authorization"))))
+      return c.json({ error: "unauthorized" }, 401);
     await next();
   });
   app.use("/countries", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
+    if (!(await authorize(c.req.header("Authorization"))))
+      return c.json({ error: "unauthorized" }, 401);
     await next();
   });
   app.use("/constants", async (c, next) => {
-    if (!authorize()) return c.json({ error: "unauthorized" }, 401);
+    if (!(await authorize(c.req.header("Authorization"))))
+      return c.json({ error: "unauthorized" }, 401);
     await next();
   });
   const programs = app.get("/programs", async (c) =>
