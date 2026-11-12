@@ -11,12 +11,17 @@
     "start": "bun apps/server/dist/index.js",
     "db:generate": "drizzle-kit generate --config packages/database/drizzle.config.ts",
     "db:migrate": "bun packages/database/src/migrate.ts",
-    "db:seed": "bun packages/database/src/seed.ts"
+    "db:seed": "bun packages/database/src/seed.ts",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
+    "@playwright/test": "^1.65.0",
+    "drizzle-kit": "^0.31.0",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
-    "drizzle-kit": "^0.31.0"
+    "vitest": "^5.1.0"
   }
 }
