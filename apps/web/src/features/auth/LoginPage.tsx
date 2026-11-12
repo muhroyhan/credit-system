@@ -10,8 +10,8 @@ import {
   Title,
 } from "@mantine/core";
 import { Navigate } from "@tanstack/react-router";
-import { useCompanies } from "@web/features/auth/useCompanies";
-import { useSession } from "@web/features/auth/useSession";
+import { useCompanies } from "@web/features/auth/hooks/useCompanies";
+import { useSession } from "@web/features/auth/hooks/useSession";
 import { useState } from "react";
 export function LoginPage() {
   const { session, loading, error, login } = useSession();

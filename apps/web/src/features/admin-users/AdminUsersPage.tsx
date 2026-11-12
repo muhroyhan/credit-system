@@ -1,7 +1,7 @@
 import { Stack, Text } from "@mantine/core";
 import { Link, Navigate } from "@tanstack/react-router";
 import { AdminUsers } from "@web/features/admin-users/AdminUsers";
-import { useSession } from "@web/features/auth/useSession";
+import { useSession } from "@web/features/auth/hooks/useSession";
 export function AdminUsersPage({ embedded = false }: { embedded?: boolean }) {
   const { session } = useSession();
   if (!session) return <Navigate to="/login" replace />;

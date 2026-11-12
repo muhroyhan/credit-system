@@ -13,7 +13,7 @@ import {
   Title,
 } from "@mantine/core";
 import type { AdminInput } from "@web/features/admin-users/admin-users.api";
-import { useAdminUsers } from "@web/features/admin-users/useAdminUsers";
+import { useAdminUsers } from "@web/features/admin-users/hooks/useAdminUsers";
 import { useState } from "react";
 export function AdminUsers({
   token,

@@ -7,8 +7,8 @@ import {
   Outlet,
 } from "@tanstack/react-router";
 import { AdminUsersPage } from "@web/features/admin-users/AdminUsersPage";
-import { DashboardPage } from "@web/features/auth/DashboardPage";
 import { LoginPage } from "@web/features/auth/LoginPage";
+import { DashboardPage } from "@web/features/dashboard/DashboardPage";
 
 const rootRoute = createRootRoute({
   component: Outlet,
