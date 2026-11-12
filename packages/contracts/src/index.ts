@@ -40,7 +40,7 @@ export const loginSchema = z
 
 export const adminRoleSchema = z.object({
   programId: z.number().int().positive(),
-  value: z.enum(["READ", "WRITE", "CREATE", "UPDATE", "DELETE", "APPROVAL"]),
+  value: z.enum(["READ", "CREATE", "UPDATE", "DELETE", "APPROVAL"]),
 });
 export const adminInputSchema = z.object({
   username: z.string().min(1).max(255),

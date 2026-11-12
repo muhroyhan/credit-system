@@ -37,3 +37,5 @@ Task P04-T03: MySQL 8.4 disposable `credit_p04_test`; migration berhasil dan see
 Audit layer setelah P04: error bisnis dan orkestrasi transaksi dipindahkan ke service; integration Admin User/Perusahaan memanggil service untuk konflik, ownership dan rollback SQL child. Lint/typecheck/build, 8 unit, 6 integration dan 11 E2E lulus dengan MySQL disposable credit_layer_test. Tidak ada throw eksplisit atau pembukaan transaksi dalam repository. Error teknis driver tetap diteruskan agar transaksi rollback.
 
 Audit route/ACL: migrasi dan seed MySQL disposable, 10 unit, 6 integration dan 12 E2E lulus; E2E mencakup ACL CREATE dan APPROVAL pada program yang sama, izin DELETE/READ ditolak, serta role WRITE lama.
+
+Penghapusan WRITE: migration 0001 diuji pada MySQL disposable dengan role WRITE dan READ yang sudah ada; hasil masing-masing CREATE/READ/UPDATE/DELETE tepat satu dan tanpa APPROVAL. Migration dan seed dua kali pada data sintetis menghasilkan nol duplikasi role; 6 integration dan 12 E2E lulus.

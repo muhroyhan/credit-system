@@ -18,12 +18,11 @@ export function crudaAccess(
           .filter((role) => role.program === program)
           .map((role) => role.value)
       : [];
-  const write = values.includes("WRITE");
   return {
-    create: write || values.includes("CREATE"),
-    read: write || values.includes("READ"),
-    update: write || values.includes("UPDATE"),
-    delete: write || values.includes("DELETE"),
+    create: values.includes("CREATE"),
+    read: values.includes("READ"),
+    update: values.includes("UPDATE"),
+    delete: values.includes("DELETE"),
     approve: values.includes("APPROVAL"),
   };
 }

@@ -7,7 +7,7 @@ Daftar ini adalah ruang lingkup produk. Model data tambahan tidak otomatis berar
 | Login | Mode admin bank, perusahaan, dan debitor; login perusahaan/debitor menggunakan slug; identitas dan akses sesuai aktor. |
 | Pendaftaran debitor | Registrasi melalui slug perusahaan, pembuatan akun, login setelah berhasil, dan lanjut melengkapi data. HRD dapat mendaftarkan karyawan. |
 | Dashboard | Total perusahaan aktif/tidak aktif untuk admin, jumlah debitor untuk admin/HRD, dan nominal kredit per status sesuai lingkup aktor. |
-| Admin User | Daftar, filter, tambah, lihat, ubah, hapus, status aktif, dan hak akses READ/WRITE per program. |
+| Admin User | Daftar, filter, tambah, lihat, ubah, hapus, status aktif, dan hak akses CREATE/READ/UPDATE/DELETE/APPROVAL per program. |
 | Perusahaan | Daftar, filter, CSV, tambah, lihat, ubah, hapus dengan pengaman bila masih ada debitor; status, badan usaha, slug, kredensial, bunga per tenor dan biaya. |
 | Master Karyawan | Daftar, filter, urutkan, CSV, tambah, lihat, ubah dan hapus; profil pribadi, alamat, kontak, penghasilan dan dokumen. |
 | Pengajuan Kredit | Daftar, filter, CSV, tambah/ubah/lihat, simulasi dan tabel bunga; HRD dapat menyetujui atau menolak; unduh perjanjian. |
@@ -22,11 +22,11 @@ Daftar ini adalah ruang lingkup produk. Model data tambahan tidak otomatis berar
 
 | Program | Akses administrator |
 | --- | --- |
-| Admin User | `USA_READ`, `USA_WRITE` |
-| Daftar Kredit Karyawan | `DKN_READ`, `DKN_WRITE` |
-| Master Karyawan | `CGP_READ`, `CGP_WRITE` |
-| Pengajuan Kredit | `CGP_READ`, `CGP_WRITE` |
-| Daftar Perusahaan | `USC_READ`, `USC_WRITE` |
+| Admin User | `USA_CREATE`, `USA_READ`, `USA_UPDATE`, `USA_DELETE`, `USA_APPROVAL` |
+| Daftar Kredit Karyawan | `DKN_CREATE`, `DKN_READ`, `DKN_UPDATE`, `DKN_DELETE`, `DKN_APPROVAL` |
+| Master Karyawan | `CGP_CREATE`, `CGP_READ`, `CGP_UPDATE`, `CGP_DELETE`, `CGP_APPROVAL` |
+| Pengajuan Kredit | `CGP_CREATE`, `CGP_READ`, `CGP_UPDATE`, `CGP_DELETE`, `CGP_APPROVAL` |
+| Daftar Perusahaan | `USC_CREATE`, `USC_READ`, `USC_UPDATE`, `USC_DELETE`, `USC_APPROVAL` |
 
 Perusahaan dan debitor menggunakan menu Master Karyawan dan Pengajuan Kredit. Akses tampilan dan akses API adalah batas terpisah; validasi hak akses aktual harus diuji.
 

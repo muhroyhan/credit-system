@@ -34,3 +34,10 @@ export interface AuthRepository {
   findAccount: AccountLookup;
   resolveIdentity: IdentityResolver;
 }
+
+export type PermissionAction =
+  | "CREATE"
+  | "READ"
+  | "UPDATE"
+  | "DELETE"
+  | "APPROVAL";

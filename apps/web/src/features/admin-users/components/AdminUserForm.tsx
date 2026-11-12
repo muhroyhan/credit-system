@@ -81,7 +81,6 @@ export function AdminUserForm({
                   label={p.label}
                   data={[
                     { value: "READ", label: "READ" },
-                    { value: "WRITE", label: "WRITE (legacy)" },
                     { value: "CREATE", label: "CREATE" },
                     { value: "UPDATE", label: "UPDATE" },
                     { value: "DELETE", label: "DELETE" },

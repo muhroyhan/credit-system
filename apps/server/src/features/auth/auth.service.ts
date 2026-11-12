@@ -4,6 +4,7 @@ import type {
   Identity,
   IdentityResolver,
   LoginInput,
+  PermissionAction,
 } from "@server/features/auth/auth.type";
 import { withTransaction } from "@server/utils/transaction";
 
@@ -36,29 +37,20 @@ export async function authenticate(
     return null;
   return resolveIdentity(claims.data.type, claims.data.id, claims.data.slug);
 }
-export function hasProgramPermission(
-  identity: Identity,
-  program: string,
-  access: "READ" | "WRITE",
-) {
-  return (
-    identity.type === "admin" &&
-    identity.permissions.some(
-      (p) =>
-        p.program === program &&
-        (p.value === access || (access === "READ" && p.value === "WRITE")),
-    )
-  );
-}
 export function hasAclPermission(identity: Identity, acl: string) {
   const match = /^([A-Z0-9]+)_(CREATE|READ|UPDATE|DELETE|APPROVAL)$/.exec(acl);
   if (!match || identity.type !== "admin") return false;
   const [, program, action] = match;
   return identity.permissions.some(
-    (p) =>
-      p.program === program &&
-      (p.value === action || (p.value === "WRITE" && action !== "APPROVAL")),
+    (p) => p.program === program && p.value === action,
   );
+}
+export function hasProgramPermission(
+  identity: Identity,
+  program: string,
+  action: PermissionAction,
+) {
+  return hasAclPermission(identity, `${program}_${action}`);
 }
 export function belongsToCompany(identity: Identity, slug: string) {
   return identity.type === "admin" || identity.slug === slug;
@@ -97,7 +89,7 @@ export const authService = {
     ),
   authenticate: (header?: string) =>
     authenticate(header, authRepository.resolveIdentity),
-  hasProgramPermission,
   hasAclPermission,
+  hasProgramPermission,
   belongsToCompany,
 };

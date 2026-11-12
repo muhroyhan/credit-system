@@ -9,14 +9,7 @@ export const adminSchema = z.object({
     .array(
       z.object({
         programId: z.number(),
-        value: z.enum([
-          "READ",
-          "WRITE",
-          "CREATE",
-          "UPDATE",
-          "DELETE",
-          "APPROVAL",
-        ]),
+        value: z.enum(["READ", "CREATE", "UPDATE", "DELETE", "APPROVAL"]),
       }),
     )
     .optional(),

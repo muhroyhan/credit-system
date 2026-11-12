@@ -107,7 +107,7 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
     (
       await request.put("/api/admin-user/update", {
         headers: writeHeaders,
-        data: { ...data, id, roles: [{ programId: 123456, value: "WRITE" }] },
+        data: { ...data, id, roles: [{ programId: 123456, value: "UPDATE" }] },
       })
     ).status(),
   ).toBe(409);
@@ -124,7 +124,7 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
     (
       await request.put("/api/admin-user/update", {
         headers: writeHeaders,
-        data: { ...data, id, roles: [{ programId: 900003, value: "WRITE" }] },
+        data: { ...data, id, roles: [{ programId: 900003, value: "UPDATE" }] },
       })
     ).status(),
   ).toBe(200);

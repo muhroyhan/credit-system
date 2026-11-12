@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { connectDatabase } from "./client";
 import {
   adminUsers,
@@ -88,15 +88,28 @@ try {
         },
       ])
       .onDuplicateKeyUpdate({ set: { id: sql`id` } });
-    await tx
-      .insert(roles)
-      .values([
-        { id: 900001, adminUserId: 900001, programId: 900001, value: "WRITE" },
-        { id: 900002, adminUserId: 900002, programId: 900001, value: "READ" },
-        { id: 900003, adminUserId: 900001, programId: 900004, value: "WRITE" },
-        { id: 900004, adminUserId: 900002, programId: 900004, value: "READ" },
-      ])
-      .onDuplicateKeyUpdate({ set: { id: sql`id` } });
+    const seededRoles = [
+      ...["CREATE", "READ", "UPDATE", "DELETE"].flatMap((value) => [
+        { adminUserId: 900001, programId: 900001, value },
+        { adminUserId: 900001, programId: 900004, value },
+      ]),
+      { adminUserId: 900002, programId: 900001, value: "READ" },
+      { adminUserId: 900002, programId: 900004, value: "READ" },
+    ];
+    for (const role of seededRoles) {
+      const [existing] = await tx
+        .select({ id: roles.id })
+        .from(roles)
+        .where(
+          and(
+            eq(roles.adminUserId, role.adminUserId),
+            eq(roles.programId, role.programId),
+            eq(roles.value, role.value),
+          ),
+        )
+        .limit(1);
+      if (!existing) await tx.insert(roles).values(role);
+    }
     await tx
       .insert(users)
       .values([

@@ -95,7 +95,7 @@ Hasil: tiga aktor dapat login dan membuka shell sesuai akses; API mengenali akto
 | Kode task | Task dan keluaran |
 | --- | --- |
 | P02-T01 | Implementasikan login admin/company/debitor, username/email sesuai kontrak, slug, bcrypt dan JWT HS256 24 jam dengan id/slug/type. Catat keputusan status akun/perusahaan dan error sesuai SUPPORT-02/03. |
-| P02-T02 | Bangun identity context, pembatasan tenant/ownership dan READ/WRITE program; hubungkan proteksi referensi P01. Tolak manipulasi scope/audit dari body dan jangan percaya ACL client. Dokumentasikan SUPPORT-01/08/09/14 dan FE-05/17. |
+| P02-T02 | Bangun identity context, pembatasan tenant/ownership dan CREATE/READ/UPDATE/DELETE/APPROVAL program; hubungkan proteksi referensi P01. Tolak manipulasi scope/audit dari body dan jangan percaya ACL client. Dokumentasikan SUPPORT-01/08/09/14 dan FE-05/17. |
 | P02-T03 | Buat halaman login, state sesi, gateway RPC, navigasi per aktor/program, breadcrumb, loading, notifikasi dan halaman tidak ditemukan. Menu fitur tampil saat route fitur tersedia; belum ada link ke layar yang belum dibuat. |
 | P02-T04 | Verifikasi akhir phase: unit auth/permission, integration login dan akses API lintas dua tenant, E2E login ketiga aktor, token salah/kedaluwarsa dan akses path langsung. Jalankan lint/typecheck/build, cleanup dan laporkan hasil. |
 
@@ -106,7 +106,7 @@ Hasil: administrator dengan hak yang sesuai dapat mengelola akun dan role per pr
 | Kode task | Task dan keluaran |
 | --- | --- |
 | P03-T01 | Implementasikan DTO, repository dan use case daftar/detail/create/update/delete admin; hash password, status aktif, penggantian daftar role dan audit server; putuskan guard self-delete/last-admin secara tercatat (SUPPORT-16). |
-| P03-T02 | Pasang route admin-user(s) dan pemeriksaan USA_READ/WRITE; transaksi parent/role dan validasi konflik akun. Hubungkan tabel/form tambah/lihat/ubah/hapus, filter email/username/aktif dan pagination. |
+| P03-T02 | Pasang route admin-user(s) dan pemeriksaan USA_CREATE/READ/UPDATE/DELETE; transaksi parent/role dan validasi konflik akun. Hubungkan tabel/form tambah/lihat/ubah/hapus, filter email/username/aktif dan pagination. |
 | P03-T03 | Verifikasi akhir phase: unit role/mapping, integration CRUD dan hak API, E2E form/filter/status/role; uji penolakan akses dan kegagalan simpan. Jalankan lint/typecheck/build, cleanup dan catat hasil. |
 
 ## P04 — Perusahaan, bunga dan biaya
@@ -116,7 +116,7 @@ Hasil: konfigurasi perusahaan dapat dikelola dan dipakai fitur berikutnya; CSV d
 | Kode task | Task dan keluaran |
 | --- | --- |
 | P04-T01 | Implementasikan kontrak/repository/use case perusahaan, bunga per tenor dan biaya; transaksi parent/child, konflik identitas, rekonsiliasi array serta ownership child. Putuskan perilaku array kosong dan constraint berdasarkan bukti (SUPPORT-05/06/07, FE-14). |
-| P04-T02 | Pasang API users/user dan bunga-kredits, scope serta USC_READ/WRITE; larang hapus perusahaan yang memiliki debitor. Implementasikan list/detail/form, status, slug, filter dan pagination. |
+| P04-T02 | Pasang API users/user dan bunga-kredits, scope serta USC_CREATE/READ/UPDATE/DELETE; larang hapus perusahaan yang memiliki debitor. Implementasikan list/detail/form, status, slug, filter dan pagination. |
 | P04-T03 | Verifikasi akhir phase: unit konfigurasi dan mapping, integration CRUD/konflik/transaksi/deletion guard dengan seeded debitor, E2E form bunga/biaya termasuk array kosong dan akses tenant. Jalankan lint/typecheck/build, cleanup dan laporkan hasil. |
 
 ## P05 — Registrasi dan Master Karyawan
@@ -159,7 +159,7 @@ Hasil: BPR meninjau kredit yang disetujui HRD, menetapkan status, menghasilkan s
 | --- | --- |
 | P08-T01 | Buat schema/migration `credit_expense`, DTO review dan repository transaksi; implementasikan biaya persen/x/langsung dari data tersimpan yang lengkap. Pertahankan asuransi, materai dan tabungan sesuai rumus; catat FLOW-04/05/09 dan FE-06. |
 | P08-T02 | Implementasikan approved/rejected/completed BPR, perubahan HRD ke rejected saat penolakan BPR, lock form serta snapshot approval; jangan mensyaratkan approved sebelumnya untuk completed tanpa keputusan bisnis. Tetapkan perilaku request berulang dan kegagalan notifikasi secara tercatat. |
-| P08-T03 | Buat adapter WhatsApp untuk tautan status nasabah dan implementasi produksi berdasarkan konfigurasi/provider terverifikasi; gunakan adapter deterministik untuk test. Buat Daftar Kredit Karyawan, default HRD approved, filter perusahaan/debitor/status, detail identitas/score, form nominal/tenor/asuransi/status dengan DKN_READ/WRITE. |
+| P08-T03 | Buat adapter WhatsApp untuk tautan status nasabah dan implementasi produksi berdasarkan konfigurasi/provider terverifikasi; gunakan adapter deterministik untuk test. Buat Daftar Kredit Karyawan, default HRD approved, filter perusahaan/debitor/status, detail identitas/score, form nominal/tenor/asuransi/status dengan DKN_CREATE/READ/UPDATE/DELETE/APPROVAL. |
 | P08-T04 | Verifikasi akhir phase: unit biaya/score/status, integration transaksi snapshot, pengulangan request dan gagal notifikasi, E2E approved/rejected/completed dan lock form. Uji kebocoran tenant dan field approval melalui API; lint/typecheck/build, cleanup dan laporan hasil. |
 
 ## P09 — Status nasabah, pembatalan dan rekening

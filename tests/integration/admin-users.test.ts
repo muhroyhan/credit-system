@@ -31,7 +31,7 @@ describe.skipIf(!url)("administrator service", () => {
       ).rejects.toBeInstanceOf(AdminConflict);
       await expect(
         adminUsersService.save(
-          { ...input, roles: [{ programId: 123456, value: "WRITE" }] },
+          { ...input, roles: [{ programId: 123456, value: "UPDATE" }] },
           "test",
           id,
         ),

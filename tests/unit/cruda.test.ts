@@ -8,7 +8,7 @@ const session = (type: Session["type"], roles: unknown): Session => ({
   userData: { id: 1, roles },
 });
 describe("CRUDA mirrors current Admin User API permissions", () => {
-  it("allows READ only for reading and never infers Approval from WRITE", () => {
+  it("allows only explicitly granted permissions", () => {
     expect(
       crudaAccess(session("admin", [{ program: "USA", value: "READ" }]), "USA"),
     ).toEqual({
@@ -24,10 +24,10 @@ describe("CRUDA mirrors current Admin User API permissions", () => {
         "USA",
       ),
     ).toEqual({
-      create: true,
-      read: true,
-      update: true,
-      delete: true,
+      create: false,
+      read: false,
+      update: false,
+      delete: false,
       approve: false,
     });
   });
@@ -51,7 +51,7 @@ describe("CRUDA mirrors current Admin User API permissions", () => {
   it("denies other programs, tenant actors and malformed roles", () => {
     for (const candidate of [
       null,
-      session("admin", [{ program: "OTHER", value: "WRITE" }]),
+      session("admin", [{ program: "OTHER", value: "UPDATE" }]),
       session("company", [{ program: "USA", value: "WRITE" }]),
       session("debitor", []),
       session("admin", [null, 5, {}, { program: "USA", value: "UNKNOWN" }]),
