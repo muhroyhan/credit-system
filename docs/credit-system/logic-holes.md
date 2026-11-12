@@ -44,7 +44,7 @@ Daftar ini mencatat risiko dari analisis statis; dampak runtime, tingkat keparah
 | FE-07 | Nomor dokumen dihitung count+1 saat render, bukan identitas permanen pada frontend. Potensi duplikasi/berubah bergantung query backend dan concurrency |
 | FE-08 | Surat memakai bunga r*12 sementara PKS memakai r/tahun; denda constant vs hardcoded 0.2%; administrasiTerbilang menguji provisiPercent, bukan administrasiPercent |
 | FE-09 | Konversi base64 yang melanjutkan pembacaan file setelah hasil kosong atau URL yang sudah tersedia berpotensi menghasilkan exception. |
-| FE-10 | State passwordRegex global membuat `.test` stateful; KTP minimal 16, email TLD 2–4, nominal required menerima 0; aturan UX tidak seragam |
+| FE-10 | State passwordRegex global membuat `.test` stateful; KTP minimal 16, email TLD 2â€“4, nominal required menerima 0; aturan UX tidak seragam |
 | FE-11 | Filter tenor <8 juta fallback ke tenor 12 tanpa memverifikasi tenor 12 ada; invalid config/tenor nol bisa menghasilkan NaN/Infinity |
 | FE-12 | Tombol Simpan master kredit untuk admin disabled ketika bukan view dan enabled ketika view (ternary terbalik dari non-admin); remarks admin muncul tanpa disabled di view |
 | FE-13 | Pengajuan list memakai dataIndex `debitorAcknowledgementTimestamp` (dengan e) sedangkan model/transformer bernama `debitorAcknowledgmentTimestamp`; kolom berpotensi kosong |
@@ -76,3 +76,5 @@ P02-T02: token direvalidasi terhadap akun dan izin terkini untuk mengurangi SUPP
 P03 SUPPORT-16: mempertahankan perilaku yang telah didokumentasikan, yaitu belum ada larangan khusus penghapusan akun sendiri atau administrator terakhir. Dampaknya adalah risiko kehilangan akses administrasi; perubahan aturan membutuhkan keputusan bisnis. Pemeriksaan username/email di aplikasi belum menghilangkan race karena constraint unik fisik belum diverifikasi (SUPPORT-05).
 
 P03: input endpoint Admin User divalidasi Zod saat runtime, tetapi Hono belum menginfer tipe query/body karena route memakai `c.req.query/json` langsung. Gateway RPC saat ini menggunakan assertion untuk argumen; integrasikan validator yang mengekspos tipe input sebelum mengandalkan pemeriksaan tipe end-to-end. DTO UI juga memerlukan role dengan program dan nilai READ/WRITE yang valid; data lama yang berbeda perlu diverifikasi sebelum migrasi.
+
+Frontend CRUDA: Admin User mengikuti USA_READ/WRITE yang sudah tersedia; Approval selalu false karena belum ada permission atau endpoint approval. Izin UI menggunakan snapshot login dan dapat tertinggal setelah perubahan role; API tetap memeriksa izin terkini. Ekspor PDF/XLSX memakai request listing bertahap sesuai filter/sorting, sehingga perubahan data selama ekspor dapat menyebabkan duplikasi atau baris terlewat; snapshot ekspor belum tersedia. Sorting default listing tetap createdAt/id menurun; query sorting opsional ditambahkan tanpa perubahan ACL server.

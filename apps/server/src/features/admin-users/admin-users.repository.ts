@@ -6,7 +6,7 @@ import {
   AdminNotFound,
 } from "@server/features/admin-users/admin-users.error";
 import type { AdminRepository } from "@server/features/admin-users/admin-users.type";
-import { and, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
 export const adminUsersRepository: AdminRepository = {
   async list(query) {
     const db = connectDatabase().db;
@@ -31,7 +31,10 @@ export const adminUsersRepository: AdminRepository = {
       })
       .from(adminUsers)
       .where(where)
-      .orderBy(desc(adminUsers.createdAt), desc(adminUsers.id))
+      .orderBy(
+        (query.sortDirection === "asc" ? asc : desc)(adminUsers[query.sortBy]),
+        desc(adminUsers.id),
+      )
       .limit(query.limit)
       .offset((query.page - 1) * query.limit);
     const assignedRoles = data.length

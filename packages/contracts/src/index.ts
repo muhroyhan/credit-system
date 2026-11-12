@@ -64,6 +64,10 @@ export const adminUpdateSchema = adminInputSchema.extend({
 });
 export const adminDeleteSchema = z.object({ id: z.number().int().positive() });
 export const adminListQuerySchema = z.object({
+  sortBy: z
+    .enum(["createdAt", "username", "email", "isActive"])
+    .default("createdAt"),
+  sortDirection: z.enum(["asc", "desc"]).default("desc"),
   email: z.string().optional(),
   username: z.string().optional(),
   active: z.enum(["true", "false"]).optional(),

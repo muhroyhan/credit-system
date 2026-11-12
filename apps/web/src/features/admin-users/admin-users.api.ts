@@ -75,3 +75,19 @@ export async function deleteAdmin(token: string, id: number) {
     ),
   );
 }
+
+export async function exportAdmins(
+  token: string,
+  filters: URLSearchParams,
+): Promise<Admin[]> {
+  const query = new URLSearchParams(filters);
+  query.set("page", "1");
+  query.set("limit", "100");
+  const first = await listAdmins(token, query);
+  const rows = [...first.data];
+  for (let page = 2; page <= Math.ceil(first.count / 100); page++) {
+    query.set("page", String(page));
+    rows.push(...(await listAdmins(token, query)).data);
+  }
+  return rows;
+}

@@ -1,12 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  type AdminInput,
-  adminDetail,
   deleteAdmin,
+  exportAdmins,
   listAdmins,
-  programs,
-  saveAdmin,
 } from "@web/features/admin-users/admin-users.api";
+import { exportTable } from "@web/utils/export-table";
 import { useState } from "react";
 export function useAdminUsers(token: string) {
   const client = useQueryClient();
@@ -14,53 +12,49 @@ export function useAdminUsers(token: string) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [active, setActive] = useState<string | null>(null);
-  const key = ["admin-users", token] as const;
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState("desc");
+  const query = new URLSearchParams({ username, email, sortBy, sortDirection });
+  if (active) query.set("active", active);
+  const filters = query.toString();
   const list = useQuery({
-    queryKey: [...key, "list", { page, username, email, active }],
-    queryFn: () => {
-      const query = new URLSearchParams({
-        page: String(page),
-        limit: "20",
-        username,
-        email,
-      });
-      if (active) query.set("active", active);
-      return listAdmins(token, query);
-    },
+    queryKey: ["admin-users", token, "list", filters, page],
+    queryFn: () =>
+      listAdmins(
+        token,
+        new URLSearchParams({
+          ...Object.fromEntries(query),
+          page: String(page),
+          limit: "20",
+        }),
+      ),
   });
-  const programQuery = useQuery({
-    queryKey: ["programs", token],
-    queryFn: () => programs(token),
-  });
-  const saveMutation = useMutation({
-    mutationFn: ({ input, id }: { input: AdminInput; id?: number }) =>
-      saveAdmin(token, input, id),
-    onSuccess: () => client.invalidateQueries({ queryKey: key }),
-  });
-  const deleteMutation = useMutation({
+  const remove = useMutation({
     mutationFn: (id: number) => deleteAdmin(token, id),
     onSuccess: async (_, id) => {
-      client.removeQueries({ queryKey: [...key, "detail", id] });
-      await client.invalidateQueries({ queryKey: key });
+      client.removeQueries({ queryKey: ["admin-users", token, "detail", id] });
+      if (list.data?.data.length === 1 && page > 1) setPage(page - 1);
+      await client.invalidateQueries({ queryKey: ["admin-users", token] });
     },
   });
-  async function save(input: AdminInput, id?: number) {
-    deleteMutation.reset();
-    try {
-      await saveMutation.mutateAsync({ input, id });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  async function remove(id: number) {
-    saveMutation.reset();
-    try {
-      await deleteMutation.mutateAsync(id);
-    } catch {
-      /* Error is displayed by the mutation state. */
-    }
-  }
+  const exporting = useMutation({
+    mutationFn: async (format: "pdf" | "xlsx") => {
+      const rows = await exportAdmins(token, new URLSearchParams(filters));
+      await exportTable(
+        {
+          title: "Admin User",
+          filename: "admin-users",
+          columns: ["Username", "Email", "Status"],
+          rows: rows.map((row) => [
+            row.username ?? "",
+            row.email ?? "",
+            row.isActive ? "Aktif" : "Tidak aktif",
+          ]),
+        },
+        format,
+      );
+    },
+  });
   return {
     rows: list.data?.data ?? [],
     total: list.data?.count ?? 0,
@@ -72,26 +66,15 @@ export function useAdminUsers(token: string) {
     setEmail,
     active,
     setActive,
-    options: (programQuery.data ?? []).map((p) => ({
-      value: String(p.id),
-      label: p.name ?? String(p.id),
-    })),
-    error:
-      (
-        saveMutation.error ??
-        deleteMutation.error ??
-        list.error ??
-        programQuery.error
-      )?.message ?? "",
+    sortBy,
+    setSortBy,
+    sortDirection,
+    setSortDirection,
     loading: list.isFetching,
-    saving: saveMutation.isPending,
-    deleting: deleteMutation.isPending,
-    save,
-    remove,
-    detail: (id: number) =>
-      client.fetchQuery({
-        queryKey: [...key, "detail", id],
-        queryFn: () => adminDetail(token, id),
-      }),
+    deleting: remove.isPending,
+    exporting: exporting.isPending,
+    error: (remove.error ?? exporting.error ?? list.error)?.message ?? "",
+    remove: remove.mutate,
+    exportRows: exporting.mutate,
   };
 }
