@@ -1,1 +1,5 @@
-{"name":"@credit/test-utils","private":true,"type":"module"}
+{
+  "name": "@credit/test-utils",
+  "private": true,
+  "type": "module"
+}
