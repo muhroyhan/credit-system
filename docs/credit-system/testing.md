@@ -17,7 +17,7 @@ Test bisnis memakai contoh numerik independen dari implementasi. Adapter storage
 
 Integration menggunakan MySQL disposable dan data sintetis. Uji service untuk aturan bisnis/rollback, repository untuk query/mapping, dan API langsung untuk otorisasi; tombol tersembunyi bukan bukti keamanan. Frontend menggunakan provider aplikasi dan memeriksa loading/kosong/gagal/sukses.
 
-Playwright memakai aplikasi, database dan API nyata; jangan mock API aplikasi pada skenario fullstack. Clock/timezone dan fixture dibuat deterministik; cleanup data/resource agar dapat diulang, simpan trace kegagalan. Runner native dan isolasi DB mengikuti runbook lokal.
+Instruksi E2E ada di [tests/e2e/AGENTS.md](../../tests/e2e/AGENTS.md).
 
 ## Bukti terakhir
 

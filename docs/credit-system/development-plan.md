@@ -1,16 +1,6 @@
 # Rencana pengembangan
 
-Sumber tunggal urutan phase, task dan pelacakan commit. P00–P04 selesai; P05–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
-
-## Aturan eksekusi
-
-1. Kerjakan fitur setelah dependensinya selesai; jangan menjadikan fitur phase mendatang prasyarat tersembunyi. Seed boleh memenuhi prasyarat data.
-2. Pertahankan kode Pxx-Tyy. Setiap task menghasilkan satu commit terfokus; daftarkan subtask berkode bila perlu dipecah. Catat status todo/doing/blocked/done, commit dan keputusan.
-3. Commit hanya di custom branch. Periksa branch sebelum mulai dan sebelum commit. Jika main/detached atau belum ada branch custom, ingatkan pengguna dan tunda commit.
-4. Format commit mengikuti [Git Commit Best Practices](https://gist.github.com/Aditi3/a7a1ddd1ecef73dab548f7955210cfff): `<type>(scope opsional): <subject>` imperative huruf kecil, tanpa titik, subject maksimum 50 karakter; body dibungkus 72 karakter. Footer `Task: Pxx-Tyy` menjaga trace.
-5. Jalankan test pada task terakhir setiap phase, bukan tiap task. Task sebelumnya boleh menyiapkan test permanen. Pada verifikasi akhir jalankan lint/typecheck/build serta suite relevan sesuai testing.md; laporan harus menyebut hasil aktual.
-6. Phase selesai setelah semua task, kontrak/model/keputusan terkait dan verifikasi terakhir selesai. Jika schema berubah sertakan migration; bila data diperlukan perbarui seed. Runner/perintah hanya di runbook lokal.
-7. Hapus script test sementara sebelum commit verifikasi; test permanen, fixture, seed.ts dan migrate.ts tetap disimpan. Keputusan bisnis yang belum tersedia hanya memblokir pekerjaan yang bergantung padanya.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P04 selesai; P05–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
