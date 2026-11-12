@@ -1,9 +1,4 @@
-import {
-  employeeDocumentKinds,
-  employeeDocumentLabels,
-  employeeOptionalFields,
-  employeeProfileFields,
-} from '@credit/contracts';
+import { employeeDocumentKinds } from '@credit/contracts';
 import { Text } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -11,6 +6,11 @@ import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployeeDetail';
+import {
+  employeeDocumentLabels,
+  employeeOptionalFields,
+  employeeProfileFields,
+} from '@web/features/employees/employees.constant';
 export function EmployeesViewPage() {
   return (
     <CrudPage program="CGP" action="read" title="Detail karyawan">

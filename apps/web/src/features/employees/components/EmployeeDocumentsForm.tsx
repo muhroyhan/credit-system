@@ -1,11 +1,9 @@
-import {
-  employeeDocumentKinds,
-  employeeDocumentLabels,
-} from '@credit/contracts';
+import { employeeDocumentKinds } from '@credit/contracts';
 import { Alert, Button, FileInput, Stack, Text, Title } from '@mantine/core';
 import { FormActions } from '@web/components/crud/FormActions';
 import type { EmployeeDetail } from '@web/features/employees/employees.type';
 import { useEmployeeDocuments } from '@web/features/employees/hooks/useEmployeeDocuments';
+import { employeeDocumentLabels } from '@web/features/employees/employees.constant';
 import { Controller } from 'react-hook-form';
 export function EmployeeDocumentsForm({
   token,

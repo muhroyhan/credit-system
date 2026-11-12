@@ -1,9 +1,9 @@
+import { Alert, Stack, Text, TextInput, Title } from '@mantine/core';
+import { FormActions } from '@web/components/crud/FormActions';
 import {
   employeeOptionalFields,
   employeeProfileFields,
-} from '@credit/contracts';
-import { Alert, Stack, Text, TextInput, Title } from '@mantine/core';
-import { FormActions } from '@web/components/crud/FormActions';
+} from '@web/features/employees/employees.constant';
 import type { EmployeeDetail } from '@web/features/employees/employees.type';
 import { useEmployeeProfile } from '@web/features/employees/hooks/useEmployeeProfile';
 export function EmployeeProfileForm({

@@ -1,6 +1,5 @@
 import {
   employeeDocumentKinds,
-  employeeProfileFields,
   employeeProfileSchema,
 } from '@credit/contracts';
 import { closeDatabase, connectDatabase } from '@credit/database/client';
@@ -111,12 +110,22 @@ describe.skipIf(!url)(
           ),
         ).rejects.toBeInstanceOf(EmployeeForbidden);
         const profile = employeeProfileSchema.parse({
-          ...Object.fromEntries(
-            employeeProfileFields.map(([key]) => [
-              key,
-              key === 'tanggalLahir' ? '1990-01-02' : 'Synthetic',
-            ]),
-          ),
+          employeeId: 'Synthetic',
+          noKtp: 'Synthetic',
+          namaLengkap: 'Synthetic',
+          jenisKelamin: 'Synthetic',
+          agama: 'Synthetic',
+          tempatLahir: 'Synthetic',
+          tanggalLahir: '1990-01-02',
+          statusMarital: 'Synthetic',
+          namaIbuKandung: 'Synthetic',
+          alamatKtp: 'Synthetic',
+          provinsi: 'Synthetic',
+          kota: 'Synthetic',
+          kecamatan: 'Synthetic',
+          kelurahanDesa: 'Synthetic',
+          kodePos: 'Synthetic',
+          alamatDomisili: 'Synthetic',
           namaAlias: 'alias-p05',
           noHp: '08123',
           noTelp: '',
