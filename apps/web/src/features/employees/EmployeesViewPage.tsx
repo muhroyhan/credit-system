@@ -10,7 +10,7 @@ import {
   employeeOptionalFields,
   employeeProfileFields,
 } from '@web/features/employees/employees.type';
-import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployees';
+import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployeeDetail';
 export function EmployeesViewPage() {
   return (
     <CrudPage program="CGP" action="read" title="Detail karyawan">

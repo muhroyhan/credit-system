@@ -12,10 +12,8 @@ import {
 import { Link } from '@tanstack/react-router';
 import { FormActions } from '@web/components/crud/FormActions';
 import type { CompanyFormProps } from '@web/features/companies/companies.type';
-import {
-  useCompanyForm,
-  useEntities,
-} from '@web/features/companies/hooks/useCompanies';
+import { useCompanyForm } from '@web/features/companies/hooks/useCompanyForm';
+import { useEntities } from '@web/features/companies/hooks/useEntities';
 import { Controller, useFieldArray } from 'react-hook-form';
 
 export function CompanyForm({ token, id, initial }: CompanyFormProps) {

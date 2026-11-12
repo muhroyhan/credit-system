@@ -4,10 +4,8 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import {
-  useCompanyDetail,
-  useEntities,
-} from '@web/features/companies/hooks/useCompanies';
+import { useCompanyDetail } from '@web/features/companies/hooks/useCompanyDetail';
+import { useEntities } from '@web/features/companies/hooks/useEntities';
 
 export function CompaniesViewPage() {
   return (

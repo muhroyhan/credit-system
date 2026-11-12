@@ -5,7 +5,7 @@ import {
   employeeDocumentKinds,
   employeeDocumentLabels,
 } from '@web/features/employees/employees.type';
-import { useEmployeeDocuments } from '@web/features/employees/hooks/useEmployeeProfile';
+import { useEmployeeDocuments } from '@web/features/employees/hooks/useEmployeeDocuments';
 import { Controller } from 'react-hook-form';
 export function EmployeeDocumentsForm({
   token,

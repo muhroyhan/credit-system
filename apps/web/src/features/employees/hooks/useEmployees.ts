@@ -2,18 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ExportFormat } from '@web/constant/type';
 import {
   deleteEmployee,
-  employeeDetail,
   exportEmployees,
   listEmployees,
 } from '@web/features/employees/employees.api';
 import { useState } from 'react';
-export function useEmployeeDetail(token: string, id: number) {
-  return useQuery({
-    queryKey: ['employees', token, 'detail', id],
-    queryFn: () => employeeDetail(token, id),
-    enabled: Number.isInteger(id) && id > 0,
-  });
-}
+
 export function useEmployees(token: string) {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({

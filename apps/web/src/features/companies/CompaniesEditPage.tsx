@@ -3,10 +3,8 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { CompanyForm } from '@web/features/companies/components/CompanyForm';
-import {
-  useCompanyDetail,
-  useEntities,
-} from '@web/features/companies/hooks/useCompanies';
+import { useCompanyDetail } from '@web/features/companies/hooks/useCompanyDetail';
+import { useEntities } from '@web/features/companies/hooks/useEntities';
 
 export function CompaniesEditPage() {
   return (

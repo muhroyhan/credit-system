@@ -5,7 +5,7 @@ import { useSession } from '@web/features/auth/hooks/useSession';
 import { EmployeeDocumentsForm } from '@web/features/employees/components/EmployeeDocumentsForm';
 import { EmployeeForm } from '@web/features/employees/components/EmployeeForm';
 import { EmployeeProfileForm } from '@web/features/employees/components/EmployeeProfileForm';
-import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployees';
+import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployeeDetail';
 export function EmployeesEditPage() {
   return (
     <CrudPage program="CGP" action="update" title="Ubah karyawan">

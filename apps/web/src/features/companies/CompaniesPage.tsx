@@ -4,10 +4,8 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import {
-  useCompanies,
-  useEntities,
-} from '@web/features/companies/hooks/useCompanies';
+import { useCompanies } from '@web/features/companies/hooks/useCompanies';
+import { useEntities } from '@web/features/companies/hooks/useEntities';
 import { crudaAccess } from '@web/utils/cruda';
 
 export function CompaniesPage() {
