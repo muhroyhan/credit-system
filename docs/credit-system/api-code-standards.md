@@ -7,7 +7,7 @@ Berlaku untuk semua fitur backend. Aturan ini melengkapi [architecture.md](archi
 | Area | Perbedaan yang ditemukan | Standar |
 | --- | --- | --- |
 | Akses database | Reference memanggil `connectDatabase().db.select`, admin/auth menyimpan `db` | Setiap fungsi repository mengambil `const db = connectDatabase().db` satu kali, lalu memakai `db` |
-| Pembuatan route | Reference factory; admin/auth instance singleton dengan dependency internal | global routes mengimpor `<featureCamelCase>Controller`; controller mengimpor service; service mengimpor repository |
+| Pembuatan route | Method/path tersebar di controller | global routes mendaftarkan method/path; controller mengekspor handler, controller mengimpor service, service mengimpor repository |
 | Hasil repository | Interface reference/admin memakai `Promise<unknown>` | Gunakan DTO konkret dari contracts; null menandakan detail tidak ditemukan, bukan `unknown` |
 | Validasi ID | Admin menulis Zod ID langsung di route | Schema request/query di contracts, termasuk `idQuerySchema` |
 | Tipe RPC | `SchemaOf` didefinisikan ulang pada beberapa file | Gunakan helper bersama dari infrastructure; schema semua route ikut dalam `AppType` |
@@ -46,17 +46,15 @@ async function listSomething() {
 ## Route dan validasi
 
 ```ts
-export function featureController() {
+export function routes() {
   const app = new Hono<AuthEnv>();
-  const list = app.get("/items", identityContext, async (c) => {
-    // Validasi input, panggil service, dan petakan response di sini.
-  });
-  // Gabungkan schema tipe hasil pendaftaran; jangan hilangkan tipe RPC.
+  const list = app.get("/items", identityContext, featureController.list);
+  // Gabungkan schema hasil pendaftaran untuk tipe RPC.
   return app;
 }
 ```
 
-Contoh di atas menunjukkan struktur, bukan implementasi siap salin untuk tipe RPC. Pada implementasi, gunakan `SchemaOf` untuk menggabungkan schema hasil pendaftaran route dan pertahankan semua endpoint dalam tipe yang dikembalikan.
+Contoh menunjukkan pembagian tanggung jawab. Semua method dan path HTTP didaftarkan di `routes.ts`; controller hanya menyediakan handler request/response dan middleware. Pertahankan `SchemaOf` untuk menggabungkan schema hasil pendaftaran dan tipe RPC untuk seluruh endpoint.
 
 - Daftarkan handler dengan pemanggilan terpisah pada instance app; hindari chaining panjang. Path endpoint ditulis sekali bersama middleware dan handler. Prefix `/api` hanya dipasang di app utama.
 - Urutan handler: autentikasi, pemeriksaan izin/lingkup bila diperlukan, validasi request, service, response. Route publik tidak diberi autentikasi hanya untuk menyamakan tampilan kode.
@@ -69,6 +67,6 @@ Contoh di atas menunjukkan struktur, bukan implementasi siap salin untuk tipe RP
 
 ## Batas penyeragaman saat ini
 
-Perubahan ini menyamakan akses database reference, factory route, tipe hasil repository reference/admin, schema ID, dan helper tipe RPC. Inferensi input RPC existing yang masih memakai assertion tercatat di [logic-holes.md](logic-holes.md); penulisan standar ini tidak berarti masalah tersebut sudah diperbaiki. Validasi response runtime juga belum seragam pada seluruh fitur. Perubahan validator/response berikutnya harus mempertahankan kontrak dan memperbarui test yang relevan.
+Perubahan ini menyamakan akses database reference, pendaftaran route terpusat, tipe hasil repository reference/admin, schema ID, dan helper tipe RPC. Inferensi input RPC existing yang masih memakai assertion tercatat di [logic-holes.md](logic-holes.md); penulisan standar ini tidak berarti masalah tersebut sudah diperbaiki. Validasi response runtime juga belum seragam pada seluruh fitur. Perubahan validator/response berikutnya harus mempertahankan kontrak dan memperbarui test yang relevan.
 
 Verifikasi mengikuti testing.md dan aturan akhir phase pada development-plan.md. Catat hasil nyata dan hapus script test sementara sebelum commit.

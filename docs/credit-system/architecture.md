@@ -11,7 +11,7 @@
 
 | Frontend | Backend | Tanggung jawab |
 | --- | --- | --- |
-| `presentation` | `controller` | Komponen/form di frontend; route Hono, validasi dan pemetaan response di backend. |
+| `presentation` | `controller` | Komponen/form di frontend; handler request/response, middleware dan validasi di backend; method dan path didaftarkan di `routes.ts`. |
 | `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
 | `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
 
