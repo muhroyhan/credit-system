@@ -1,0 +1,12 @@
+import { expect, test } from "@playwright/test";
+
+test("serves the app and API", async ({ page, request }) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: "Credit System" }),
+  ).toBeVisible();
+  expect((await request.get("/api/health")).status()).toBe(200);
+  expect((await request.get("/api/missing")).status()).toBe(404);
+  expect((await request.get("/api")).status()).toBe(404);
+  expect((await request.get("/assets/missing.js")).status()).toBe(404);
+});

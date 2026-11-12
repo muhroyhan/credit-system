@@ -1,0 +1,21 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.7/schema.json",
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!!.vscode",
+      "!!node_modules",
+      "!!**/dist",
+      "!!pnpm-lock.yaml",
+      "!!docs",
+      "!!**/.turbo",
+      "!!test-results",
+      "!!playwright-report"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space"
+  }
+}

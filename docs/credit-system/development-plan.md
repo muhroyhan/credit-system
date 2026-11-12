@@ -216,6 +216,10 @@ Format catatan pelaksanaan yang dapat ditambahkan per task:
 
 | Kode task | Status | Branch / hash commit | Keluaran / keputusan | Hasil verifikasi akhir phase |
 | --- | --- | --- | --- | --- |
-| P00-T01 | todo | — | — | menunggu P00-T05 |
+| P00-T05 | done | lihat commit Task: P00-T05 | Lint, typecheck, build, Vitest unit/integration dan E2E lulus; migration/seed MySQL disposable lulus setelah MySQL siap | lulus |
+| P00-T04 | done | lihat commit Task: P00-T04 | Konfigurasi test dan adapter sintetis; belum diuji | menunggu P00-T05 |
+| P00-T03 | done | lihat commit Task: P00-T03 | MySQL dan runner; belum diuji | menunggu P00-T05 |
+| P00-T02 | done | lihat commit Task: P00-T02 | Shell monolit; belum diuji | menunggu P00-T05 |
+| P00-T01 | done | lihat commit Task: P00-T01 | Workspace dan dependensi dasar; belum diuji | menunggu P00-T05 |
 
 Keseluruhan rencana selesai setelah semua phase lulus task verifikasi terakhirnya, termasuk regresi lintas fitur pada phase yang dikerjakan paling akhir.
