@@ -12,6 +12,7 @@
 - TypeScript strict; pnpm workspace, Turborepo, Biome dan runtime Bun.
 - Frontend React + Vite + Mantine; backend Hono RPC + Drizzle ORM + MySQL; Zod di frontend dan backend.
 - Backend memakai layer `controller`, `service`, `repository`: aturan bisnis di service dan akses data di repository. Simpan langsung di folder fitur sebagai `<feature>.<layer>.ts`, dengan simbol utama `<featureCamelCase><Layer>`. Deklarasi type/interface fitur disimpan di `<feature>.type.ts`. Frontend tetap memakai layer `presentation`, `application`, `data`.
+- Alur backend wajib `global routes → controller → service → repository`. Global routes merangkai dependency; controller hanya menerima request, memanggil service, dan mengirim response. Controller tidak mengimpor atau memanggil repository/database langsung.
 - Import lintas aplikasi/package menggunakan nama workspace `@credit/...` dan ekspor publik; gunakan alias tsconfig `@server/*` atau `@web/*` untuk import dalam aplikasi dan selaraskan resolusi runtime/test.
 - Satu deployment monolit: server Hono/Bun melayani API dan aset frontend. Baca `docs/credit-system/architecture.md` untuk batas layer dan struktur target.
 - Untuk lingkungan lokal, Docker hanya untuk service database MySQL; semua aplikasi dan tooling dijalankan secara native di host, termasuk server Bun/Hono dan Vite.

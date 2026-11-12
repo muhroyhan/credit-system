@@ -4,6 +4,7 @@ import type {
   adminListQuerySchema,
   adminUserDtoSchema,
 } from "@credit/contracts";
+import type { adminUsersService } from "@server/features/admin-users/admin-users.service";
 import type { z } from "zod";
 export type AdminInput = z.infer<typeof adminInputSchema>;
 export type AdminQuery = z.infer<typeof adminListQuerySchema>;
@@ -20,3 +21,5 @@ export type AdminUsersRoutes<L, D, C, U, R> = SchemaOf<L> &
   SchemaOf<C> &
   SchemaOf<U> &
   SchemaOf<R>;
+
+export type AdminUsersService = ReturnType<typeof adminUsersService>;

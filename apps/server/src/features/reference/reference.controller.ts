@@ -6,17 +6,20 @@ import {
   referenceItemSchema,
   slugSchema,
 } from "@credit/contracts";
-import { identityContext } from "@server/features/auth/auth.controller";
-import type { AuthEnv } from "@server/features/auth/auth.type";
-import { referenceService } from "@server/features/reference/reference.service";
 import type {
-  ReferenceRepository,
+  AuthEnv,
+  IdentityMiddleware,
+} from "@server/features/auth/auth.type";
+import type {
   ReferenceRoutes,
+  ReferenceService,
 } from "@server/features/reference/reference.type";
 import { Hono } from "hono";
 
-export function referenceController(repository: ReferenceRepository) {
-  const service = referenceService(repository);
+export function referenceController(
+  service: ReferenceService,
+  identityContext: IdentityMiddleware,
+) {
   const app = new Hono<AuthEnv>();
   const slugs = app.get("/user/slugs", async (c) =>
     c.json(slugSchema.array().parse(await service.slugs())),

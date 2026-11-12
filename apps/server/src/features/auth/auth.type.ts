@@ -1,3 +1,5 @@
+import type { authService } from "@server/features/auth/auth.service";
+import type { MiddlewareHandler } from "hono";
 export type Identity = {
   id: number;
   type: "admin" | "company" | "debitor";
@@ -29,3 +31,10 @@ export type LoginInput = {
   slug?: string;
 };
 export type AuthEnv = { Variables: { identity: Identity } };
+
+export interface AuthRepository {
+  findAccount: AccountLookup;
+  resolveIdentity: IdentityResolver;
+}
+export type AuthService = ReturnType<typeof authService>;
+export type IdentityMiddleware = MiddlewareHandler<AuthEnv>;

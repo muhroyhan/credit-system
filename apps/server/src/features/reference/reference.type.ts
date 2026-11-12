@@ -5,6 +5,7 @@ import type {
   referenceItemSchema,
   slugSchema,
 } from "@credit/contracts";
+import type { referenceService } from "@server/features/reference/reference.service";
 import type { z } from "zod";
 export interface ReferenceRepository {
   listPrograms(): Promise<z.infer<typeof programSchema>[]>;
@@ -20,3 +21,5 @@ export type ReferenceRoutes<S, P, E, C, K> = SchemaOf<S> &
   SchemaOf<E> &
   SchemaOf<C> &
   SchemaOf<K>;
+
+export type ReferenceService = ReturnType<typeof referenceService>;

@@ -1,5 +1,6 @@
 import type {
   AccountLookup,
+  AuthRepository,
   Identity,
   IdentityResolver,
   LoginInput,
@@ -76,9 +77,10 @@ export async function login(input: LoginInput, findAccount: AccountLookup) {
   return { authToken, type: input.type, userData: account.userData };
 }
 
-export const authService = {
-  login,
-  authenticate,
+export const authService = (repository: AuthRepository) => ({
+  login: (input: LoginInput) => login(input, repository.findAccount),
+  authenticate: (header?: string) =>
+    authenticate(header, repository.resolveIdentity),
   hasProgramPermission,
   belongsToCompany,
-};
+});

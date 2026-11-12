@@ -11,3 +11,5 @@
 - Pasang prefix `/api` satu kali. Daftarkan middleware dan handler endpoint dalam pemanggilan yang sama, misalnya `app.get("/programs", identityContext, handler)`, agar path tidak diulang pada `app.use` dan `app.get`.
 
 - Ikuti `docs/credit-system/api-code-standards.md` untuk pola repository, service, route factory, validasi, error, dan tipe RPC. Ambil `const db = connectDatabase().db` sekali di setiap fungsi repository dan gunakan `db` untuk query.
+
+- Urutan akses wajib `global routes → controller → service → repository`. Global routes hanya merangkai dependency; controller menerima service, bukan repository atau koneksi database. Service menjalankan aturan bisnis dan repository menjalankan query. Middleware controller juga harus mengakses database melalui service.

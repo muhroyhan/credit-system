@@ -15,7 +15,7 @@
 | `application` | `service` | Hook/state di frontend; use case, aturan bisnis dan interface repository di backend. |
 | `data` | `repository` | RPC gateway di frontend; query Drizzle dan adapter di backend. |
 
-Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend tetap memakai folder layer seperti pada struktur di bawah. Dependensi backend mengarah dari controller ke service ke repository melalui interface; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
+Di backend, file langsung berada dalam folder fitur dengan nama `<feature>.<layer>.ts`, dengan layer `controller`, `service`, dan `repository`. Simbol utama menggunakan `<featureCamelCase><Layer>`. Frontend tetap memakai folder layer seperti pada struktur di bawah. Alur backend wajib global routes → controller → service → repository. Global routes merangkai dependency, controller menerima request dan mengirim response melalui service, service menjalankan aturan bisnis, dan hanya repository yang menjalankan query. Controller tidak boleh mengakses repository langsung; frontend dari presentation ke application ke data. Infrastruktur bersama dan kontrak merupakan fondasi komposisi, bukan layer bisnis keempat. Antarfitur menggunakan interface publik, bukan impor internal feature lain.
 
 ## Struktur target
 
