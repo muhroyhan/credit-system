@@ -70,3 +70,7 @@ Contoh menunjukkan pembagian tanggung jawab. Semua method dan path HTTP didaftar
 Perubahan ini menyamakan akses database reference, pendaftaran route terpusat, tipe hasil repository reference/admin, schema ID, dan helper tipe RPC. Inferensi input RPC existing yang masih memakai assertion tercatat di [logic-holes.md](logic-holes.md); penulisan standar ini tidak berarti masalah tersebut sudah diperbaiki. Validasi response runtime juga belum seragam pada seluruh fitur. Perubahan validator/response berikutnya harus mempertahankan kontrak dan memperbarui test yang relevan.
 
 Verifikasi mengikuti testing.md dan aturan akhir phase pada development-plan.md. Catat hasil nyata dan hapus script test sementara sebelum commit.
+
+## Transaksi service non-GET
+
+Service untuk setiap endpoint non-GET menggunakan `withTransaction` dan meneruskan transaksi yang sama ke repository untuk seluruh query dalam operasi tersebut. Error harus keluar dari callback agar Drizzle melakukan rollback. Pekerjaan yang tidak memakai database boleh dikerjakan sebelum transaksi; login memakai transaksi untuk pembacaan data akun. Repository mendukung transaksi mandiri saat dipanggil langsung dalam integration test.

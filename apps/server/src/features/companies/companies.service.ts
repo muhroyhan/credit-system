@@ -4,6 +4,7 @@ import type {
   CompanyQuery,
 } from "@server/features/companies/companies.type";
 import { exportFile } from "@server/utils/export-file";
+import { withTransaction } from "@server/utils/transaction";
 export const companiesService = {
   async interests(slug: string) {
     const id = await companiesRepository.bySlug(slug);
@@ -43,7 +44,10 @@ export const companiesService = {
           cost: 10,
         })
       : undefined;
-    return companiesRepository.save({ ...input, password }, actor, id);
+    return withTransaction((tx) =>
+      companiesRepository.save({ ...input, password }, actor, id, tx),
+    );
   },
-  remove: (id: number) => companiesRepository.remove(id),
+  remove: (id: number) =>
+    withTransaction((tx) => companiesRepository.remove(id, tx)),
 };

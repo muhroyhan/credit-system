@@ -4,6 +4,7 @@ import type {
   AdminQuery,
 } from "@server/features/admin-users/admin-users.type";
 import { exportFile } from "@server/utils/export-file";
+import { withTransaction } from "@server/utils/transaction";
 export const adminUsersService = {
   async exportFile(query: AdminQuery, format: "pdf" | "xlsx") {
     const { data: rows } = await adminUsersRepository.list(query, false);
@@ -28,7 +29,10 @@ export const adminUsersService = {
           cost: 10,
         })
       : undefined;
-    return adminUsersRepository.save({ ...input, password }, actor, id);
+    return withTransaction((tx) =>
+      adminUsersRepository.save({ ...input, password }, actor, id, tx),
+    );
   },
-  remove: (id: number) => adminUsersRepository.remove(id),
+  remove: (id: number) =>
+    withTransaction((tx) => adminUsersRepository.remove(id, tx)),
 };

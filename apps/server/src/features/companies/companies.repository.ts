@@ -14,6 +14,7 @@ import type {
   CompanyInput,
   CompanyQuery,
 } from "@server/features/companies/companies.type";
+import type { DatabaseTransaction } from "@server/utils/transaction";
 import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
 export const companiesRepository = {
   async list(query: CompanyQuery, paginate = true) {
@@ -100,9 +101,14 @@ export const companiesRepository = {
       .where(eq(userBiaya.userId, id));
     return { ...row, bungaKredits, biaya };
   },
-  async save(input: CompanyInput, actor: string, id?: number) {
+  async save(
+    input: CompanyInput,
+    actor: string,
+    id?: number,
+    transaction?: DatabaseTransaction,
+  ) {
     const db = connectDatabase().db;
-    return db.transaction(async (tx) => {
+    const work = async (tx: DatabaseTransaction) => {
       const { bungaKredits, biaya, password, ...parent } = input;
       if (id) {
         const [found] = await tx
@@ -244,11 +250,12 @@ export const companiesRepository = {
           });
       }
       return companyId;
-    });
+    };
+    return transaction ? work(transaction) : db.transaction(work);
   },
-  async remove(id: number) {
+  async remove(id: number, transaction?: DatabaseTransaction) {
     const db = connectDatabase().db;
-    return db.transaction(async (tx) => {
+    const work = async (tx: DatabaseTransaction) => {
       const [row] = await tx
         .select({ id: users.id })
         .from(users)
@@ -266,6 +273,7 @@ export const companiesRepository = {
       await tx.delete(userBungaKredit).where(eq(userBungaKredit.userId, id));
       await tx.delete(users).where(eq(users.id, id));
       return true;
-    });
+    };
+    return transaction ? work(transaction) : db.transaction(work);
   },
 };

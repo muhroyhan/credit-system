@@ -5,6 +5,7 @@ import type {
   IdentityResolver,
   LoginInput,
 } from "@server/features/auth/auth.type";
+import { withTransaction } from "@server/utils/transaction";
 
 export type { Identity } from "@server/features/auth/auth.type";
 
@@ -78,7 +79,12 @@ export async function login(input: LoginInput, findAccount: AccountLookup) {
 }
 
 export const authService = {
-  login: (input: LoginInput) => login(input, authRepository.findAccount),
+  login: (input: LoginInput) =>
+    withTransaction((tx) =>
+      login(input, (type, username, slug) =>
+        authRepository.findAccount(type, username, slug, tx),
+      ),
+    ),
   authenticate: (header?: string) =>
     authenticate(header, authRepository.resolveIdentity),
   hasProgramPermission,

@@ -17,3 +17,5 @@
 - Daftarkan semua method dan path HTTP dalam satu fungsi `routes()` di `apps/server/src/routes.ts`. Controller mengekspor handler/middleware tanpa mendaftarkan route; `app.ts` hanya memasang hasilnya pada prefix `/api` dan mengekspor tipe RPC.
 
 - Semua middleware backend berada di `apps/server/src/middleware/`, satu fungsi middleware per file bernama `<nama>.middleware.ts`. Global routes mengimpor middleware langsung; middleware yang membutuhkan aturan bisnis hanya mengakses service, bukan repository. Middleware bawaan dibungkus di folder yang sama.
+
+- Setiap service yang menangani API non-GET menjalankan seluruh operasi database dalam satu transaksi Drizzle melalui `withTransaction`; teruskan transaction ke repository dan gunakan transaction tersebut untuk setiap query. Kegagalan harus dilempar agar rollback; jangan membuka atau menutup pool per request.

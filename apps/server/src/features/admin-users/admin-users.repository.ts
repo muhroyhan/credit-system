@@ -1,11 +1,11 @@
 import { connectDatabase } from "@credit/database/client";
 import { adminUsers, programs, roles } from "@credit/database/schema";
-
 import {
   AdminConflict,
   AdminNotFound,
 } from "@server/features/admin-users/admin-users.error";
 import type { AdminRepository } from "@server/features/admin-users/admin-users.type";
+import type { DatabaseTransaction } from "@server/utils/transaction";
 import { and, asc, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
 export const adminUsersRepository: AdminRepository = {
   async list(query, paginate = true) {
@@ -82,9 +82,9 @@ export const adminUsersRepository: AdminRepository = {
       .where(eq(roles.adminUserId, id));
     return { ...user, roles: userRoles };
   },
-  async save(input, actor, id) {
+  async save(input, actor, id, transaction) {
     const db = connectDatabase().db;
-    return db.transaction(async (tx) => {
+    const work = async (tx: DatabaseTransaction) => {
       const conflict = await tx
         .select({ id: adminUsers.id })
         .from(adminUsers)
@@ -148,11 +148,12 @@ export const adminUsersRepository: AdminRepository = {
           })),
         );
       return userId;
-    });
+    };
+    return transaction ? work(transaction) : db.transaction(work);
   },
-  async remove(id) {
+  async remove(id, transaction) {
     const db = connectDatabase().db;
-    return db.transaction(async (tx) => {
+    const work = async (tx: DatabaseTransaction) => {
       const [existing] = await tx
         .select({ id: adminUsers.id })
         .from(adminUsers)
@@ -161,6 +162,7 @@ export const adminUsersRepository: AdminRepository = {
       await tx.delete(roles).where(eq(roles.adminUserId, id));
       await tx.delete(adminUsers).where(eq(adminUsers.id, id));
       return true;
-    });
+    };
+    return transaction ? work(transaction) : db.transaction(work);
   },
 };

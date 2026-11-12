@@ -6,13 +6,15 @@ import {
   roles,
   users,
 } from "@credit/database/schema";
+import type { DatabaseTransaction } from "@server/utils/transaction";
 import { and, eq, or } from "drizzle-orm";
 export async function findAccount(
   type: "admin" | "company" | "debitor",
   username: string,
   slug?: string,
+  transaction?: DatabaseTransaction,
 ) {
-  const db = connectDatabase().db;
+  const db = transaction ?? connectDatabase().db;
   if (type === "admin") {
     const [account] = await db
       .select()
