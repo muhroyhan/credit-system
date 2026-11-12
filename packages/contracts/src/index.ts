@@ -157,3 +157,5 @@ export const companyQuerySchema = z.object({
     .default('createdAt'),
   sortDirection: z.enum(['asc', 'desc']).default('desc'),
 });
+
+export * from './employees.type';

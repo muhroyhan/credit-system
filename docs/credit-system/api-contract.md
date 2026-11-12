@@ -51,13 +51,16 @@ Admin detail menyertakan roles. Save mengganti seluruh daftar role. Perusahaan s
 
 GET /user/bunga-kredits?slug=... memerlukan JWT; company/debitor hanya slug sendiri. Admin boleh membaca konfigurasi untuk simulasi. Respons array bunga/tenor; route ini bukan akses CRUD perusahaan.
 
-## Rancangan API P05–P12 (belum tersedia)
+### Registrasi dan Master Karyawan (P05)
+
+Prefix /debitor: POST /register publik menerima {slug, namaLengkap, username, password}; POST /create privat menerima akun dan userId opsional (wajib untuk admin); PUT /update menerima {id, namaLengkap, username, password?}. Payload strict: field internal/audit/approval ditolak. Registrasi menyimpan akun lalu client melakukan login biasa; kegagalan login tidak diklaim sebagai registrasi gagal.
+
+GET /list menerima namaLengkap, namaAlias, userId, sortBy id/employeeId/namaLengkap/createdAt, sortDirection, page/limit; GET /detail?id dan PUT /delete {id}. Admin memerlukan CGP aksi terkait. HRD mengelola perusahaan sendiri; debitor hanya membaca/mengubah akun sendiri, tanpa create/delete privat. Filter tidak dapat menimpa scope. Username unik per tenant diperiksa sambil lock perusahaan; password di-hash dan tidak pernah dikirim kembali. Delete membersihkan keenam child, menolak kredit ketika tabel credit tersedia; verifikasi kredit nyata pada P06.
+
+## Rancangan API P06–P12 (belum tersedia)
 
 | Method dan path | Fungsi |
 | --- | --- |
-| `POST /debitor/create` | Pendaftaran debitor; return id; username diperiksa dan password di-hash. |
-| `GET /debitor/list`, `GET /debitor/detail` | Daftar/filter dan detail debitor beserta data terkait. |
-| `PUT /debitor/update`, `PUT /debitor/delete` | Update profil, finansial/dokumen; tolak hapus jika mempunyai kredit. |
 | `GET /debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
 | `POST /credit/create` | Membuat pengajuan; return id. |
 | `GET /credit/list`, `GET /credit/detail` | Daftar/detail, filter, pagination, total angsuran dan skor untuk admin. |
