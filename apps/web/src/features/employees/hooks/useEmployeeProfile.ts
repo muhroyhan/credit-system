@@ -1,9 +1,9 @@
+import type { EmployeeProfile } from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { saveProfile } from '@web/features/employees/employees.api';
 import {
   type EmployeeDetail,
-  type EmployeeProfile,
   employeeProfileSchema,
   emptyProfile,
 } from '@web/features/employees/employees.type';

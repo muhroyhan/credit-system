@@ -1,3 +1,4 @@
+import type { EmployeeProfile } from '@credit/contracts';
 import type { AppType } from '@credit/server/app';
 import type { ApiResponse } from '@web/constant/interface';
 import { apiErrorSchema } from '@web/constant/schema';
@@ -5,7 +6,6 @@ import type { ExportFormat } from '@web/constant/type';
 import {
   type EmployeeDownloadResponse,
   type EmployeeFormInput,
-  type EmployeeProfile,
   employeeDetailSchema,
   employeeListSchema,
   type RegistrationInput,

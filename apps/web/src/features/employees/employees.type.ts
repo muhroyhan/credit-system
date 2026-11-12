@@ -13,7 +13,6 @@ import {
 } from '@credit/contracts';
 import { z } from 'zod';
 
-export type { EmployeeDocumentKind, EmployeeProfile } from '@credit/contracts';
 export {
   employeeDetailSchema,
   employeeDocumentKinds,
