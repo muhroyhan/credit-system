@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { employeeDocumentKinds } from './employees.constant';
 
 export const employeeAccountSchema = z
   .object({
@@ -55,24 +56,6 @@ export const employeeListSchema = z.object({
 export type EmployeeAccount = z.infer<typeof employeeAccountSchema>;
 export type EmployeeQuery = z.infer<typeof employeeQuerySchema>;
 
-export const employeeProfileFields = [
-  ['employeeId', 'Nomor induk'],
-  ['noKtp', 'NIK'],
-  ['namaLengkap', 'Nama lengkap'],
-  ['jenisKelamin', 'Jenis kelamin'],
-  ['agama', 'Agama'],
-  ['tempatLahir', 'Tempat lahir'],
-  ['tanggalLahir', 'Tanggal lahir'],
-  ['statusMarital', 'Status perkawinan'],
-  ['namaIbuKandung', 'Nama ibu kandung'],
-  ['alamatKtp', 'Alamat KTP'],
-  ['provinsi', 'Provinsi'],
-  ['kota', 'Kota'],
-  ['kecamatan', 'Kecamatan'],
-  ['kelurahanDesa', 'Kelurahan/desa'],
-  ['kodePos', 'Kode pos'],
-  ['alamatDomisili', 'Alamat domisili'],
-] as const;
 const requiredText = z.string().trim().min(1, 'Wajib diisi').max(255);
 export const employeeProfileSchema = z
   .object({
@@ -111,22 +94,7 @@ export const employeeProfileSchema = z
 export const employeeProfileUpdateSchema = z
   .object({ id: z.number().int().positive(), profile: employeeProfileSchema })
   .strict();
-export const employeeDocumentKinds = [
-  'fotoUrl',
-  'selfieUrl',
-  'kkUrl',
-  'slipGajiUrl',
-  'tandaTanganUrl',
-  'npwpUrl',
-] as const;
-export const employeeDocumentLabels = {
-  fotoUrl: 'KTP',
-  selfieUrl: 'Selfie KTP',
-  kkUrl: 'KK',
-  slipGajiUrl: 'Slip gaji',
-  tandaTanganUrl: 'Tanda tangan',
-  npwpUrl: 'NPWP',
-} as const;
+
 export const employeeDocumentKindSchema = z.enum(employeeDocumentKinds);
 export const employeeDetailSchema = employeeRowSchema.extend({
   profile: employeeProfileSchema.partial(),
@@ -134,13 +102,3 @@ export const employeeDetailSchema = employeeRowSchema.extend({
 });
 export type EmployeeProfile = z.infer<typeof employeeProfileSchema>;
 export type EmployeeDocumentKind = z.infer<typeof employeeDocumentKindSchema>;
-
-export const employeeOptionalFields = [
-  ['namaAlias', 'Alias'],
-  ['noHp', 'Nomor HP'],
-  ['noTelp', 'Nomor telepon'],
-  ['pekerjaan', 'Pekerjaan'],
-  ['pendidikan', 'Pendidikan'],
-  ['kewarganegaraan', 'Kewarganegaraan'],
-  ['npwp', 'NPWP'],
-] as const;

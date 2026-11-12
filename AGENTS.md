@@ -22,7 +22,7 @@ Satu deployment Bun/Hono melayani API serta aset React/Vite. Database MySQL mela
 | packages/database                  | Schema fisik, koneksi, migration dan seed                                                                                                                                          |
 | packages/test-utils                | Adapter dan fixture sintetis                                                                                                                                                       |
 
-Import lintas package melalui @credit/... dan ekspor publik; dalam aplikasi melalui @server/* atau @web/*. Selaraskan tsconfig, runtime dan test resolver. Simbol utama backend memakai featureCamelCaseLayer. Definisi khusus fitur tetap di feature.type.ts; schema runtime memakai .ts, deklarasi tanpa implementasi dapat memakai .d.ts. Gunakan import/export type untuk dependency tipe.
+Import lintas package melalui @credit/... dan ekspor publik; dalam aplikasi melalui @server/* atau @web/*. Selaraskan tsconfig, runtime dan test resolver. Simbol utama backend memakai featureCamelCaseLayer. Tipe dan schema khusus fitur berada di feature.type.ts; konstanta khusus fitur berada di feature.constant.ts. Schema runtime memakai .ts, deklarasi tanpa implementasi dapat memakai .d.ts. Gunakan import/export type untuk dependency tipe.
 
 ## TypeScript, Biome dan gaya
 

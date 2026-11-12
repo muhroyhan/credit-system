@@ -2,10 +2,10 @@ import type { EmployeeProfile } from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { saveProfile } from '@web/features/employees/employees.api';
+import { emptyProfile } from '@web/features/employees/employees.constant';
 import {
   type EmployeeDetail,
   employeeProfileSchema,
-  emptyProfile,
 } from '@web/features/employees/employees.type';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';

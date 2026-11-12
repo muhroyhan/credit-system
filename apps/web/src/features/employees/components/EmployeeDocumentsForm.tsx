@@ -1,10 +1,10 @@
-import { Alert, Button, FileInput, Stack, Text, Title } from '@mantine/core';
-import { FormActions } from '@web/components/crud/FormActions';
 import {
-  type EmployeeDetail,
   employeeDocumentKinds,
   employeeDocumentLabels,
-} from '@web/features/employees/employees.type';
+} from '@credit/contracts';
+import { Alert, Button, FileInput, Stack, Text, Title } from '@mantine/core';
+import { FormActions } from '@web/components/crud/FormActions';
+import type { EmployeeDetail } from '@web/features/employees/employees.type';
 import { useEmployeeDocuments } from '@web/features/employees/hooks/useEmployeeDocuments';
 import { Controller } from 'react-hook-form';
 export function EmployeeDocumentsForm({

@@ -1,15 +1,15 @@
+import { employeeDocumentKinds } from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   downloadDocument,
   uploadDocuments,
 } from '@web/features/employees/employees.api';
+import { emptyDocuments } from '@web/features/employees/employees.constant';
 import {
   type EmployeeDetail,
   type EmployeeDocuments,
-  employeeDocumentKinds,
   employeeDocumentsSchema,
-  emptyDocuments,
 } from '@web/features/employees/employees.type';
 import { useForm } from 'react-hook-form';
 

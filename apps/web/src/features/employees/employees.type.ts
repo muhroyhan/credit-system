@@ -1,27 +1,14 @@
-import type { EmployeeProfile } from '@credit/contracts';
 import {
   employeeAccountSchema,
   employeeCreateSchema,
   employeeDetailSchema,
   employeeDocumentKindSchema,
-  employeeDocumentKinds,
-  employeeDocumentLabels,
   employeeListSchema,
-  employeeOptionalFields,
-  employeeProfileFields,
   employeeProfileSchema,
 } from '@credit/contracts';
 import { z } from 'zod';
 
-export {
-  employeeDetailSchema,
-  employeeDocumentKinds,
-  employeeDocumentLabels,
-  employeeListSchema,
-  employeeOptionalFields,
-  employeeProfileFields,
-  employeeProfileSchema,
-};
+export { employeeDetailSchema, employeeListSchema, employeeProfileSchema };
 export const employeeFormSchema = employeeCreateSchema
   .omit({ password: true })
   .extend({ password: z.string() });
@@ -68,39 +55,4 @@ export const employeeDocumentsSchema = z.record(
   z.instanceof(File).nullable(),
 );
 export type EmployeeDocuments = z.infer<typeof employeeDocumentsSchema>;
-export const emptyDocuments: EmployeeDocuments = {
-  fotoUrl: null,
-  selfieUrl: null,
-  kkUrl: null,
-  slipGajiUrl: null,
-  tandaTanganUrl: null,
-  npwpUrl: null,
-};
-export const emptyProfile: EmployeeProfile = {
-  employeeId: '',
-  noKtp: '',
-  namaLengkap: '',
-  jenisKelamin: '',
-  agama: '',
-  tempatLahir: '',
-  tanggalLahir: '',
-  statusMarital: '',
-  namaIbuKandung: '',
-  alamatKtp: '',
-  provinsi: '',
-  kota: '',
-  kecamatan: '',
-  kelurahanDesa: '',
-  kodePos: '',
-  alamatDomisili: '',
-  namaAlias: '',
-  noHp: '',
-  noTelp: '',
-  pekerjaan: '',
-  pendidikan: '',
-  kewarganegaraan: '',
-  npwp: '',
-  takehomePay: '',
-};
-
 export type EmployeeDownloadResponse = Pick<Response, 'ok' | 'blob'>;
