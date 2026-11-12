@@ -9,50 +9,18 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { AdminUsers } from "@web/features/admin-users/presentation/AdminUsers";
 import { useCompanies } from "@web/features/auth/application/useCompanies";
 import { useSession } from "@web/features/auth/application/useSession";
+import { Dashboard } from "@web/features/auth/presentation/Dashboard";
 import { useState } from "react";
 export function Login() {
-  const { session, loading, error, login, logout } = useSession();
+  const { session, loading, error, login } = useSession();
   const [type, setType] = useState<"admin" | "company" | "debitor">("admin");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [slug, setSlug] = useState<string | null>(null);
   const { companies, companyError } = useCompanies(type);
-  if (window.location.pathname !== "/")
-    return (
-      <Container>
-        <Title>Halaman tidak ditemukan</Title>
-        <a href="/">Kembali</a>
-      </Container>
-    );
-  if (session)
-    return (
-      <Container>
-        <Stack>
-          <Text>Beranda</Text>
-          <Title>Credit System</Title>
-          <Text>Masuk sebagai {session.type}</Text>
-          {session.type === "admin" &&
-            Array.isArray(session.userData.roles) &&
-            session.userData.roles.some(
-              (r: { program?: string; value?: string }) =>
-                r.program === "USA" &&
-                (r.value === "READ" || r.value === "WRITE"),
-            ) && (
-              <AdminUsers
-                token={session.authToken}
-                canWrite={session.userData.roles.some(
-                  (r: { program?: string; value?: string }) =>
-                    r.program === "USA" && r.value === "WRITE",
-                )}
-              />
-            )}
-          <Button onClick={logout}>Keluar</Button>
-        </Stack>
-      </Container>
-    );
+  if (session) return <Dashboard />;
   return (
     <Container size="xs">
       <Stack>

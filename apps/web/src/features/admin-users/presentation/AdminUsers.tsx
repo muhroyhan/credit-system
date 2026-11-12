@@ -128,6 +128,7 @@ export function AdminUsers({
                       </Button>
                       <Button
                         color="red"
+                        disabled={users.deleting}
                         onClick={() => {
                           if (window.confirm("Hapus administrator ini?"))
                             void users.remove(u.id);
@@ -238,7 +239,11 @@ export function AdminUsers({
               />
             ))}
             <Group>
-              {!viewOnly && <Button type="submit">Simpan</Button>}
+              {!viewOnly && (
+                <Button type="submit" loading={users.saving}>
+                  Simpan
+                </Button>
+              )}
               <Button type="button" onClick={() => setEditing(false)}>
                 Tutup
               </Button>
