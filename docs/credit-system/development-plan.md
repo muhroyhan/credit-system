@@ -65,6 +65,8 @@ Hasil: nasabah mendaftar melalui slug, login setelah registrasi dan melengkapi i
 
 Hasil: pengajuan dan simulasi nasabah/HRD dapat dipakai dengan status HRD awal pending, tanpa membutuhkan review BPR.
 
+Status: doing. P06-T01 selesai; verifikasi guard dilakukan pada P06-T04. P06-T02–T04 belum selesai.
+
 | Kode task | Task dan keluaran |
 | --- | --- |
 | P06-T01 | Buat schema/migration `credit`, `credit_collection`, `credit_guarantor`, `credit_insurance`, `credit_potongan`, `credit_slik_bmpk`, `credit_spouse`; tetapkan mapping child/upsert dan aktifkan guard penghapusan debitor yang memiliki kredit. |

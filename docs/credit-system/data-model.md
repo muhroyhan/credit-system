@@ -239,3 +239,7 @@ Sebelum menambah constraint atau mengubah tipe, verifikasi DDL tujuan, duplikasi
 Migration 0002 melengkapi debitor dan menambah enam tabel child profil sesuai kamus. Telepon no_hp/no_telp memakai varchar(255), flag NUMBER menjadi boolean, user_id integer unsigned. Tanggal pribadi memakai DATE string YYYY-MM-DD tanpa offset zona waktu. Nominal BIGINT dipetakan DECIMAL(20,0) unsigned agar presisi tidak hilang di JavaScript; takehome_pay tetap integer unsigned. Koordinat memakai DOUBLE bertanda agar lintang/bujur negatif valid.
 
 Relasi child 0..1 dikelola melalui transaksi dan lock baris debitor; belum menambahkan FK/unique fisik tanpa verifikasi data tujuan. Kolom baru nullable agar akun seed/migration lama tetap valid. Tabel credit belum tersedia; guard kredit diaktifkan P06 sebelum fitur kredit dipakai.
+
+## Persiapan P06
+
+Schema dan migration 0003 menyiapkan credit dan enam tabel child. Kolom mengikuti kamus di atas, memakai nullable dan audit seperti schema awal; belum ada FK atau unique fisik. Ini rancangan baru, belum membuktikan kompatibilitas dengan DDL atau data lama. Upsert child memerlukan service mengunci parent credit selama transaksi; pengujian guard dilakukan pada P06-T04.
