@@ -134,3 +134,13 @@ export const employeeDetailSchema = employeeRowSchema.extend({
 });
 export type EmployeeProfile = z.infer<typeof employeeProfileSchema>;
 export type EmployeeDocumentKind = z.infer<typeof employeeDocumentKindSchema>;
+
+export const employeeOptionalFields = [
+  ['namaAlias', 'Alias'],
+  ['noHp', 'Nomor HP'],
+  ['noTelp', 'Nomor telepon'],
+  ['pekerjaan', 'Pekerjaan'],
+  ['pendidikan', 'Pendidikan'],
+  ['kewarganegaraan', 'Kewarganegaraan'],
+  ['npwp', 'NPWP'],
+] as const;

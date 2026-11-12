@@ -9,6 +9,7 @@ import {
   type EmployeeFormInput,
   type EmployeePageProps,
 } from '@web/features/employees/employees.type';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 export function useEmployeeForm({ token, id, initial }: EmployeePageProps) {
   const { session } = useSession();
@@ -22,12 +23,24 @@ export function useEmployeeForm({ token, id, initial }: EmployeePageProps) {
       userId: initial?.userId ?? undefined,
     },
   });
+  const dirty = form.formState.isDirty;
+  useEffect(() => {
+    if (initial && !dirty) {
+      form.reset({
+        namaLengkap: initial.namaLengkap ?? '',
+        username: initial.username ?? '',
+        password: '',
+        userId: initial.userId ?? undefined,
+      });
+    }
+  }, [initial, dirty, form]);
   const client = useQueryClient();
   const navigate = useNavigate();
   const save = useMutation({
     mutationFn: (input: EmployeeFormInput) => saveEmployee(token, input, id),
     onSuccess: async () => {
       await client.invalidateQueries({ queryKey: ['employees'] });
+      form.reset({ ...form.getValues(), password: '' });
       if (!id) {
         await navigate({ to: '/employees' });
       }

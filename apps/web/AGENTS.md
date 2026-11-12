@@ -4,12 +4,12 @@ Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Ho
 
 Root router.tsx mendefinisikan /, /login dan prefix fitur. Child route di feature.routes.ts melalui createCrudRoutes. Empat halaman standar:
 
-| Page | Tugas |
-| --- | --- |
-| FeaturePage | Listing dengan filter/sort/pagination, aksi baris, tambah dan ekspor |
-| FeatureAddPage | Form tambah |
-| FeatureEditPage | Form edit, boleh berbagi komponen form dengan tambah |
-| FeatureViewPage | Detail berupa teks; bukan input disabled |
+| Page            | Tugas                                                                |
+| --------------- | -------------------------------------------------------------------- |
+| FeaturePage     | Listing dengan filter/sort/pagination, aksi baris, tambah dan ekspor |
+| FeatureAddPage  | Form tambah                                                          |
+| FeatureEditPage | Form edit, boleh berbagi komponen form dengan tambah                 |
+| FeatureViewPage | Detail berupa teks; bukan input disabled                             |
 
 Pakai komponen bersama src/components/crud: CrudPage (layout/ACL), ListingTable (tabel/pagination/export), RecordState (ID/loading/error), DetailFields, DeleteAction dan FormActions. Fitur menyediakan kolom, filter, mapping, field dan hook; jangan menyalin layout/kontrol yang sama.
 

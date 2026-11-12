@@ -2,6 +2,7 @@ import { Alert, Stack, Text, TextInput, Title } from '@mantine/core';
 import { FormActions } from '@web/components/crud/FormActions';
 import {
   type EmployeeDetail,
+  employeeOptionalFields,
   employeeProfileFields,
 } from '@web/features/employees/employees.type';
 import { useEmployeeProfile } from '@web/features/employees/hooks/useEmployeeProfile';
@@ -39,17 +40,7 @@ export function EmployeeProfileForm({
           {...register('takehomePay')}
           error={errors.takehomePay?.message}
         />
-        {(
-          [
-            ['namaAlias', 'Alias'],
-            ['noHp', 'Nomor HP'],
-            ['noTelp', 'Nomor telepon'],
-            ['pekerjaan', 'Pekerjaan'],
-            ['pendidikan', 'Pendidikan'],
-            ['kewarganegaraan', 'Kewarganegaraan'],
-            ['npwp', 'NPWP'],
-          ] as const
-        ).map(([name, label]) => (
+        {employeeOptionalFields.map(([name, label]) => (
           <TextInput
             key={name}
             label={label}

@@ -209,7 +209,7 @@ async function document(c: Context<AuthEnv>) {
     );
     c.header('Cache-Control', 'private, no-store');
     c.header('X-Content-Type-Options', 'nosniff');
-    return c.body(result.bytes);
+    return c.body(new Uint8Array(result.bytes).buffer);
   } catch (error) {
     return failure(c, error);
   }

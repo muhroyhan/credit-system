@@ -1,6 +1,6 @@
 # Kontrak API
 
-Sumber tunggal path, payload, DTO dan otorisasi. Bagian berjalan sudah diimplementasikan P00–P04; bagian rancangan belum menjamin endpoint tersedia. Semua path berprefix /api dan persistence dipetakan ke camelCase. Perubahan kompatibilitas dicatat di logic-holes.md.
+Sumber tunggal path, payload, DTO dan otorisasi. Bagian berjalan sudah diimplementasikan P00–P05; bagian rancangan belum menjamin endpoint tersedia. Semua path berprefix /api dan persistence dipetakan ke camelCase. Perubahan kompatibilitas dicatat di logic-holes.md.
 
 ## Ketentuan umum dan ACL
 

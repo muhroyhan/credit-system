@@ -7,6 +7,7 @@ import { useSession } from '@web/features/auth/hooks/useSession';
 import {
   employeeDocumentKinds,
   employeeDocumentLabels,
+  employeeOptionalFields,
   employeeProfileFields,
 } from '@web/features/employees/employees.type';
 import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployees';
@@ -32,18 +33,14 @@ function Content() {
                 label,
                 value: data.profile[key],
               })),
-              ...(
-                [
-                  'namaAlias',
-                  'noHp',
-                  'noTelp',
-                  'pekerjaan',
-                  'pendidikan',
-                  'kewarganegaraan',
-                  'npwp',
-                  'takehomePay',
-                ] as const
-              ).map((key) => ({ label: key, value: data.profile[key] })),
+              ...employeeOptionalFields.map(([key, label]) => ({
+                label,
+                value: data.profile[key],
+              })),
+              {
+                label: 'Pendapatan bersih bulanan',
+                value: data.profile.takehomePay,
+              },
             ]}
           />
           {employeeDocumentKinds.map((kind) => (

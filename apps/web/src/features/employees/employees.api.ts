@@ -3,6 +3,7 @@ import type { ApiResponse } from '@web/constant/interface';
 import { apiErrorSchema } from '@web/constant/schema';
 import type { ExportFormat } from '@web/constant/type';
 import {
+  type EmployeeDownloadResponse,
   type EmployeeFormInput,
   type EmployeeProfile,
   employeeDetailSchema,
@@ -122,7 +123,7 @@ export async function deleteEmployee(token: string, id: number) {
     ),
   );
 }
-async function download(response: Response, filename: string) {
+async function download(response: EmployeeDownloadResponse, filename: string) {
   if (!response.ok) {
     throw new Error('Unduhan gagal');
   }

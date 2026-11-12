@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P04 selesai; P05 sedang dikerjakan; P06–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P05 selesai; P06–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -50,7 +50,7 @@ Footer task dapat ditelusuri dengan `git log --all --grep='Task: Pxx-Tyy'`. Refa
 
 ## P05 — Registrasi dan Master Karyawan
 
-Status: doing. P05-T01 done (60d9625); P05-T02 done (3a1ce1c); P05-T03: profil/dokumen dan UI siap, verifikasi pada P05-T04.
+Status: done. P05-T01: 60d9625; P05-T02: 3a1ce1c; P05-T03: 9a544e0; P05-T04: lihat footer commit Task: P05-T04. Bukti verifikasi pada testing.md.
 
 Hasil: nasabah mendaftar melalui slug, login setelah registrasi dan melengkapi identitas/penghasilan/dokumen; HRD mengelola karyawan perusahaannya.
 

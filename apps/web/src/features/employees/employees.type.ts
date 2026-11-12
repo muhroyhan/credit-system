@@ -7,6 +7,7 @@ import {
   employeeDocumentKinds,
   employeeDocumentLabels,
   employeeListSchema,
+  employeeOptionalFields,
   employeeProfileFields,
   employeeProfileSchema,
 } from '@credit/contracts';
@@ -18,6 +19,7 @@ export {
   employeeDocumentKinds,
   employeeDocumentLabels,
   employeeListSchema,
+  employeeOptionalFields,
   employeeProfileFields,
   employeeProfileSchema,
 };
@@ -101,3 +103,5 @@ export const emptyProfile: EmployeeProfile = {
   npwp: '',
   takehomePay: '',
 };
+
+export type EmployeeDownloadResponse = Pick<Response, 'ok' | 'blob'>;

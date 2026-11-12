@@ -119,7 +119,8 @@ export const employeesRepository = {
           id ? ne(debitors.id, id) : undefined,
         ),
       )
-      .limit(1);
+      .limit(1)
+      .for('update');
     return !!row;
   },
   async save(
@@ -145,18 +146,23 @@ export const employeesRepository = {
   async profile(id: number, tx?: DatabaseTransaction) {
     const db = tx ?? connectDatabase().db;
     const { password: _password, ...publicColumns } = getTableColumns(debitors);
-    const [parent] = await db
+    const parentQuery = db
       .select(publicColumns)
       .from(debitors)
       .where(eq(debitors.id, id));
-    const [data] = await db
+    const dataQuery = db
       .select()
       .from(debitorData)
       .where(eq(debitorData.debitorId, id));
-    const [financial] = await db
+    const financialQuery = db
       .select({ takehomePay: debitorFinancial.takehomePay })
       .from(debitorFinancial)
       .where(eq(debitorFinancial.debitorId, id));
+    const [parent] = await (tx ? parentQuery.for('update') : parentQuery);
+    const [data] = await (tx ? dataQuery.for('update') : dataQuery);
+    const [financial] = await (tx
+      ? financialQuery.for('update')
+      : financialQuery);
     return { parent, data, financial };
   },
   async saveProfile(
@@ -228,7 +234,7 @@ export const employeesRepository = {
       return false;
     }
     const [rows] = await tx.execute(
-      sql`SELECT id FROM credit WHERE debitor_id = ${id} LIMIT 1`,
+      sql`SELECT id FROM credit WHERE debitor_id = ${id} LIMIT 1 FOR UPDATE`,
     );
     return Array.isArray(rows) && rows.length > 0;
   },

@@ -15,6 +15,7 @@ import {
   emptyDocuments,
   emptyProfile,
 } from '@web/features/employees/employees.type';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 export function useEmployeeProfile(token: string, data: EmployeeDetail) {
   const client = useQueryClient();
@@ -23,9 +24,18 @@ export function useEmployeeProfile(token: string, data: EmployeeDetail) {
     mode: 'onTouched',
     defaultValues: { ...emptyProfile, ...data.profile },
   });
+  const dirty = form.formState.isDirty;
+  useEffect(() => {
+    if (!dirty) {
+      form.reset({ ...emptyProfile, ...data.profile });
+    }
+  }, [data.profile, dirty, form]);
   const save = useMutation({
     mutationFn: (input: EmployeeProfile) => saveProfile(token, data.id, input),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['employees'] }),
+    onSuccess: async (_result, input) => {
+      await client.invalidateQueries({ queryKey: ['employees'] });
+      form.reset(input);
+    },
   });
   return { form, save };
 }

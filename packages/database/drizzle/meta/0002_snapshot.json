@@ -78,9 +78,7 @@
       "compositePrimaryKeys": {
         "admin_user_id": {
           "name": "admin_user_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -153,9 +151,7 @@
       "compositePrimaryKeys": {
         "constant_id": {
           "name": "constant_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -221,9 +217,7 @@
       "compositePrimaryKeys": {
         "country_id": {
           "name": "country_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -331,9 +325,7 @@
       "compositePrimaryKeys": {
         "debitor_data_id": {
           "name": "debitor_data_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -490,9 +482,7 @@
       "compositePrimaryKeys": {
         "debitor_family_id": {
           "name": "debitor_family_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -635,9 +625,7 @@
       "compositePrimaryKeys": {
         "debitor_financial_id": {
           "name": "debitor_financial_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -710,9 +698,7 @@
       "compositePrimaryKeys": {
         "debitor_gps_id": {
           "name": "debitor_gps_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -904,9 +890,7 @@
       "compositePrimaryKeys": {
         "debitor_others_id": {
           "name": "debitor_others_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1028,9 +1012,7 @@
       "compositePrimaryKeys": {
         "debitor_slik_id": {
           "name": "debitor_slik_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1285,9 +1267,7 @@
       "compositePrimaryKeys": {
         "debitor_id": {
           "name": "debitor_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1332,9 +1312,7 @@
       "compositePrimaryKeys": {
         "entity_type_id": {
           "name": "entity_type_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1386,9 +1364,7 @@
       "compositePrimaryKeys": {
         "program_id": {
           "name": "program_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1447,9 +1423,7 @@
       "compositePrimaryKeys": {
         "role_id": {
           "name": "role_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1529,9 +1503,7 @@
       "compositePrimaryKeys": {
         "user_biaya_id": {
           "name": "user_biaya_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1604,9 +1576,7 @@
       "compositePrimaryKeys": {
         "user_bunga_kredit_id": {
           "name": "user_bunga_kredit_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1707,9 +1677,7 @@
       "compositePrimaryKeys": {
         "user_id": {
           "name": "user_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},

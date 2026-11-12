@@ -23,8 +23,9 @@ Instruksi E2E ada di [tests/e2e/AGENTS.md](../../tests/e2e/AGENTS.md).
 
 | Verifikasi | Hasil tercatat |
 | --- | --- |
-| Audit Google TypeScript, 12 November 2026, commit 73deb33 | Lint, typecheck seluruh workspace/tooling/test dan build lulus; 10 unit, 6 integration, 12 E2E lulus pada MySQL disposable credit_style_test setelah migration/seed. |
+| P05-T04, 12 November 2026 | Lint, typecheck seluruh workspace/tooling/test dan build lulus; 14 unit, 7 integration, 16 E2E lulus pada MySQL disposable credit_p05_test setelah migration 0000–0002 dan seed dua kali. |
+| P05 kegagalan dan konkurensi | Konflik username bersamaan menghasilkan satu akun; save profil bersamaan tidak menggandakan child. SQL child gagal mengembalikan perubahan parent; storage gagal membersihkan file baru dan mempertahankan dokumen lama. API lintas tenant/field internal/file palsu ditolak. Registrasi-login-profil-lima dokumen-unduh dan HRD CRUD diuji di browser nyata. |
 | Migration ACL 0001 | Role WRITE lama dengan READ yang sudah ada menghasilkan tepat satu aksi CRUD per program tanpa Approval; seed dua kali tidak menggandakan role. |
 | Probe declaration dependency | Pemeriksaan tanpa skipLibCheck gagal; rincian masalah aktif hanya di logic-holes.md. |
 
-Ini bukti pada revisi tersebut, bukan jaminan test telah dijalankan ulang setelah perubahan selanjutnya. Histori hasil phase ada pada commit task di development-plan.md, bukan diulang sebagai log panjang di sini. Pekerjaan P05–P12 belum diklaim lulus. Perapian dokumentasi setelah audit ini hanya diperiksa untuk konsistensi dan tautan; tidak menjalankan ulang suite aplikasi.
+Ini bukti pada revisi tersebut, bukan jaminan test telah dijalankan ulang setelah perubahan selanjutnya. Histori hasil phase ada pada commit task di development-plan.md, bukan diulang sebagai log panjang di sini. Pekerjaan P06–P12 belum diklaim lulus; guard dengan data credit nyata menunggu P06. Warning build dependency Zod dan ukuran chunk frontend tetap muncul. Tidak ada script test sementara yang disimpan.
