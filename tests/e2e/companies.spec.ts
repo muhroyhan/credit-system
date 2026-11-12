@@ -15,13 +15,13 @@ test("company API permissions, tenant scope and deletion guard", async ({
   const writer = await login("admin_sintetis");
   const reader = await login("admin_baca");
   const company = await login("hrd_satu", "company", "sintetis-satu");
-  expect((await request.get("/api/users")).status()).toBe(401);
-  expect((await request.get("/api/users", { headers: reader })).status()).toBe(
-    200,
-  );
-  expect((await request.get("/api/users", { headers: company })).status()).toBe(
-    403,
-  );
+  expect((await request.get("/api/user/list")).status()).toBe(401);
+  expect(
+    (await request.get("/api/user/list", { headers: reader })).status(),
+  ).toBe(200);
+  expect(
+    (await request.get("/api/user/list", { headers: company })).status(),
+  ).toBe(403);
   expect(
     (
       await request.get("/api/user/bunga-kredits?slug=sintetis-dua", {
@@ -73,7 +73,7 @@ test("company API permissions, tenant scope and deletion guard", async ({
       ).status(),
     ).toBe(409);
     const before = await (
-      await request.get(`/api/user?id=${id}`, { headers: reader })
+      await request.get(`/api/user/detail?id=${id}`, { headers: reader })
     ).json();
     expect(before.bungaKredits).toHaveLength(1);
     expect(before.password).toBeUndefined();
@@ -94,7 +94,7 @@ test("company API permissions, tenant scope and deletion guard", async ({
       ).status(),
     ).toBe(200);
     const after = await (
-      await request.get(`/api/user?id=${id}`, { headers: reader })
+      await request.get(`/api/user/detail?id=${id}`, { headers: reader })
     ).json();
     expect(after.bungaKredits).toEqual([]);
     expect(after.biaya).toEqual([]);

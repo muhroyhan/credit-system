@@ -7,7 +7,17 @@ export const adminSchema = z.object({
   isActive: z.boolean().nullable(),
   roles: z
     .array(
-      z.object({ programId: z.number(), value: z.enum(["READ", "WRITE"]) }),
+      z.object({
+        programId: z.number(),
+        value: z.enum([
+          "READ",
+          "WRITE",
+          "CREATE",
+          "UPDATE",
+          "DELETE",
+          "APPROVAL",
+        ]),
+      }),
     )
     .optional(),
 });

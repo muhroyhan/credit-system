@@ -14,26 +14,28 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
   const reader = await signIn("admin_baca");
   const writeHeaders = { Authorization: `Bearer ${writer}` };
   const readHeaders = { Authorization: `Bearer ${reader}` };
-  expect((await request.get("/api/admin-users")).status()).toBe(401);
+  expect((await request.get("/api/admin-user/list")).status()).toBe(401);
   expect(
-    (await request.get("/api/admin-users", { headers: readHeaders })).status(),
+    (
+      await request.get("/api/admin-user/list", { headers: readHeaders })
+    ).status(),
   ).toBe(200);
   expect(
     (
-      await request.get("/api/admin-users?sortBy=invalid", {
+      await request.get("/api/admin-user/list?sortBy=invalid", {
         headers: readHeaders,
       })
     ).status(),
   ).toBe(400);
   const ascending = await (
     await request.get(
-      "/api/admin-users?sortBy=username&sortDirection=asc&limit=1",
+      "/api/admin-user/list?sortBy=username&sortDirection=asc&limit=1",
       { headers: readHeaders },
     )
   ).json();
   const descending = await (
     await request.get(
-      "/api/admin-users?sortBy=username&sortDirection=desc&limit=1",
+      "/api/admin-user/list?sortBy=username&sortDirection=desc&limit=1",
       { headers: readHeaders },
     )
   ).json();
@@ -60,17 +62,17 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
   expect(created.status()).toBe(201);
   const { id } = await created.json();
   expect(
-    (await request.get("/api/admin-users/export?format=pdf")).status(),
+    (await request.get("/api/admin-user/export?format=pdf")).status(),
   ).toBe(401);
   expect(
     (
-      await request.get("/api/admin-users/export?format=csv", {
+      await request.get("/api/admin-user/export?format=csv", {
         headers: readHeaders,
       })
     ).status(),
   ).toBe(400);
   const pdf = await request.get(
-    "/api/admin-users/export?format=pdf&username=p03_admin&limit=1",
+    "/api/admin-user/export?format=pdf&username=p03_admin&limit=1",
     { headers: readHeaders },
   );
   expect(pdf.status()).toBe(200);
@@ -79,14 +81,14 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
   expect(pdfText).toContain("p03_admin");
   expect(pdfText).not.toContain("admin_sintetis");
   const unlimited = await request.get(
-    "/api/admin-users/export?format=pdf&username=admin_&limit=1",
+    "/api/admin-user/export?format=pdf&username=admin_&limit=1",
     { headers: readHeaders },
   );
   const unlimitedText = (await unlimited.body()).toString("latin1");
   expect(unlimitedText).toContain("admin_sintetis");
   expect(unlimitedText).toContain("admin_baca");
 
-  const detail = await request.get(`/api/admin-user?id=${id}`, {
+  const detail = await request.get(`/api/admin-user/detail?id=${id}`, {
     headers: readHeaders,
   });
   expect(detail.status()).toBe(200);
@@ -112,7 +114,9 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
   expect(
     (
       await (
-        await request.get(`/api/admin-user?id=${id}`, { headers: readHeaders })
+        await request.get(`/api/admin-user/detail?id=${id}`, {
+          headers: readHeaders,
+        })
       ).json()
     ).roles,
   ).toEqual([{ programId: 900002, value: "READ" }]);
@@ -125,7 +129,7 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
     ).status(),
   ).toBe(200);
   const filtered = await (
-    await request.get("/api/admin-users?username=p03_admin", {
+    await request.get("/api/admin-user/list?username=p03_admin", {
       headers: readHeaders,
     })
   ).json();
@@ -140,7 +144,9 @@ test("admin CRUD, role checks and conflicts", async ({ request }) => {
   ).toBe(200);
   expect(
     (
-      await request.get(`/api/admin-user?id=${id}`, { headers: readHeaders })
+      await request.get(`/api/admin-user/detail?id=${id}`, {
+        headers: readHeaders,
+      })
     ).status(),
   ).toBe(404);
 });
@@ -241,5 +247,74 @@ test("protected feature URLs redirect anonymous visitors to login", async ({
     await expect(
       page.getByRole("button", { name: "Masuk", exact: true }),
     ).toBeVisible();
+  }
+});
+
+test("individual ACL values apply independently", async ({ request }) => {
+  const login = async (username: string, pass: string) => {
+    const result = await request.post("/api/login", {
+      data: { type: "admin", username, password: pass },
+    });
+    expect(result.status()).toBe(200);
+    return { Authorization: `Bearer ${(await result.json()).authToken}` };
+  };
+  const writer = await login("admin_sintetis", password ?? "");
+  const input = {
+    username: "acl_creator",
+    email: "acl_creator@example.invalid",
+    password: "Synthetic123",
+    isActive: true,
+    roles: [
+      { programId: 900001, value: "CREATE" },
+      { programId: 900001, value: "APPROVAL" },
+    ],
+  };
+  const response = await request.post("/api/admin-user/create", {
+    headers: writer,
+    data: input,
+  });
+  expect(response.status()).toBe(201);
+  const { id } = await response.json();
+  let createdId: number | undefined;
+  try {
+    const detail = await (
+      await request.get(`/api/admin-user/detail?id=${id}`, { headers: writer })
+    ).json();
+    expect(detail.roles).toEqual(expect.arrayContaining(input.roles));
+    const limited = await login(input.username, input.password);
+    expect(
+      (
+        await request.get("/api/admin-user/list", { headers: limited })
+      ).status(),
+    ).toBe(403);
+    const created = await request.post("/api/admin-user/create", {
+      headers: limited,
+      data: {
+        ...input,
+        username: "acl_created",
+        email: "acl_created@example.invalid",
+        roles: [],
+      },
+    });
+    expect(created.status()).toBe(201);
+    createdId = (await created.json()).id;
+    expect(
+      (
+        await request.put("/api/admin-user/delete", {
+          headers: limited,
+          data: { id: createdId },
+        })
+      ).status(),
+    ).toBe(403);
+  } finally {
+    if (createdId)
+      await request.put("/api/admin-user/delete", {
+        headers: writer,
+        data: { id: createdId },
+      });
+    await request.put("/api/admin-user/delete", {
+      headers: writer,
+      data: { id },
+    });
   }
 });

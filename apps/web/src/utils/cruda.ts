@@ -20,10 +20,10 @@ export function crudaAccess(
       : [];
   const write = values.includes("WRITE");
   return {
-    create: write,
+    create: write || values.includes("CREATE"),
     read: write || values.includes("READ"),
-    update: write,
-    delete: write,
-    approve: false,
+    update: write || values.includes("UPDATE"),
+    delete: write || values.includes("DELETE"),
+    approve: values.includes("APPROVAL"),
   };
 }

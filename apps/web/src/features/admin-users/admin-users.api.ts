@@ -28,14 +28,14 @@ export async function listAdmins(
   token: string,
   query: URLSearchParams,
 ): Promise<AdminList> {
-  const response = await client.api["admin-users"].$get(
+  const response = await client.api["admin-user"].list.$get(
     { query: Object.fromEntries(query) } as never,
     options(token),
   );
   return adminListSchema.parse(await read(response));
 }
 export async function adminDetail(token: string, id: number): Promise<Admin> {
-  const response = await client.api["admin-user"].$get(
+  const response = await client.api["admin-user"].detail.$get(
     { query: { id: String(id) } } as never,
     options(token),
   );
@@ -74,7 +74,7 @@ export async function exportAdmins(
   format: AdminExportFormat,
 ): Promise<void> {
   filters.set("format", format);
-  const response = await client.api["admin-users"].export.$get(
+  const response = await client.api["admin-user"].export.$get(
     { query: Object.fromEntries(filters) } as never,
     options(token),
   );

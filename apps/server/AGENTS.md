@@ -21,3 +21,5 @@
 - Setiap service yang menangani API non-GET menjalankan seluruh operasi database dalam satu transaksi Drizzle melalui `withTransaction`; teruskan transaction ke repository dan gunakan transaction tersebut untuk setiap query. Kegagalan harus dilempar agar rollback; jangan membuka atau menutup pool per request.
 
 - Hanya service yang melempar error bisnis. Repository mengembalikan hasil query (data/null/boolean/ID) dan tidak membuat error bisnis atau membuka transaksi. Error teknis Drizzle/driver diteruskan secara alami. Satu service boleh menggunakan banyak repository; seluruh query penulisan memakai transaksi service yang sama.
+
+- Kelompokkan route fitur dengan satu `app.route` per prefix fitur; method dan path tetap didaftarkan di `routes.ts`. Gunakan `permission("PROGRAM_CREATE|READ|UPDATE|DELETE|APPROVAL")` untuk otorisasi aksi, dengan string sebenarnya seperti `USA_CREATE`. Role READ/WRITE lama tetap didukung; Approval harus eksplisit.

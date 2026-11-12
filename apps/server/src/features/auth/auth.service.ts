@@ -50,6 +50,16 @@ export function hasProgramPermission(
     )
   );
 }
+export function hasAclPermission(identity: Identity, acl: string) {
+  const match = /^([A-Z0-9]+)_(CREATE|READ|UPDATE|DELETE|APPROVAL)$/.exec(acl);
+  if (!match || identity.type !== "admin") return false;
+  const [, program, action] = match;
+  return identity.permissions.some(
+    (p) =>
+      p.program === program &&
+      (p.value === action || (p.value === "WRITE" && action !== "APPROVAL")),
+  );
+}
 export function belongsToCompany(identity: Identity, slug: string) {
   return identity.type === "admin" || identity.slug === slug;
 }
@@ -88,5 +98,6 @@ export const authService = {
   authenticate: (header?: string) =>
     authenticate(header, authRepository.resolveIdentity),
   hasProgramPermission,
+  hasAclPermission,
   belongsToCompany,
 };

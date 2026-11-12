@@ -1,5 +1,6 @@
 import {
   belongsToCompany,
+  hasAclPermission,
   hasProgramPermission,
   type Identity,
 } from "@credit/server/identity";
@@ -31,5 +32,26 @@ describe("program and tenant access", () => {
     expect(belongsToCompany(user, "tenant-a")).toBe(true);
     expect(belongsToCompany(user, "tenant-b")).toBe(false);
     expect(hasProgramPermission(user, "USA", "READ")).toBe(false);
+  });
+});
+
+describe("granular ACL", () => {
+  it("checks each action, keeps legacy WRITE, and requires explicit approval", () => {
+    const identity: Identity = {
+      ...admin,
+      permissions: [
+        { program: "USA", value: "CREATE" },
+        { program: "USA", value: "APPROVAL" },
+        { program: "USC", value: "WRITE" },
+      ],
+    };
+    expect(hasAclPermission(identity, "USA_CREATE")).toBe(true);
+    expect(hasAclPermission(identity, "USA_UPDATE")).toBe(false);
+    expect(hasAclPermission(identity, "USA_READ")).toBe(false);
+    expect(hasAclPermission(identity, "USA_APPROVAL")).toBe(true);
+    expect(hasAclPermission(identity, "USC_DELETE")).toBe(true);
+    expect(hasAclPermission(identity, "USC_APPROVAL")).toBe(false);
+    expect(hasAclPermission(identity, "USA_WRITE")).toBe(false);
+    expect(hasAclPermission(identity, "usa_CREATE")).toBe(false);
   });
 });

@@ -36,7 +36,7 @@ function ViewContent() {
         <Title order={2}>Hak akses</Title>
         {data.roles?.length ? (
           data.roles.map((role) => (
-            <Text key={role.programId}>
+            <Text key={`${role.programId}-${role.value}`}>
               {programs.data?.find((p) => p.id === role.programId)?.name ??
                 `Program ${role.programId}`}
               : {role.value}

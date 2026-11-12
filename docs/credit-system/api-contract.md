@@ -24,13 +24,13 @@ Registrasi debitor, login dan slug dapat diakses sebelum JWT; endpoint lain memb
 
 | Method dan path | Fungsi |
 | --- | --- |
-| `GET /api/admin-users`, `GET /api/admin-user` | Daftar/filter dan detail administrator dengan role/program. |
+| `GET /api/admin-user/list`, `GET /api/admin-user/detail` | Daftar/filter dan detail administrator dengan role/program. |
 | `POST /api/admin-user/create`, `PUT /api/admin-user/update`, `PUT /api/admin-user/delete` | Pengelolaan administrator dan role. |
-| `GET /api/users`, `GET /api/user`, `GET /api/user/export` | Daftar/filter, detail dan CSV perusahaan. |
+| `GET /api/user/list`, `GET /api/user/detail`, `GET /api/user/export` | Daftar/filter, detail dan CSV perusahaan. |
 | `POST /api/user/create`, `PUT /api/user/update`, `PUT /api/user/delete` | Pengelolaan perusahaan serta konfigurasi bunga/biaya; hapus dibatasi bila mempunyai debitor. |
 | `GET /api/user/bunga-kredits` | Daftar bunga dan tenor perusahaan terkait slug. |
 
-Perusahaan membawa jenis badan usaha, nama, email, username, slug, status, pengaturan bunga dan biaya. Benturan username/email atau kombinasi nama dan jenis entitas dicek sebelum create/update. Pembaruan array bunga dan biaya merekonsiliasi detail yang dikirim; perilaku array kosong tercatat sebagai risiko untuk divalidasi. Pada administrator, password di-hash dan setiap role memetakan nilai `READ`/`WRITE` ke program; edit role mengganti daftar role.
+Perusahaan membawa jenis badan usaha, nama, email, username, slug, status, pengaturan bunga dan biaya. Benturan username/email atau kombinasi nama dan jenis entitas dicek sebelum create/update. Pembaruan array bunga dan biaya merekonsiliasi detail yang dikirim; perilaku array kosong tercatat sebagai risiko untuk divalidasi. Pada administrator, password di-hash dan setiap role memetakan nilai `CREATE`/`READ`/`UPDATE`/`DELETE`/`APPROVAL` atau `WRITE` lama ke program; edit role mengganti daftar role.
 
 Admin user mendukung filter email, username dan aktif. Perusahaan mendukung email, username, nama badan usaha+nama perusahaan dan status. Daftar menggunakan pengurutan dan pagination; CSV perusahaan mengikuti filter/pengurutan tanpa pagination dan mencakup identitas, status, serta audit.
 
@@ -68,12 +68,18 @@ Login menerima `{type, username, password, slug?}`; slug wajib untuk perusahaan 
 
 ## Implementasi Admin User P03
 
-`GET /api/admin-users` menerima filter `email`, `username`, `active`, serta `page` dan `limit`. Sorting opsional: `sortBy` (`createdAt`, `username`, `email`, `isActive`; default `createdAt`) dan `sortDirection` (`asc`/`desc`; default `desc`), dengan id menurun sebagai tie-breaker; respons `{count, data}` tidak menyertakan password. `GET /api/admin-user?id=...` menyertakan `roles` berisi `{programId, value}`. Create menerima `{username, email, password, isActive, roles}`; update menambahkan `id` dan password opsional; delete menerima `{id}`. Penulisan dan penggantian role dilakukan dalam transaksi. Endpoint membaca memerlukan USA_READ, endpoint menulis memerlukan USA_WRITE; WRITE juga memberikan READ. Input salah menghasilkan 400, identitas tidak valid 401, izin tidak cukup 403, data tidak ditemukan 404, dan konflik akun/program 409. Pemeriksaan konflik belum menjamin keunikan saat request paralel tanpa constraint database terverifikasi.
+`GET /api/admin-user/list` menerima filter `email`, `username`, `active`, serta `page` dan `limit`. Sorting opsional: `sortBy` (`createdAt`, `username`, `email`, `isActive`; default `createdAt`) dan `sortDirection` (`asc`/`desc`; default `desc`), dengan id menurun sebagai tie-breaker; respons `{count, data}` tidak menyertakan password. `GET /api/admin-user/detail?id=...` menyertakan `roles` berisi `{programId, value}`. Create menerima `{username, email, password, isActive, roles}`; update menambahkan `id` dan password opsional; delete menerima `{id}`. Penulisan dan penggantian role dilakukan dalam transaksi. Endpoint membaca memerlukan USA_READ, endpoint menulis memerlukan USA_CREATE, USA_UPDATE, atau USA_DELETE sesuai aksi; WRITE lama memberikan semua izin CRUD. Input salah menghasilkan 400, identitas tidak valid 401, izin tidak cukup 403, data tidak ditemukan 404, dan konflik akun/program 409. Pemeriksaan konflik belum menjamin keunikan saat request paralel tanpa constraint database terverifikasi.
 
-`GET /api/admin-users/export` menerima `format=pdf|xlsx` dan filter serta sorting yang sama dengan listing; seluruh hasil yang cocok diekspor tanpa pagination. Membutuhkan USA_READ atau USA_WRITE.
+`GET /api/admin-user/export` menerima `format=pdf|xlsx` dan filter serta sorting yang sama dengan listing; seluruh hasil yang cocok diekspor tanpa pagination. Membutuhkan USA_READ atau USA_WRITE.
 
 ## Implementasi P04
 
-API perusahaan: GET users (listing), GET user?id, POST user/create, PUT user/update dan PUT user/delete dengan id. CRUD administratif memerlukan USC_READ/WRITE; WRITE termasuk READ. Payload camelCase: entityTypeId, companyName, email, username, slug, status (active/inactive/blocked), password (wajib create), bungaKredits [{id?, bungaPercentage, jangkaWaktuBulan}], biaya [{id?, expenseType, type, value}]. Array merupakan konfigurasi lengkap: child yang tidak dikirim dihapus, array kosong menghapus semua. ID child wajib milik parent; error 400/401/403/404/409.
+API perusahaan: GET user/list (listing), GET user/detail?id, POST user/create, PUT user/update dan PUT user/delete dengan id. CRUD administratif memerlukan USC_READ/WRITE; WRITE termasuk READ. Payload camelCase: entityTypeId, companyName, email, username, slug, status (active/inactive/blocked), password (wajib create), bungaKredits [{id?, bungaPercentage, jangkaWaktuBulan}], biaya [{id?, expenseType, type, value}]. Array merupakan konfigurasi lengkap: child yang tidak dikirim dihapus, array kosong menghapus semua. ID child wajib milik parent; error 400/401/403/404/409.
 
 GET user/bunga-kredits?slug memerlukan identitas: company/debitor dibatasi slug sendiri; admin dapat membaca konfigurasi untuk simulasi. GET user/export?format=pdf|xlsx memerlukan USC_READ, memakai filter/sorting listing tanpa pagination. Filter users: email, username, companyName, entityTypeId, status, page, limit, sortBy dan sortDirection. Tidak ada perubahan skema atau migration baru.
+
+## Route per fitur dan ACL granular
+
+Route Admin User berada pada `/api/admin-user/{list,detail,create,update,delete,export}`, route perusahaan pada `/api/user/{list,detail,create,update,delete,export,slugs,bunga-kredits}`. Method dan payload mengikuti handler sebelumnya. Perubahan path ini memerlukan pembaruan client; path lama tidak tersedia.
+
+Middleware menerima ACL berupa `<PROGRAM>_<CREATE|READ|UPDATE|DELETE|APPROVAL>`. Role disimpan sebagai program dan nilai aksi: lebih dari satu aksi dapat diberikan pada program yang sama. Role lama READ tetap memberikan READ; WRITE memberikan CREATE/READ/UPDATE/DELETE. APPROVAL harus diberikan secara eksplisit; WRITE tidak mencakupnya. Tidak ada endpoint approval yang ditambahkan pada phase ini.

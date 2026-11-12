@@ -1,10 +1,11 @@
+import { adminRoleSchema } from "@credit/contracts";
 import {
   Alert,
   Button,
   Checkbox,
   Group,
+  MultiSelect,
   PasswordInput,
-  Select,
   Stack,
   TextInput,
 } from "@mantine/core";
@@ -75,28 +76,34 @@ export function AdminUserForm({
           render={({ field }) => (
             <>
               {users.options.map((p) => (
-                <Select
+                <MultiSelect
                   key={p.value}
                   label={p.label}
-                  clearable
                   data={[
                     { value: "READ", label: "READ" },
-                    { value: "WRITE", label: "WRITE" },
+                    { value: "WRITE", label: "WRITE (legacy)" },
+                    { value: "CREATE", label: "CREATE" },
+                    { value: "UPDATE", label: "UPDATE" },
+                    { value: "DELETE", label: "DELETE" },
+                    { value: "APPROVAL", label: "APPROVAL" },
                   ]}
-                  value={
-                    field.value.find((r) => r.programId === Number(p.value))
-                      ?.value ?? null
-                  }
+                  value={field.value
+                    .filter((r) => r.programId === Number(p.value))
+                    .map((r) => r.value)}
                   onBlur={field.onBlur}
                   error={errors.roles?.message}
-                  onChange={(v) =>
+                  onChange={(values) =>
                     field.onChange([
                       ...field.value.filter(
                         (r) => r.programId !== Number(p.value),
                       ),
-                      ...(v === "READ" || v === "WRITE"
-                        ? [{ programId: Number(p.value), value: v }]
-                        : []),
+                      ...values.flatMap((value) => {
+                        const parsed = adminRoleSchema.safeParse({
+                          programId: Number(p.value),
+                          value,
+                        });
+                        return parsed.success ? [parsed.data] : [];
+                      }),
                     ])
                   }
                 />

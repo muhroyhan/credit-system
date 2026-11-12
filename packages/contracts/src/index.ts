@@ -40,7 +40,7 @@ export const loginSchema = z
 
 export const adminRoleSchema = z.object({
   programId: z.number().int().positive(),
-  value: z.enum(["READ", "WRITE"]),
+  value: z.enum(["READ", "WRITE", "CREATE", "UPDATE", "DELETE", "APPROVAL"]),
 });
 export const adminInputSchema = z.object({
   username: z.string().min(1).max(255),
@@ -51,8 +51,9 @@ export const adminInputSchema = z.object({
     .array(adminRoleSchema)
     .refine(
       (items) =>
-        new Set(items.map((item) => item.programId)).size === items.length,
-      "Program harus unik",
+        new Set(items.map((item) => `${item.programId}:${item.value}`)).size ===
+        items.length,
+      "Izin program harus unik",
     ),
 });
 export const adminCreateSchema = adminInputSchema.refine(

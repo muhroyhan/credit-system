@@ -25,7 +25,7 @@ async function read(response: CompanyApiResponse) {
 export async function listCompanies(token: string, query: URLSearchParams) {
   return companyListSchema.parse(
     await read(
-      await client.api.users.$get(
+      await client.api.user.list.$get(
         { query: Object.fromEntries(query) } as never,
         options(token),
       ),
@@ -35,7 +35,7 @@ export async function listCompanies(token: string, query: URLSearchParams) {
 export async function companyDetail(token: string, id: number) {
   return companyDetailSchema.parse(
     await read(
-      await client.api.user.$get(
+      await client.api.user.detail.$get(
         { query: { id: String(id) } } as never,
         options(token),
       ),

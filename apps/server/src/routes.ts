@@ -1,24 +1,19 @@
 import { adminUsersController } from "@server/features/admin-users/admin-users.controller";
-import type { AdminUsersRoutes } from "@server/features/admin-users/admin-users.type";
 import { authController } from "@server/features/auth/auth.controller";
 import type { AuthEnv } from "@server/features/auth/auth.type";
 import { companiesController } from "@server/features/companies/companies.controller";
 import { healthController } from "@server/features/health/health.controller";
 import { referenceController } from "@server/features/reference/reference.controller";
-import type { ReferenceRoutes } from "@server/features/reference/reference.type";
 import type { SchemaOf } from "@server/infrastructure/rpc-types";
-import { adminReadPermission } from "@server/middleware/admin-read.middleware";
-import { adminWritePermission } from "@server/middleware/admin-write.middleware";
-import { companyReadPermission } from "@server/middleware/company-read.middleware";
-import { companyWritePermission } from "@server/middleware/company-write.middleware";
 import { identityContext } from "@server/middleware/identity-context.middleware";
+import { permission } from "@server/middleware/permission.middleware";
 import { Hono } from "hono";
+import type { MergeSchemaPath } from "hono/types";
 
 export function routes() {
   const app = new Hono<AuthEnv>();
   const health = app.get("/health", healthController.health);
   const login = app.post("/login", authController.login);
-  const slugs = app.get("/user/slugs", referenceController.slugs);
   const programs = app.get(
     "/programs",
     identityContext,
@@ -39,106 +34,109 @@ export function routes() {
     identityContext,
     referenceController.constants,
   );
-  const list = app.get(
-    "/admin-users",
+  const admin = new Hono<AuthEnv>();
+  const list = admin.get(
+    "/list",
     identityContext,
-    adminReadPermission,
+    permission("USA_READ"),
     adminUsersController.list,
   );
-  const exportFile = app.get(
-    "/admin-users/export",
+  const exportFile = admin.get(
+    "/export",
     identityContext,
-    adminReadPermission,
+    permission("USA_READ"),
     adminUsersController.exportFile,
   );
-  const detail = app.get(
-    "/admin-user",
+  const detail = admin.get(
+    "/detail",
     identityContext,
-    adminReadPermission,
+    permission("USA_READ"),
     adminUsersController.detail,
   );
-  const create = app.post(
-    "/admin-user/create",
+  const create = admin.post(
+    "/create",
     identityContext,
-    adminWritePermission,
+    permission("USA_CREATE"),
     adminUsersController.create,
   );
-  const update = app.put(
-    "/admin-user/update",
+  const update = admin.put(
+    "/update",
     identityContext,
-    adminWritePermission,
+    permission("USA_UPDATE"),
     adminUsersController.update,
   );
-  const remove = app.put(
-    "/admin-user/delete",
+  const remove = admin.put(
+    "/delete",
     identityContext,
-    adminWritePermission,
+    permission("USA_DELETE"),
     adminUsersController.remove,
   );
-  const companies = app.get(
-    "/users",
+  type AdminSchema = SchemaOf<typeof list> &
+    SchemaOf<typeof exportFile> &
+    SchemaOf<typeof detail> &
+    SchemaOf<typeof create> &
+    SchemaOf<typeof update> &
+    SchemaOf<typeof remove>;
+  app.route("/admin-user", admin as Hono<AuthEnv, AdminSchema>);
+  const user = new Hono<AuthEnv>();
+  const slugs = user.get("/slugs", referenceController.slugs);
+  const companies = user.get(
+    "/list",
     identityContext,
-    companyReadPermission,
+    permission("USC_READ"),
     companiesController.list,
   );
-  const company = app.get(
-    "/user",
+  const company = user.get(
+    "/detail",
     identityContext,
-    companyReadPermission,
+    permission("USC_READ"),
     companiesController.detail,
   );
-  const companyCreate = app.post(
-    "/user/create",
+  const companyCreate = user.post(
+    "/create",
     identityContext,
-    companyWritePermission,
+    permission("USC_CREATE"),
     companiesController.create,
   );
-  const companyUpdate = app.put(
-    "/user/update",
+  const companyUpdate = user.put(
+    "/update",
     identityContext,
-    companyWritePermission,
+    permission("USC_UPDATE"),
     companiesController.update,
   );
-  const companyDelete = app.put(
-    "/user/delete",
+  const companyDelete = user.put(
+    "/delete",
     identityContext,
-    companyWritePermission,
+    permission("USC_DELETE"),
     companiesController.remove,
   );
-  const companyInterests = app.get(
-    "/user/bunga-kredits",
+  const interests = user.get(
+    "/bunga-kredits",
     identityContext,
     companiesController.interests,
   );
-  const companyExport = app.get(
-    "/user/export",
+  const companyExport = user.get(
+    "/export",
     identityContext,
-    companyReadPermission,
+    permission("USC_READ"),
     companiesController.exportFile,
   );
-  type ApiSchema = SchemaOf<typeof companies> &
+  type UserSchema = SchemaOf<typeof slugs> &
+    SchemaOf<typeof companies> &
     SchemaOf<typeof company> &
     SchemaOf<typeof companyCreate> &
     SchemaOf<typeof companyUpdate> &
     SchemaOf<typeof companyDelete> &
-    SchemaOf<typeof companyInterests> &
-    SchemaOf<typeof companyExport> &
-    SchemaOf<typeof health> &
+    SchemaOf<typeof interests> &
+    SchemaOf<typeof companyExport>;
+  app.route("/user", user as Hono<AuthEnv, UserSchema>);
+  type ApiSchema = SchemaOf<typeof health> &
     SchemaOf<typeof login> &
-    ReferenceRoutes<
-      typeof slugs,
-      typeof programs,
-      typeof entityTypes,
-      typeof countries,
-      typeof constants
-    > &
-    AdminUsersRoutes<
-      typeof list,
-      typeof detail,
-      typeof create,
-      typeof update,
-      typeof remove,
-      typeof exportFile
-    >;
+    SchemaOf<typeof programs> &
+    SchemaOf<typeof entityTypes> &
+    SchemaOf<typeof countries> &
+    SchemaOf<typeof constants> &
+    MergeSchemaPath<AdminSchema, "/admin-user"> &
+    MergeSchemaPath<UserSchema, "/user">;
   return app as Hono<AuthEnv, ApiSchema>;
 }
