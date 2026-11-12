@@ -69,6 +69,13 @@ const slikBmpkSchema = z.strictObject({
 const spouseSchema = z.strictObject({
   status: optionalText,
 });
+const insuranceSchema = z.strictObject({
+  tanggalJtAsuransi: calendarDate.nullable().optional(),
+  jangkaWaktuAsuransi: optionalInteger,
+  nilaiPertanggungan: optionalInteger,
+  namaAsuransi: optionalText,
+  statusPertanggungan: optionalText,
+});
 
 export const creditApplicationSchema = z.strictObject({
   debitorId: z.number().int().positive(),
@@ -79,6 +86,7 @@ export const creditApplicationSchema = z.strictObject({
   guarantor: guarantorSchema.optional(),
   slikBmpk: slikBmpkSchema.optional(),
   spouse: spouseSchema.optional(),
+  insurance: insuranceSchema.optional(),
 });
 
 export const creditUpdateSchema = creditApplicationSchema.extend({

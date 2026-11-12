@@ -12,7 +12,7 @@ ACL berbentuk PROGRAM_ACTION, dengan aksi CREATE, READ, UPDATE, DELETE, APPROVAL
 | --- | --- | --- |
 | USA | Admin User | Berjalan; belum ada endpoint Approval |
 | USC | Perusahaan | Berjalan; belum ada endpoint Approval |
-| CGP | Master Karyawan dan Pengajuan Kredit | Karyawan berjalan P05, kredit rancangan; jangan memisahkan kode tanpa keputusan |
+| CGP | Master Karyawan dan Pengajuan Kredit | Karyawan berjalan P05, kredit berjalan P06; jangan memisahkan kode tanpa keputusan |
 | DKN | Review BPR/Daftar Kredit Karyawan | Rancangan |
 
 List/detail/export administratif memerlukan PROGRAM_READ; create/update/delete memakai aksi masing-masing. UI bukan sumber otorisasi; scope aktor/tenant tetap diperiksa server.
@@ -61,9 +61,9 @@ PUT /profile menerima {id, profile}: identitas wajib sesuai business-flow, takeh
 
 Detail menambahkan profile dan documents (URL unduhan privat atau null). GET /document?id&kind memeriksa READ dan ownership sebelum mengirim attachment no-store. File disimpan lewat adapter disk privat; kegagalan upload/SQL membersihkan file baru, SQL rollback. GET /export?format=pdf|xlsx memakai query listing yang sama tanpa pagination/batas data dan scope identik. CSV mengikuti P11.
 
-### Pengajuan kredit (P06, dalam implementasi)
+### Pengajuan kredit (P06)
 
-Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected. Implementasi dan bukti pengujian belum final sampai P06-T04.
+Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, insurance, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected.
 
 ## Rancangan API P07–P12 (belum tersedia)
 

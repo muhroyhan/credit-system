@@ -228,6 +228,14 @@ export const creditService = {
       if (input.spouse) {
         await creditRepository.saveSpouse(result, input.spouse, actor, tx);
       }
+      if (input.insurance) {
+        await creditRepository.saveInsurance(
+          result,
+          input.insurance,
+          actor,
+          tx,
+        );
+      }
       return result;
     });
   },

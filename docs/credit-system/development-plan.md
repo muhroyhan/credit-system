@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P05 selesai; P06–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P06 selesai; P07–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -65,7 +65,7 @@ Hasil: nasabah mendaftar melalui slug, login setelah registrasi dan melengkapi i
 
 Hasil: pengajuan dan simulasi nasabah/HRD dapat dipakai dengan status HRD awal pending, tanpa membutuhkan review BPR.
 
-Status: doing. P06-T01–T03 selesai secara implementasi; verifikasi dan perbaikan hasil pemeriksaan dilakukan pada P06-T04.
+Status: done. P06-T01: b27e9e3; P06-T02: e4b11ca; P06-T03: b8cd2d8; P06-T04: lihat footer commit Task: P06-T04. Bukti verifikasi pada testing.md.
 
 | Kode task | Task dan keluaran |
 | --- | --- |

@@ -1,6 +1,6 @@
 import { employeeDocumentKinds } from '@credit/contracts';
-import { employeeProfileFields } from '@web/features/employees/employees.constant';
 import { type APIRequestContext, expect, test } from '@playwright/test';
+import { employeeProfileFields } from '@web/features/employees/employees.constant';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(!password, 'Synthetic database required');
