@@ -9,27 +9,22 @@ import {
   TextInput,
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
-import type {
-  AdminInput,
-  AdminUserFormProps,
-} from "@web/features/admin-users/admin-users.type";
+import type { AdminUserFormProps } from "@web/features/admin-users/admin-users.type";
 import { useAdminPrograms } from "@web/features/admin-users/hooks/useAdminDetail";
+import { useAdminForm } from "@web/features/admin-users/hooks/useAdminForm";
 import { useAdminSave } from "@web/features/admin-users/hooks/useAdminSave";
-import { useState } from "react";
+import { Controller } from "react-hook-form";
 export function AdminUserForm({
   token,
   id: editId,
   initial,
 }: AdminUserFormProps) {
-  const [form, setForm] = useState<AdminInput>(
-    initial ?? {
-      username: "",
-      email: "",
-      password: "",
-      isActive: true,
-      roles: [],
-    },
-  );
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useAdminForm(initial, !!editId);
   const programs = useAdminPrograms(token);
   const users = {
     options: (programs.data ?? []).map((p) => ({
@@ -40,10 +35,10 @@ export function AdminUserForm({
   const save = useAdminSave(token, editId);
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        save.mutate({ ...form, password: form.password || undefined });
-      }}
+      noValidate
+      onSubmit={handleSubmit((data) =>
+        save.mutate({ ...data, password: data.password || undefined }),
+      )}
     >
       <Stack>
         {(save.error ?? programs.error) && (
@@ -53,64 +48,65 @@ export function AdminUserForm({
         <TextInput
           label="Username administrator"
           required
-          value={form.username}
-          onChange={(e) =>
-            setForm({ ...form, username: e.currentTarget.value })
-          }
+          {...register("username")}
+          error={errors.username?.message}
         />
         <TextInput
           label="Email administrator"
           type="email"
           required
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.currentTarget.value })}
+          {...register("email")}
+          error={errors.email?.message}
         />
         <PasswordInput
           label="Password administrator"
           required={!editId}
-          value={form.password ?? ""}
-          onChange={(e) =>
-            setForm({ ...form, password: e.currentTarget.value })
-          }
+          {...register("password")}
+          error={errors.password?.message}
         />
         <Checkbox
           label="Aktif"
-          checked={form.isActive}
-          onChange={(e) =>
-            setForm({ ...form, isActive: e.currentTarget.checked })
-          }
+          {...register("isActive")}
+          error={errors.isActive?.message}
         />
-        {users.options.map((p) => (
-          <Select
-            key={p.value}
-            label={p.label}
-            clearable
-            data={[
-              { value: "READ", label: "READ" },
-              { value: "WRITE", label: "WRITE" },
-            ]}
-            value={
-              form.roles.find((r) => r.programId === Number(p.value))?.value ??
-              null
-            }
-            onChange={(v) =>
-              setForm({
-                ...form,
-                roles: [
-                  ...form.roles.filter((r) => r.programId !== Number(p.value)),
-                  ...(v === "READ" || v === "WRITE"
-                    ? [
-                        {
-                          programId: Number(p.value),
-                          value: v as "READ" | "WRITE",
-                        },
-                      ]
-                    : []),
-                ],
-              })
-            }
-          />
-        ))}
+        <Controller
+          name="roles"
+          control={control}
+          render={({ field }) => (
+            <>
+              {users.options.map((p) => (
+                <Select
+                  key={p.value}
+                  label={p.label}
+                  clearable
+                  data={[
+                    { value: "READ", label: "READ" },
+                    { value: "WRITE", label: "WRITE" },
+                  ]}
+                  value={
+                    field.value.find((r) => r.programId === Number(p.value))
+                      ?.value ?? null
+                  }
+                  onBlur={field.onBlur}
+                  error={errors.roles?.message}
+                  onChange={(v) =>
+                    field.onChange([
+                      ...field.value.filter(
+                        (r) => r.programId !== Number(p.value),
+                      ),
+                      ...(v === "READ" || v === "WRITE"
+                        ? [{ programId: Number(p.value), value: v }]
+                        : []),
+                    ])
+                  }
+                />
+              ))}
+              {errors.roles?.message && users.options.length === 0 && (
+                <Alert color="red">{errors.roles.message}</Alert>
+              )}
+            </>
+          )}
+        />
         <Group>
           <Button
             type="submit"

@@ -1,4 +1,4 @@
-import type { adminInputSchema } from "@credit/contracts";
+import { adminInputSchema } from "@credit/contracts";
 import { z } from "zod";
 export const adminSchema = z.object({
   id: z.number(),
@@ -27,3 +27,17 @@ export type AdminUserFormProps = {
   initial?: AdminInput;
 };
 export type AdminExportFormat = "pdf" | "xlsx";
+
+export const adminFormSchema = (editing: boolean) =>
+  adminInputSchema
+    .extend({
+      password: z.union([z.literal(""), z.string().min(8).max(72)]).optional(),
+    })
+    .superRefine((value, ctx) => {
+      if (!editing && !value.password)
+        ctx.addIssue({
+          code: "custom",
+          path: ["password"],
+          message: "Password wajib",
+        });
+    });
