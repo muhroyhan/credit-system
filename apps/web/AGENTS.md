@@ -1,6 +1,7 @@
 # Frontend credit-system
 
 - Gunakan React, Vite, Mantine dan Zod. Terapkan layer per fitur: `presentation` → `application` → `data`.
+- Simpan file langsung di folder fitur. Komponen yang diimpor router bernama `FeaturePage.tsx`; layer API bernama `feature.api.ts`. Subfolder fitur hanya untuk komponen atau utilitas khusus fitur; komponen dan utilitas bersama berada di `src/components` dan `src/utils`.
 - Komponen presentasi memakai hook/use case; akses Hono RPC dan mapping DTO berada di layer data.
 - Pertahankan alur aktor, status, pengajuan, simulasi, rekening dan dokumen di `docs/credit-system/business-flow.md` dan `docs/credit-system/features.md`.
 - Jangan menyamakan pembatasan tombol/menu dengan otorisasi API. Tampilkan loading, sukses dan kegagalan sesuai hasil operasi.

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type Session, signIn } from "@web/features/auth/data/gateway";
+import { type Session, signIn } from "@web/features/auth/auth.api";
 
 const sessionKey = ["session"] as const;
 export function useSession() {

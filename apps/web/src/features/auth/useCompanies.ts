@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSlugs } from "@web/features/auth/data/gateway";
+import { getSlugs } from "@web/features/auth/auth.api";
 export function useCompanies(type: "admin" | "company" | "debitor") {
   const query = useQuery({
     queryKey: ["companies"],

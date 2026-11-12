@@ -1,23 +1,8 @@
-import { Button, Container, Stack, Text, Title } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { Link, Navigate } from "@tanstack/react-router";
-import { AdminUsers } from "@web/features/admin-users/presentation/AdminUsers";
-import { useSession } from "@web/features/auth/application/useSession";
-export function Dashboard() {
-  const { session, logout } = useSession();
-  if (!session) return <Navigate to="/login" replace />;
-  return (
-    <Container>
-      <Stack>
-        <Text>Beranda</Text>
-        <Title>Credit System</Title>
-        <Text>Masuk sebagai {session.type}</Text>
-        <AdminPage embedded />
-        <Button onClick={logout}>Keluar</Button>
-      </Stack>
-    </Container>
-  );
-}
-export function AdminPage({ embedded = false }: { embedded?: boolean }) {
+import { AdminUsers } from "@web/features/admin-users/AdminUsers";
+import { useSession } from "@web/features/auth/useSession";
+export function AdminUsersPage({ embedded = false }: { embedded?: boolean }) {
   const { session } = useSession();
   if (!session) return <Navigate to="/login" replace />;
   const roles = Array.isArray(session.userData.roles)

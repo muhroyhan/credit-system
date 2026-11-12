@@ -6,7 +6,7 @@ import {
   listAdmins,
   programs,
   saveAdmin,
-} from "@web/features/admin-users/data/gateway";
+} from "@web/features/admin-users/admin-users.api";
 import { useState } from "react";
 export function useAdminUsers(token: string) {
   const client = useQueryClient();

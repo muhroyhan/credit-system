@@ -12,8 +12,8 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { useAdminUsers } from "@web/features/admin-users/application/useAdminUsers";
-import type { AdminInput } from "@web/features/admin-users/data/gateway";
+import type { AdminInput } from "@web/features/admin-users/admin-users.api";
+import { useAdminUsers } from "@web/features/admin-users/useAdminUsers";
 import { useState } from "react";
 export function AdminUsers({
   token,

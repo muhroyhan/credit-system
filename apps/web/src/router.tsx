@@ -6,11 +6,9 @@ import {
   Link,
   Outlet,
 } from "@tanstack/react-router";
-import {
-  AdminPage,
-  Dashboard,
-} from "@web/features/auth/presentation/Dashboard";
-import { Login } from "@web/features/auth/presentation/Login";
+import { AdminUsersPage } from "@web/features/admin-users/AdminUsersPage";
+import { DashboardPage } from "@web/features/auth/DashboardPage";
+import { LoginPage } from "@web/features/auth/LoginPage";
 
 const rootRoute = createRootRoute({
   component: Outlet,
@@ -24,17 +22,17 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: Dashboard,
+  component: DashboardPage,
 });
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
-  component: Login,
+  component: LoginPage,
 });
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin-users",
-  component: AdminPage,
+  component: AdminUsersPage,
 });
 export const router = createRouter({
   routeTree: rootRoute.addChildren([indexRoute, loginRoute, adminRoute]),
