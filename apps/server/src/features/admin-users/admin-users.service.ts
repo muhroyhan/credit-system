@@ -1,13 +1,17 @@
+import { adminUsersRepository } from "@server/features/admin-users/admin-users.repository";
+
+export {
+  AdminConflict,
+  AdminNotFound,
+} from "@server/features/admin-users/admin-users.repository";
+
 import type {
   AdminInput,
   AdminQuery,
-  AdminRepository,
 } from "@server/features/admin-users/admin-users.type";
-export class AdminConflict extends Error {}
-export class AdminNotFound extends Error {}
-export const adminUsersService = (repository: AdminRepository) => ({
-  list: (query: AdminQuery) => repository.list(query),
-  detail: (id: number) => repository.detail(id),
+export const adminUsersService = {
+  list: (query: AdminQuery) => adminUsersRepository.list(query),
+  detail: (id: number) => adminUsersRepository.detail(id),
   async save(input: AdminInput, actor: string, id?: number) {
     const password = input.password
       ? await Bun.password.hash(input.password, {
@@ -15,7 +19,7 @@ export const adminUsersService = (repository: AdminRepository) => ({
           cost: 10,
         })
       : undefined;
-    return repository.save({ ...input, password }, actor, id);
+    return adminUsersRepository.save({ ...input, password }, actor, id);
   },
-  remove: (id: number) => repository.remove(id),
-});
+  remove: (id: number) => adminUsersRepository.remove(id),
+};

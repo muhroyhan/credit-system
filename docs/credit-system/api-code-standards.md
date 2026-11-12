@@ -7,7 +7,7 @@ Berlaku untuk semua fitur backend. Aturan ini melengkapi [architecture.md](archi
 | Area | Perbedaan yang ditemukan | Standar |
 | --- | --- | --- |
 | Akses database | Reference memanggil `connectDatabase().db.select`, admin/auth menyimpan `db` | Setiap fungsi repository mengambil `const db = connectDatabase().db` satu kali, lalu memakai `db` |
-| Pembuatan route | Reference factory; admin/auth instance singleton dengan dependency internal | `<featureCamelCase>Controller(service)` membuat app; global routes memasok service yang sudah menerima repository |
+| Pembuatan route | Reference factory; admin/auth instance singleton dengan dependency internal | global routes mengimpor `<featureCamelCase>Controller`; controller mengimpor service; service mengimpor repository |
 | Hasil repository | Interface reference/admin memakai `Promise<unknown>` | Gunakan DTO konkret dari contracts; null menandakan detail tidak ditemukan, bukan `unknown` |
 | Validasi ID | Admin menulis Zod ID langsung di route | Schema request/query di contracts, termasuk `idQuerySchema` |
 | Tipe RPC | `SchemaOf` didefinisikan ulang pada beberapa file | Gunakan helper bersama dari infrastructure; schema semua route ikut dalam `AppType` |
@@ -37,17 +37,16 @@ async function listSomething() {
 
 ## Service dan dependency
 
-- Repository menyediakan interface bertipe di `<feature>.type.ts` untuk dipakai service. Use case menerima dependency secara eksplisit; simbol utama service mengikuti `<featureCamelCase>Service` dan dapat berupa factory atau objek fungsi.
+- Repository menyediakan interface bertipe di `<feature>.type.ts` untuk dipakai service. Service mengimpor repository fitur; simbol utama service mengikuti `<featureCamelCase>Service` dan menyediakan use case bagi controller.
 - DTO request/response yang dipakai lintas layer bersumber dari `@credit/contracts`. `unknown` dipakai pada batas input yang belum divalidasi, bukan hasil repository publik.
-- Urutan akses wajib `global routes → controller → service → repository`. Global routes (`app.ts`) hanya merangkai dependency: `featureController(featureService(featureRepository))`, bukan menjalankan use case atau query.
-- Controller menerima service yang sudah dirangkai, menerima request, memanggil service, dan mengirim response. Controller tidak mengimpor, membuat, atau memanggil repository maupun koneksi database. Middleware autentikasi mengikuti aturan yang sama.
-- Service menangani aturan bisnis dan memanggil interface repository; hanya repository yang mengeksekusi query. Tidak boleh melompati layer.
+- Urutan akses sekaligus import wajib `global routes → controller → service → repository`. Global routes (`app.ts`) hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service atau controller.
+- Controller menerima request dan mengirim response melalui service. Service menangani aturan bisnis; hanya repository yang mengeksekusi query. Middleware autentikasi mengikuti urutan yang sama. Type dan kontrak bersama boleh diimpor terpisah; test repository boleh mengimpor repository sebagai subjek pengujian.
 - Import lintas package memakai `@credit/...`; internal server memakai `@server/...`. Type-only dependency memakai `import type`.
 
 ## Route dan validasi
 
 ```ts
-export function featureController(service: FeatureService) {
+export function featureController() {
   const app = new Hono<AuthEnv>();
   const list = app.get("/items", identityContext, async (c) => {
     // Validasi input, panggil service, dan petakan response di sini.

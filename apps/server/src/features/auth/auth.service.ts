@@ -1,6 +1,6 @@
+import { authRepository } from "@server/features/auth/auth.repository";
 import type {
   AccountLookup,
-  AuthRepository,
   Identity,
   IdentityResolver,
   LoginInput,
@@ -77,10 +77,10 @@ export async function login(input: LoginInput, findAccount: AccountLookup) {
   return { authToken, type: input.type, userData: account.userData };
 }
 
-export const authService = (repository: AuthRepository) => ({
-  login: (input: LoginInput) => login(input, repository.findAccount),
+export const authService = {
+  login: (input: LoginInput) => login(input, authRepository.findAccount),
   authenticate: (header?: string) =>
-    authenticate(header, repository.resolveIdentity),
+    authenticate(header, authRepository.resolveIdentity),
   hasProgramPermission,
   belongsToCompany,
-});
+};

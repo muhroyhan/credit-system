@@ -8,11 +8,9 @@ import {
 import {
   AdminConflict,
   AdminNotFound,
+  adminUsersService,
 } from "@server/features/admin-users/admin-users.service";
-import type {
-  AdminUsersRoutes,
-  AdminUsersService,
-} from "@server/features/admin-users/admin-users.type";
+import type { AdminUsersRoutes } from "@server/features/admin-users/admin-users.type";
 import { hasProgramPermission } from "@server/features/auth/auth.service";
 import type {
   AuthEnv,
@@ -21,10 +19,7 @@ import type {
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 
-export function adminUsersController(
-  service: AdminUsersService,
-  identityContext: IdentityMiddleware,
-) {
+export function adminUsersController(identityContext: IdentityMiddleware) {
   const app = new Hono<AuthEnv>();
   const permission = (access: "READ" | "WRITE") =>
     createMiddleware<AuthEnv>(async (c, next) => {
@@ -39,7 +34,7 @@ export function adminUsersController(
     async (c) => {
       const query = adminListQuerySchema.safeParse(c.req.query());
       if (!query.success) return c.json({ error: "invalid query" }, 400);
-      return c.json(await service.list(query.data));
+      return c.json(await adminUsersService.list(query.data));
     },
   );
   const detail = app.get(
@@ -49,7 +44,7 @@ export function adminUsersController(
     async (c) => {
       const id = idQuerySchema.safeParse(c.req.query());
       if (!id.success) return c.json({ error: "invalid id" }, 400);
-      const result = await service.detail(id.data.id);
+      const result = await adminUsersService.detail(id.data.id);
       if (!result) return c.json({ error: "not found" }, 404);
       return c.json(result);
     },
@@ -64,7 +59,10 @@ export function adminUsersController(
       );
       if (!input.success) return c.json({ error: "invalid request" }, 400);
       try {
-        const id = await service.save(input.data, String(c.get("identity").id));
+        const id = await adminUsersService.save(
+          input.data,
+          String(c.get("identity").id),
+        );
         return c.json({ id }, 201);
       } catch (error) {
         if (error instanceof AdminConflict)
@@ -84,7 +82,7 @@ export function adminUsersController(
       if (!input.success) return c.json({ error: "invalid request" }, 400);
       try {
         const { id, ...data } = input.data;
-        await service.save(data, String(c.get("identity").id), id);
+        await adminUsersService.save(data, String(c.get("identity").id), id);
         return c.json({ id });
       } catch (error) {
         if (error instanceof AdminConflict)
@@ -104,7 +102,7 @@ export function adminUsersController(
         await c.req.json().catch(() => null),
       );
       if (!input.success) return c.json({ error: "invalid request" }, 400);
-      if (!(await service.remove(input.data.id)))
+      if (!(await adminUsersService.remove(input.data.id)))
         return c.json({ error: "not found" }, 404);
       return c.json({ id: input.data.id });
     },

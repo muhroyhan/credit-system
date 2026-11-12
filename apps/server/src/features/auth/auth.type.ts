@@ -1,4 +1,3 @@
-import type { authService } from "@server/features/auth/auth.service";
 import type { MiddlewareHandler } from "hono";
 export type Identity = {
   id: number;
@@ -36,5 +35,4 @@ export interface AuthRepository {
   findAccount: AccountLookup;
   resolveIdentity: IdentityResolver;
 }
-export type AuthService = ReturnType<typeof authService>;
 export type IdentityMiddleware = MiddlewareHandler<AuthEnv>;
