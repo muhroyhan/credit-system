@@ -1,6 +1,8 @@
 import type { AppType } from "@credit/server/app";
 import {
+  type CompanyApiResponse,
   type CompanyInput,
+  companyApiErrorSchema,
   companyDetailSchema,
   companyListSchema,
   type ExportFormat,
@@ -12,9 +14,12 @@ const client = hc<AppType>(window.location.origin);
 const options = (token: string) => ({
   headers: { Authorization: `Bearer ${token}` },
 });
-async function read(response: Response) {
+async function read(response: CompanyApiResponse) {
   const value = await response.json();
-  if (!response.ok) throw new Error(value.error ?? "Operasi gagal");
+  if (!response.ok)
+    throw new Error(
+      companyApiErrorSchema.safeParse(value).data?.error ?? "Operasi gagal",
+    );
   return value;
 }
 export async function listCompanies(token: string, query: URLSearchParams) {

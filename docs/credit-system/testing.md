@@ -29,3 +29,7 @@ Jalankan browser terhadap server monolit dan database test yang berjalan; API ap
 6. Isolasi dua tenant, request langsung, kegagalan simpan, unggah, notifikasi dan PDF, serta submit ulang.
 
 Gunakan clock dan timezone terkontrol. Simpan trace ketika gagal dan pastikan fixture dibersihkan agar suite dapat diulang. Setelah script tersedia, jalankan lint, typecheck, unit/integration, build dan E2E yang relevan, lalu laporkan hasil aktual.
+
+## Hasil P04
+
+Task P04-T03: MySQL 8.4 disposable `credit_p04_test`; migration berhasil dan seed sintetis dijalankan dua kali. Lint, typecheck, build lulus; 8 unit, 6 integration, 11 E2E lulus. Cakupan baru: validasi bunga/tenor, password create, konflik perusahaan, penolakan ID child tenant lain, rollback setelah kegagalan SQL child, array kosong menghapus seluruh konfigurasi, deletion guard seeded debitor, USC READ/WRITE dan scope bunga tenant. E2E mengisi bunga/biaya, memeriksa error field, detail teks dan menyimpan array kosong. Selektor password wajib diperbaiki setelah kegagalan awal; regresi seluruh E2E kemudian lulus. Tidak ada script test sementara atau migration baru.

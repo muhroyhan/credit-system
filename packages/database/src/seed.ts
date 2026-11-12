@@ -93,6 +93,8 @@ try {
       .values([
         { id: 900001, adminUserId: 900001, programId: 900001, value: "WRITE" },
         { id: 900002, adminUserId: 900002, programId: 900001, value: "READ" },
+        { id: 900003, adminUserId: 900001, programId: 900004, value: "WRITE" },
+        { id: 900004, adminUserId: 900002, programId: 900004, value: "READ" },
       ])
       .onDuplicateKeyUpdate({ set: { id: sql`id` } });
     await tx

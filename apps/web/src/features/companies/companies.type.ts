@@ -48,3 +48,6 @@ export type CompanyFormProps = {
   initial?: CompanyInput;
 };
 export type ExportFormat = "pdf" | "xlsx";
+
+export type CompanyApiResponse = { ok: boolean; json: () => Promise<unknown> };
+export const companyApiErrorSchema = z.object({ error: z.string() });
