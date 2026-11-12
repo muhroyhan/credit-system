@@ -1,10 +1,5 @@
 import { adminUsersRepository } from "@server/features/admin-users/admin-users.repository";
 
-export {
-  AdminConflict,
-  AdminNotFound,
-} from "@server/features/admin-users/admin-users.repository";
-
 import type {
   AdminInput,
   AdminQuery,

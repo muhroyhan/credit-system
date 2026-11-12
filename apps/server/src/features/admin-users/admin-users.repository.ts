@@ -1,10 +1,12 @@
 import { connectDatabase } from "@credit/database/client";
 import { adminUsers, programs, roles } from "@credit/database/schema";
 
+import {
+  AdminConflict,
+  AdminNotFound,
+} from "@server/features/admin-users/admin-users.error";
 import type { AdminRepository } from "@server/features/admin-users/admin-users.type";
 import { and, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
-export class AdminConflict extends Error {}
-export class AdminNotFound extends Error {}
 export const adminUsersRepository: AdminRepository = {
   async list(query) {
     const db = connectDatabase().db;

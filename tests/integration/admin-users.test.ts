@@ -1,6 +1,6 @@
 import { closeDatabase } from "@credit/database/client";
+import { AdminConflict } from "@server/features/admin-users/admin-users.error";
 import { adminUsersRepository } from "@server/features/admin-users/admin-users.repository";
-import { AdminConflict } from "@server/features/admin-users/admin-users.service";
 import { afterAll, describe, expect, it } from "vitest";
 
 const url = process.env.DATABASE_URL;
