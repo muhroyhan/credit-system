@@ -216,6 +216,7 @@ Format catatan pelaksanaan yang dapat ditambahkan per task:
 
 | Kode task | Status | Branch / hash commit | Keluaran / keputusan | Hasil verifikasi akhir phase |
 | --- | --- | --- | --- | --- |
+| P04-T01 | done | lihat commit Task: P04-T01 | kontrak, transaksi parent/child dan pengaman hapus; array kosong menghapus semua sesuai persetujuan pengguna | menunggu P04-T03 |
 | P03-T03 | done | lihat commit Task: P03-T03 | lint, typecheck, build, Vitest dan E2E MySQL terisolasi lulus | lulus |
 | P03-T02 | done | e400994 | route dan form admin | lulus P03-T03 |
 | P03-T01 | done | cf18ce5 | service dan transaksi admin | lulus P03-T03 |
