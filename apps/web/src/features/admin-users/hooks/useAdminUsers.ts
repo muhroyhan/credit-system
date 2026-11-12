@@ -4,6 +4,7 @@ import {
   exportAdmins,
   listAdmins,
 } from "@web/features/admin-users/admin-users.api";
+import type { AdminExportFormat } from "@web/features/admin-users/admin-users.type";
 import { useState } from "react";
 export function useAdminUsers(token: string) {
   const client = useQueryClient();
@@ -37,7 +38,7 @@ export function useAdminUsers(token: string) {
     },
   });
   const exporting = useMutation({
-    mutationFn: async (format: "pdf" | "xlsx") => {
+    mutationFn: async (format: AdminExportFormat) => {
       await exportAdmins(token, new URLSearchParams(filters), format);
     },
   });

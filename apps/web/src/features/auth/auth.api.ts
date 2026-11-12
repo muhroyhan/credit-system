@@ -1,15 +1,16 @@
 import { loginSchema, slugSchema } from "@credit/contracts";
 import type { AppType } from "@credit/server/app";
+import type { Session } from "@web/features/auth/auth.type";
 import { hc } from "hono/client";
 import { z } from "zod";
 
 const client = hc<AppType>(window.location.origin);
-const sessionSchema = z.object({
+export const sessionSchema = z.object({
   authToken: z.string(),
   type: z.enum(["admin", "company", "debitor"]),
   userData: z.object({ id: z.number() }).passthrough(),
 });
-export type Session = z.infer<typeof sessionSchema>;
+
 export async function getSlugs() {
   const response = await client.api.user.slugs.$get();
   if (!response.ok) throw new Error("Gagal memuat perusahaan");

@@ -11,3 +11,5 @@
 
 - Fitur CRUD memiliki empat page terpisah: `FeaturePage.tsx` (listing, sorting, pagination, filter, row actions, tambah, ekspor PDF/XLSX), `FeatureAddPage.tsx`, `FeatureEditPage.tsx` (form), dan `FeatureViewPage.tsx` (detail berupa teks, tanpa input disabled). Komponen form dapat dipakai bersama add/edit.
 - Semua akses halaman dan action mengikuti CRUDA (Create, Read, Update, Delete, Approval) sesuai izin API. Jangan menyimpulkan Approval dari WRITE. Untuk Admin User: USA_READ/WRITE memberi Read dan ekspor; USA_WRITE memberi Create/Update/Delete; Approval tidak tersedia. Gate halaman harus mencegah mount/query konten terlarang termasuk saat akses URL langsung. Dashboard adalah fitur terpisah dari auth.
+
+- Simpan deklarasi type dan interface tiap fitur dalam satu file `<feature>.type.ts` di folder fitur; konsumen menggunakan `import type`.

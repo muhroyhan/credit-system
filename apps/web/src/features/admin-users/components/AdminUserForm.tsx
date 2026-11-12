@@ -9,7 +9,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
-import type { AdminInput } from "@web/features/admin-users/admin-users.api";
+import type {
+  AdminInput,
+  AdminUserFormProps,
+} from "@web/features/admin-users/admin-users.type";
 import { useAdminPrograms } from "@web/features/admin-users/hooks/useAdminDetail";
 import { useAdminSave } from "@web/features/admin-users/hooks/useAdminSave";
 import { useState } from "react";
@@ -17,11 +20,7 @@ export function AdminUserForm({
   token,
   id: editId,
   initial,
-}: {
-  token: string;
-  id?: number;
-  initial?: AdminInput;
-}) {
+}: AdminUserFormProps) {
   const [form, setForm] = useState<AdminInput>(
     initial ?? {
       username: "",

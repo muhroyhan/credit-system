@@ -1,9 +1,17 @@
 import { adminInputSchema } from "@credit/contracts";
 import type { AppType } from "@credit/server/app";
+import type {
+  Admin,
+  AdminExportFormat,
+  AdminInput,
+  AdminList,
+  ApiError,
+  ApiResponse,
+} from "@web/features/admin-users/admin-users.type";
 import { hc } from "hono/client";
 import { z } from "zod";
-export type AdminInput = z.infer<typeof adminInputSchema>;
-const adminSchema = z.object({
+
+export const adminSchema = z.object({
   id: z.number(),
   username: z.string().nullable(),
   email: z.string().nullable(),
@@ -14,18 +22,15 @@ const adminSchema = z.object({
     )
     .optional(),
 });
-export type Admin = z.infer<typeof adminSchema>;
+
 const client = hc<AppType>(window.location.origin);
 function options(token: string) {
   return { headers: { Authorization: `Bearer ${token}` } };
 }
-async function read(response: {
-  ok: boolean;
-  json: () => Promise<unknown>;
-}): Promise<unknown> {
+async function read(response: ApiResponse): Promise<unknown> {
   const data = await response.json();
   if (!response.ok) {
-    const error = data as { error?: string };
+    const error = data as ApiError;
     throw new Error(error.error ?? "Operasi gagal");
   }
   return data;
@@ -33,7 +38,7 @@ async function read(response: {
 export async function listAdmins(
   token: string,
   query: URLSearchParams,
-): Promise<{ count: number; data: Admin[] }> {
+): Promise<AdminList> {
   const response = await client.api["admin-users"].$get(
     { query: Object.fromEntries(query) } as never,
     options(token),
@@ -79,7 +84,7 @@ export async function deleteAdmin(token: string, id: number) {
 export async function exportAdmins(
   token: string,
   filters: URLSearchParams,
-  format: "pdf" | "xlsx",
+  format: AdminExportFormat,
 ): Promise<void> {
   filters.set("format", format);
   const response = await client.api["admin-users"].export.$get(

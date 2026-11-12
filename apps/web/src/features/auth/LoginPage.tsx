@@ -10,12 +10,13 @@ import {
   Title,
 } from "@mantine/core";
 import { Navigate } from "@tanstack/react-router";
+import type { AccountType } from "@web/features/auth/auth.type";
 import { useCompanies } from "@web/features/auth/hooks/useCompanies";
 import { useSession } from "@web/features/auth/hooks/useSession";
 import { useState } from "react";
 export function LoginPage() {
   const { session, loading, error, login } = useSession();
-  const [type, setType] = useState<"admin" | "company" | "debitor">("admin");
+  const [type, setType] = useState<AccountType>("admin");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [slug, setSlug] = useState<string | null>(null);

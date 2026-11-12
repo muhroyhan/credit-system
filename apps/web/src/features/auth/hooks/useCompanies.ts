@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getSlugs } from "@web/features/auth/auth.api";
-export function useCompanies(type: "admin" | "company" | "debitor") {
+import type { AccountType } from "@web/features/auth/auth.type";
+export function useCompanies(type: AccountType) {
   const query = useQuery({
     queryKey: ["companies"],
     queryFn: getSlugs,

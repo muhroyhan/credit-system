@@ -1,4 +1,4 @@
-import type { Session } from "@web/features/auth/auth.api";
+import type { Session } from "@web/features/auth/auth.type";
 import { crudaAccess } from "@web/utils/cruda";
 import { describe, expect, it } from "vitest";
 
