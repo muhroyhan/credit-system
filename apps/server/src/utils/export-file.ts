@@ -1,3 +1,4 @@
+/** Builds a tabular PDF or XLSX in memory from rows selected by a feature service. */
 export async function exportFile({
   title,
   columns,
@@ -7,10 +8,10 @@ export async function exportFile({
   title: string;
   columns: string[];
   values: string[][];
-  format: "pdf" | "xlsx";
+  format: 'pdf' | 'xlsx';
 }) {
-  if (format === "xlsx") {
-    const ExcelJS = (await import("exceljs")).default;
+  if (format === 'xlsx') {
+    const ExcelJS = (await import('exceljs')).default;
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet(title);
     sheet.addRow(columns);
@@ -21,8 +22,8 @@ export async function exportFile({
     });
     return new Uint8Array(await workbook.xlsx.writeBuffer());
   }
-  const { jsPDF } = await import("jspdf");
-  const doc = new jsPDF({ orientation: "landscape" });
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF({ orientation: 'landscape' });
   const width = 270 / columns.length;
   let y = 28;
   const header = () => {
@@ -49,11 +50,11 @@ export async function exportFile({
         header();
       }
       cells.forEach((cell, i) => {
-        doc.text(cell[line] ?? "", 10 + i * width, y);
+        doc.text(cell[line] ?? '', 10 + i * width, y);
       });
       y += 5;
     }
     y += 3;
   }
-  return new Uint8Array(doc.output("arraybuffer"));
+  return new Uint8Array(doc.output('arraybuffer'));
 }

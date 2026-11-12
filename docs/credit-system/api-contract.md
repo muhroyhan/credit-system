@@ -1,56 +1,73 @@
-# Kontrak API credit-system
+# Kontrak API
 
-Kontrak berikut merangkum kebutuhan fungsi dan route yang perlu dipertahankan atau dipetakan secara eksplisit. Implementasi Hono RPC dan schema Zod tersedia untuk login dan referensi; endpoint lainnya masih berupa kebutuhan. Bentuk snake_case persistence dan camelCase response harus dipetakan dan diuji; keputusan perubahan path/status error harus dicatat.
+Sumber tunggal path, payload, DTO dan otorisasi. Bagian berjalan sudah diimplementasikan P00–P04; bagian rancangan belum menjamin endpoint tersedia. Semua path berprefix /api dan persistence dipetakan ke camelCase. Perubahan kompatibilitas dicatat di logic-holes.md.
 
-## Autentikasi dan referensi
+## Ketentuan umum dan ACL
+
+Respons berhasil: baca/update/delete 200, create 201. Error `{error: string}`: input/JSON malformed 400, identitas/kredensial invalid 401, izin/scope ditolak 403, data tidak ditemukan 404, konflik bisnis yang diketahui 409. Error internal tidak mengekspos stack trace/pesan database. Implementasi fallback internal belum distandarkan sebagai JSON global.
+
+ACL berbentuk PROGRAM_ACTION, dengan aksi CREATE, READ, UPDATE, DELETE, APPROVAL; setiap aksi eksplisit. Role `{programId, value}` dapat berisi beberapa aksi per program, tanpa duplikasi pasangan. WRITE tidak diterima. Migration 0001 mengonversi role lama ke empat aksi CRUD tanpa Approval; detail migrasi pada data-model.md.
+
+| Program | Resource | Status |
+| --- | --- | --- |
+| USA | Admin User | Berjalan; belum ada endpoint Approval |
+| USC | Perusahaan | Berjalan; belum ada endpoint Approval |
+| CGP | Master Karyawan dan Pengajuan Kredit | Rancangan; jangan memisahkan kode tanpa keputusan |
+| DKN | Review BPR/Daftar Kredit Karyawan | Rancangan |
+
+List/detail/export administratif memerlukan PROGRAM_READ; create/update/delete memakai aksi masing-masing. UI bukan sumber otorisasi; scope aktor/tenant tetap diperiksa server.
+
+## API berjalan
+
+### Login dan referensi
+
+| Method/path | Kontrak dan akses |
+| --- | --- |
+| POST /login | Publik, body `{type, username, password, slug?}`; type admin/company/debitor, slug wajib bagi tenant. Respons `{authToken, type, userData}` tanpa password. |
+| GET /health | Publik, pemeriksaan kesehatan. |
+| GET /user/slugs | Publik, array `{id, slug, companyName}`; semua status perusahaan masih disertakan (SUPPORT-11). |
+| GET /programs | JWT; `{id, name, abbreviation}[]`. |
+| GET /entity-types | JWT; `{id, value}[]`. |
+| GET /countries | JWT; `{id, code, value}[]`. |
+| GET /constants?name=... | JWT; `{id, name, type, value}[]`; name opsional dan dicocokkan tepat. |
+
+Admin/perusahaan login dengan username atau email; debitor dengan username. Bcrypt dan JWT HS256 24 jam memakai claim id/slug/type/exp, JWT_SECRET dari environment. Admin harus aktif, perusahaan harus active; status perusahaan pada login debitor masih SUPPORT-03. Identitas dan role terkini dimuat ulang tiap request privat. DTO referensi yang kolomnya nullable dapat memuat null. Sesi UI disimpan dalam memori dan berakhir saat reload/logout.
+
+### Route administratif
+
+| Fitur/prefix | GET | POST | PUT |
+| --- | --- | --- | --- |
+| Admin User: /admin-user | /list, /detail?id=..., /export?format=pdf\|xlsx | /create | /update, /delete |
+| Perusahaan: /user | /list, /detail?id=..., /export?format=pdf\|xlsx | /create | /update, /delete |
+
+Path lama /admin-users, /admin-user, /users dan /user tanpa child tidak tersedia. Client harus menggunakan child route di tabel. Delete menerima `{id}`. Update menambahkan id ke payload create dan password opsional. List mengembalikan `{count, data}`; password tidak disertakan. Default page=1, limit=20 (maksimum 100), sortDirection=desc, sortBy=createdAt; tie-breaker id menurun. Ekspor memakai filter/sort yang sama tanpa pagination dan respons file attachment, bukan CSV pada implementasi saat ini.
+
+| Fitur | Body create | Filter/sort |
+| --- | --- | --- |
+| Admin User | username, email, password, isActive, roles: [{programId, value}] | email, username, active; sortBy createdAt/username/email/isActive |
+| Perusahaan | entityTypeId, companyName, email, username, slug, status, password, bungaKredits, biaya | email, username, companyName, entityTypeId, status; sortBy createdAt/companyName/username/email/status |
+
+Admin detail menyertakan roles. Save mengganti seluruh daftar role. Perusahaan status active/inactive/blocked; slug format huruf kecil/angka dipisahkan tanda hubung. Bunga `[{id?, bungaPercentage, jangkaWaktuBulan}]` memakai string numerik; bunga nonnegatif, tenor integer positif. Biaya `[{id?, expenseType, type, value}]` memakai integer nonnegatif untuk value. Array adalah konfigurasi lengkap: child yang dihilangkan dihapus, termasuk seluruh child jika array kosong. ID child harus milik parent dan tidak duplikat. Konflik username/email, nama+badan usaha atau slug menghasilkan 409; jenis entitas harus tersedia. Hapus perusahaan yang masih memiliki debitor menghasilkan 409.
+
+GET /user/bunga-kredits?slug=... memerlukan JWT; company/debitor hanya slug sendiri. Admin boleh membaca konfigurasi untuk simulasi. Respons array bunga/tenor; route ini bukan akses CRUD perusahaan.
+
+## Rancangan API P05–P12 (belum tersedia)
 
 | Method dan path | Fungsi |
 | --- | --- |
-| `POST /api/login` | Login `admin`, `company`, atau `debitor`; response `authToken`, `type`, `userData`; JWT HS256 dengan claim id, slug, type dan masa berlaku 24 jam. |
-| `GET /api/user/slugs` | Pilihan perusahaan untuk navigasi tenant. |
-| `GET /api/programs` | Daftar program dan abbreviation. |
-| `GET /api/entity-types` | Daftar jenis entitas perusahaan. |
-| `GET /api/countries` | Daftar negara. |
-| `GET /api/constants` | Daftar nilai referensi, dengan filter nama opsional. |
-| `GET /api/dashboard/data` | `totalUsers`, `totalDebitor`, `totalCredits`; nominal kredit dikelompokkan menurut status HRD. |
+| `POST /debitor/create` | Pendaftaran debitor; return id; username diperiksa dan password di-hash. |
+| `GET /debitor/list`, `GET /debitor/detail` | Daftar/filter dan detail debitor beserta data terkait. |
+| `PUT /debitor/update`, `PUT /debitor/delete` | Update profil, finansial/dokumen; tolak hapus jika mempunyai kredit. |
+| `GET /debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
+| `POST /credit/create` | Membuat pengajuan; return id. |
+| `GET /credit/list`, `GET /credit/detail` | Daftar/detail, filter, pagination, total angsuran dan skor untuk admin. |
+| `PUT /credit/update` | Update pengajuan dan detail terkait; proses status HRD/BPR, biaya dan notifikasi sesuai [business-flow.md](business-flow.md). |
+| `GET /credit/export` | CSV kredit sesuai filter; format karyawan BPR memakai tipe `/kredit-karyawan`. |
+| `GET /credit/export/bulk` | Mengumpulkan dokumen PDF terfilter sebagai ZIP dan mengembalikan URL/nama. |
+| `GET /credit/export/doc` | Meminta render PDF dan menyimpan URL pada kredit. |
+| `GET /credit/doc/count` | Jumlah dokumen dalam bulan pembuatan kredit untuk penomoran. |
 
-Registrasi debitor, login dan slug dapat diakses sebelum JWT; endpoint lain membutuhkan bearer token. Aktor perusahaan login ketika status perusahaan `active`. Login admin memerlukan akun aktif. Data pengguna pada respons dan batas akses menurut aktor perlu diuji, termasuk pembatasan resource di backend.
-
-- Admin login dengan username atau email dan password; respons memuat identitas dan role yang dikelompokkan per program, dengan slug `admin`. Perusahaan login dengan username atau email, password dan slug. Debitor login dengan username, password dan slug perusahaan.
-- Password diperiksa dengan bcrypt. Klaim JWT hanya memuat `id`, `slug`, `type`; role dan status tidak berada di dalam token. Akun yang tidak ditemukan/tidak sesuai kredensial menghasilkan respons kredensial salah; perbedaan status HTTP perlu diuji pada implementasi kontrak.
-- Dashboard `totalUsers` menghitung perusahaan `active` dan `inactive`; `blocked` tidak termasuk. `totalDebitor` dibatasi ke perusahaan bagi HRD dan bernilai nol bagi debitor. `totalCredits` menjumlahkan nominal pengajuan berdasarkan status HRD `pending`, `approved`, `completed` dan dibatasi lingkup aktor; nilainya bukan jumlah baris atau saldo terutang.
-
-## Administrasi dan perusahaan
-
-| Method dan path | Fungsi |
-| --- | --- |
-| `GET /api/admin-users`, `GET /api/admin-user` | Daftar/filter dan detail administrator dengan role/program. |
-| `POST /api/admin-user/create`, `PUT /api/admin-user/update`, `PUT /api/admin-user/delete` | Pengelolaan administrator dan role. |
-| `GET /api/users`, `GET /api/user`, `GET /api/user/export` | Daftar/filter, detail dan CSV perusahaan. |
-| `POST /api/user/create`, `PUT /api/user/update`, `PUT /api/user/delete` | Pengelolaan perusahaan serta konfigurasi bunga/biaya; hapus dibatasi bila mempunyai debitor. |
-| `GET /api/user/bunga-kredits` | Daftar bunga dan tenor perusahaan terkait slug. |
-
-Perusahaan membawa jenis badan usaha, nama, email, username, slug, status, pengaturan bunga dan biaya. Benturan username/email atau kombinasi nama dan jenis entitas dicek sebelum create/update. Pembaruan array bunga dan biaya merekonsiliasi detail yang dikirim; perilaku array kosong tercatat sebagai risiko untuk divalidasi. Pada administrator, password di-hash dan setiap role memetakan nilai `READ`/`WRITE` ke program; edit role mengganti daftar role.
-
-Admin user mendukung filter email, username dan aktif. Perusahaan mendukung email, username, nama badan usaha+nama perusahaan dan status. Daftar menggunakan pengurutan dan pagination; CSV perusahaan mengikuti filter/pengurutan tanpa pagination dan mencakup identitas, status, serta audit.
-
-## Debitor dan kredit
-
-| Method dan path | Fungsi |
-| --- | --- |
-| `POST /api/debitor/create` | Pendaftaran debitor; return id; username diperiksa dan password di-hash. |
-| `GET /api/debitors`, `GET /api/debitor` | Daftar/filter dan detail debitor beserta data terkait. |
-| `PUT /api/debitor/update`, `PUT /api/debitor/delete` | Update profil, finansial/dokumen; tolak hapus jika mempunyai kredit. |
-| `GET /api/debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
-| `POST /api/credit/create` | Membuat pengajuan; return id. |
-| `GET /api/credits`, `GET /api/credit` | Daftar/detail, filter, pagination, total angsuran dan skor untuk admin. |
-| `PUT /api/credit/update` | Update pengajuan dan detail terkait; proses status HRD/BPR, biaya dan notifikasi sesuai [business-flow.md](business-flow.md). |
-| `GET /api/credit/export` | CSV kredit sesuai filter; format karyawan BPR memakai tipe `/kredit-karyawan`. |
-| `GET /api/credit/export/bulk` | Mengumpulkan dokumen PDF terfilter sebagai ZIP dan mengembalikan URL/nama. |
-| `GET /api/credit/export/doc` | Meminta render PDF dan menyimpan URL pada kredit. |
-| `GET /api/credit/doc/count` | Jumlah dokumen dalam bulan pembuatan kredit untuk penomoran. |
-
-Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK, status HRD/BPR dan perusahaan. Admin memperoleh daftar berstatus HRD `approved` sebagai kondisi awal. Detail dan risiko filter/otorisasi harus dikaji berdasarkan [logic-holes.md](logic-holes.md).
+Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK dan status HRD/BPR. Admin memperoleh daftar berstatus HRD `approved` sebagai kondisi awal. Detail dan risiko filter/otorisasi harus dikaji berdasarkan [logic-holes.md](logic-holes.md).
 
 - Detail kredit mencakup debitor/perusahaan, biaya, collection, guarantor, insurance, potongan, SLIK/BMPK dan spouse. Update mendukung upsert collection, guarantor, insurance, potongan, SLIK/BMPK dan spouse; snapshot expense dibuat pada approval.
 - Daftar debitor menyediakan `count`, data debitor dan jumlah pengajuan terbuka. Detail memuat profil, dokumen dan data finansial. Filter utama: id, nama lengkap dan alias. CSV memuat nomor induk, nama lengkap, alias, NIK dan jumlah pengajuan terbuka.
@@ -58,16 +75,6 @@ Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK, s
 - Ekspor ZIP mengambil kredit yang memiliki URL dokumen, membatasi pengambilan paralel hingga lima, menamai PDF dengan id debitor/kredit, identitas perusahaan dan bulan/tahun, lalu mengembalikan nama dan URL arsip. Kasus dokumen tidak ditemukan menghasilkan error.
 - Permintaan dokumen menghasilkan PDF A4 dari halaman perjanjian, menyimpan URL pada kredit dan mengembalikan URL. Penomoran menggunakan jumlah dokumen bulan pembuatan kredit, tidak dibatasi perusahaan. Validasi akses, konkurensi, response dan batas input harus diuji; lihat catatan risiko.
 
-## Implementasi referensi P01
+GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCredits dengan agregasi sesuai business-flow.md. CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
 
-P01 menyediakan array DTO: program `{id, name, abbreviation}`, jenis entitas `{id, value}`, negara `{id, code, value}`, constant `{id, name, type, value}`, dan slug `{id, slug, companyName}`. Kolom model yang belum memiliki NOT NULL dapat bernilai null. `GET /api/constants?name=...` mencocokkan nama secara tepat. Slug publik memuat semua perusahaan tanpa filter status, sesuai perilaku yang masih perlu diputuskan pada SUPPORT-11. Empat endpoint referensi lainnya memerlukan bearer JWT yang valid dan identitas aktif sesuai aturan P02; fixture identity hanya dipasang pada app test.
-
-## Implementasi autentikasi P02
-
-Login menerima `{type, username, password, slug?}`; slug wajib untuk perusahaan dan debitor. Response `{authToken, type, userData}` tidak menyertakan hash password. Input tidak valid menghasilkan 400 dan kredensial salah menghasilkan 401. Referensi privat memverifikasi token dan memuat status akun serta role terkini pada setiap request. `JWT_SECRET` harus disediakan melalui environment. Session UI berada dalam memori dan berakhir saat reload atau keluar.
-
-## Implementasi Admin User P03
-
-`GET /api/admin-users` menerima filter `email`, `username`, `active`, serta `page` dan `limit`. Sorting opsional: `sortBy` (`createdAt`, `username`, `email`, `isActive`; default `createdAt`) dan `sortDirection` (`asc`/`desc`; default `desc`), dengan id menurun sebagai tie-breaker; respons `{count, data}` tidak menyertakan password. `GET /api/admin-user?id=...` menyertakan `roles` berisi `{programId, value}`. Create menerima `{username, email, password, isActive, roles}`; update menambahkan `id` dan password opsional; delete menerima `{id}`. Penulisan dan penggantian role dilakukan dalam transaksi. Endpoint membaca memerlukan USA_READ, endpoint menulis memerlukan USA_WRITE; WRITE juga memberikan READ. Input salah menghasilkan 400, identitas tidak valid 401, izin tidak cukup 403, data tidak ditemukan 404, dan konflik akun/program 409. Pemeriksaan konflik belum menjamin keunikan saat request paralel tanpa constraint database terverifikasi.
-
-`GET /api/admin-users/export` menerima `format=pdf|xlsx` dan filter serta sorting yang sama dengan listing; seluruh hasil yang cocok diekspor tanpa pagination. Membutuhkan USA_READ atau USA_WRITE.
+Path di bagian rancangan belum final. Normalisasi list/detail mengikuti pola fitur saat diimplementasikan; operasi GET yang mengubah dokumen harus ditinjau pada FLOW-11, bukan dianggap endpoint berjalan.

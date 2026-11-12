@@ -1,4 +1,5 @@
-import { referenceRepository } from "@server/features/reference/reference.repository";
+import { referenceRepository } from '@server/features/reference/reference.repository';
+
 export const referenceService = {
   programs: () => referenceRepository.listPrograms(),
   entityTypes: () => referenceRepository.listEntityTypes(),

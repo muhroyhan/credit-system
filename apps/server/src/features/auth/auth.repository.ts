@@ -1,19 +1,22 @@
-import { connectDatabase } from "@credit/database/client";
+import { connectDatabase } from '@credit/database/client';
 import {
   adminUsers,
   debitors,
   programs,
   roles,
   users,
-} from "@credit/database/schema";
-import { and, eq, or } from "drizzle-orm";
+} from '@credit/database/schema';
+import type { DatabaseTransaction } from '@server/constant/type';
+import { and, eq, or } from 'drizzle-orm';
+
 export async function findAccount(
-  type: "admin" | "company" | "debitor",
+  type: 'admin' | 'company' | 'debitor',
   username: string,
   slug?: string,
+  transaction?: DatabaseTransaction,
 ) {
-  const db = connectDatabase().db;
-  if (type === "admin") {
+  const db = transaction ?? connectDatabase().db;
+  if (type === 'admin') {
     const [account] = await db
       .select()
       .from(adminUsers)
@@ -21,7 +24,9 @@ export async function findAccount(
         or(eq(adminUsers.username, username), eq(adminUsers.email, username)),
       )
       .limit(1);
-    if (!account?.isActive) return null;
+    if (!account?.isActive) {
+      return null;
+    }
     const permissions = await db
       .select({ program: programs.abbreviation, value: roles.value })
       .from(roles)
@@ -29,7 +34,7 @@ export async function findAccount(
       .where(eq(roles.adminUserId, account.id));
     return {
       id: account.id,
-      slug: "admin",
+      slug: 'admin',
       password: account.password,
       userData: {
         id: account.id,
@@ -39,19 +44,24 @@ export async function findAccount(
       },
     };
   }
-  if (!slug) return null;
+  if (!slug) {
+    return null;
+  }
   const [company] = await db
     .select()
     .from(users)
     .where(eq(users.slug, slug))
     .limit(1);
-  if (!company) return null;
-  if (type === "company") {
+  if (!company) {
+    return null;
+  }
+  if (type === 'company') {
     if (
-      company.status !== "active" ||
+      company.status !== 'active' ||
       (company.username !== username && company.email !== username)
-    )
+    ) {
       return null;
+    }
     return {
       id: company.id,
       slug,
@@ -71,7 +81,9 @@ export async function findAccount(
       and(eq(debitors.userId, company.id), eq(debitors.username, username)),
     )
     .limit(1);
-  if (!debitor) return null;
+  if (!debitor) {
+    return null;
+  }
   return {
     id: debitor.id,
     slug,
@@ -86,19 +98,23 @@ export async function findAccount(
 }
 
 export async function resolveIdentity(
-  type: "admin" | "company" | "debitor",
+  type: 'admin' | 'company' | 'debitor',
   id: number,
   slug: string,
 ) {
   const db = connectDatabase().db;
-  if (type === "admin") {
-    if (slug !== "admin") return null;
+  if (type === 'admin') {
+    if (slug !== 'admin') {
+      return null;
+    }
     const [account] = await db
       .select({ id: adminUsers.id, active: adminUsers.isActive })
       .from(adminUsers)
       .where(eq(adminUsers.id, id))
       .limit(1);
-    if (!account?.active) return null;
+    if (!account?.active) {
+      return null;
+    }
     const permissions = await db
       .select({ program: programs.abbreviation, value: roles.value })
       .from(roles)
@@ -106,12 +122,12 @@ export async function resolveIdentity(
       .where(eq(roles.adminUserId, id));
     return { id, type, slug, permissions };
   }
-  if (type === "company") {
+  if (type === 'company') {
     const [company] = await db
       .select({ id: users.id })
       .from(users)
       .where(
-        and(eq(users.id, id), eq(users.slug, slug), eq(users.status, "active")),
+        and(eq(users.id, id), eq(users.slug, slug), eq(users.status, 'active')),
       )
       .limit(1);
     return company ? { id, type, slug, permissions: [] } : null;

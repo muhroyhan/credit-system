@@ -1,19 +1,15 @@
-# Backend credit-system
+# Backend
 
-- Terapkan tiga layer backend: `controller` (handler request/response dan validasi), `service` (use case dan aturan bisnis), `repository` (Drizzle dan adapter). Simpan langsung di folder fitur sebagai `<feature>.controller.ts`, `<feature>.service.ts`, dan `<feature>.repository.ts`; simbol utama mengikuti `<featureCamelCase>Controller`, `<featureCamelCase>Service`, dan `<featureCamelCase>Repository`. Jangan buat subfolder layer.
-- Simpan deklarasi type dan interface setiap fitur dalam `<feature>.type.ts` di folder fitur yang sama; gunakan `import type` untuk konsumen tipe. Kontrak Zod bersama tetap di `packages/contracts`.
-- Validasi body, query dan parameter dengan Zod; gunakan kontrak bersama di `packages/contracts`.
-- Export tipe Hono RPC tanpa mengekspos koneksi database atau konfigurasi server ke bundle frontend.
-- Pertahankan status HRD/BPR, rumus dan urutan business flow di `docs/credit-system/business-flow.md`; catat perubahan perilaku dan logic hole di `docs/credit-system/logic-holes.md`.
-- Gunakan MySQL/Drizzle; hindari menganggap relasi sebagai constraint tanpa verifikasi DDL. Gunakan adapter untuk storage, WhatsApp dan PDF.
-- Uji service dengan Vitest unit serta route dan repository dengan Vitest integration pada database disposable; lihat `docs/credit-system/testing.md`.
-- Daftarkan route Hono melalui `const app = new Hono()` dan pemanggilan `app.get`, `app.use` atau `app.route` terpisah; pertahankan inferensi `AppType` RPC untuk seluruh route.
-- Pasang prefix `/api` satu kali. Daftarkan middleware dan handler endpoint dalam pemanggilan yang sama, misalnya `app.get("/programs", identityContext, handler)`, agar path tidak diulang pada `app.use` dan `app.get`.
+Urutan akses sekaligus import: global routes → feature routes → controller → service → repository. Global routes menggabungkan feature.routes.ts; route fitur mengimpor controller dan middleware; controller mengimpor service; hanya service yang mengimpor repository. Type/kontrak bersama merupakan dependency tersendiri. Test boleh mengimpor unit yang sedang diuji.
 
-- Ikuti `docs/credit-system/api-code-standards.md` untuk pola repository, service, global routes, validasi, error, dan tipe RPC. Ambil `const db = connectDatabase().db` sekali di setiap fungsi repository dan gunakan `db` untuk query.
+- app.ts hanya memasang /api sekali dan mengekspor AppType. Definisikan method/path pada feature.routes.ts, controller hanya handler. Gunakan const app = new Hono() dan pemanggilan method terpisah, bukan chaining panjang; pasang satu prefix fitur dan tulis path endpoint sekali bersama middleware/handler.
+- Urutan request: autentikasi, izin/scope yang diperlukan, validasi Zod, service, respons. Route publik tetap publik. JSON malformed menjadi input invalid; kegagalan internal tidak disamarkan sebagai validasi.
+- Controller menerima request dan mengirim respons. Gunakan input untuk body tervalidasi, query untuk filter dan result untuk hasil service. Detail bentuk respons/status hanya di [api-contract.md](../../docs/credit-system/api-contract.md).
+- Service berisi aturan bisnis dan satu-satunya tempat throw error bisnis. Satu service boleh memakai banyak repository. Service non-GET membuka satu withTransaction dan meneruskan transaksi yang sama ke seluruh operasi DB; error harus keluar dari callback agar rollback. Pekerjaan non-DB dapat dilakukan sebelum transaksi.
+- Repository hanya query dan mapping data dengan interface bertipe di feature.type.ts. Terima transaksi service untuk penulisan; jangan membuka transaksi sendiri atau membuat error bisnis. Error teknis driver diteruskan. Kembalikan DTO konkret/null/boolean/ID, bukan unknown; pilih kolom publik secara eksplisit dan jangan sertakan hash password.
+- Untuk pembacaan tanpa transaksi ambil const db = connectDatabase().db sekali per fungsi. Jangan menutup pool per repository; tutup hanya saat aplikasi/runner mandiri berakhir. Audit dan updatedAt berasal server.
+- Middleware hanya dibuat ketika dipakai, diimpor route fitur dan mengakses aturan bisnis melalui service. Bungkus middleware bawaan di folder middleware yang sama. ACL berupa PROGRAM_ACTION melalui permission(...); daftar aksi dan mapping program hanya di kontrak API.
+- Pertahankan tipe Hono RPC saat route digabung. Tipe AppType boleh diimpor frontend dengan import type; jangan memasukkan kode server atau kredensial ke bundle browser.
+- Ekspor PDF/XLSX dibentuk di server memakai utils/export-file.ts. Service menyiapkan kolom/data, memakai repository listing yang sama tanpa pagination atau batas jumlah data, menerapkan filter/sort/scope. Frontend hanya mengunduh hasil.
 
-- Urutan akses dan import wajib `global routes → controller → service → repository`. Global routes hanya mengimpor controller; controller mengimpor service; hanya service mengimpor repository. Repository tidak mengimpor service/controller dan controller tidak mengimpor repository/database. Type dan kontrak bersama boleh diimpor terpisah. Middleware juga mengakses database melalui service. Test repository boleh mengimpor repository sebagai subjek pengujian.
-
-- Daftarkan semua method dan path HTTP dalam satu fungsi `routes()` di `apps/server/src/routes.ts`. Controller mengekspor handler/middleware tanpa mendaftarkan route; `app.ts` hanya memasang hasilnya pada prefix `/api` dan mengekspor tipe RPC.
-
-- Semua middleware backend berada di `apps/server/src/middleware/`, satu fungsi middleware per file bernama `<nama>.middleware.ts`. Global routes mengimpor middleware langsung; middleware yang membutuhkan aturan bisnis hanya mengakses service, bukan repository. Middleware bawaan dibungkus di folder yang sama.
+Rujuk [kontrak API](../../docs/credit-system/api-contract.md) dan [model data](../../docs/credit-system/data-model.md) untuk perubahan terkait.

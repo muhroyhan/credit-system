@@ -15,7 +15,7 @@ export function createTestAdapters() {
         notifications.push(message);
       },
     },
-    pdf: { render: () => new TextEncoder().encode("synthetic pdf") },
-    now: () => new Date("2025-01-01T00:00:00Z"),
+    pdf: { render: () => new TextEncoder().encode('synthetic pdf') },
+    now: () => new Date('2025-01-01T00:00:00Z'),
   };
 }

@@ -1,19 +1,21 @@
+import { adminRoleSchema } from '@credit/contracts';
 import {
   Alert,
-  Button,
   Checkbox,
-  Group,
+  MultiSelect,
   PasswordInput,
-  Select,
   Stack,
   TextInput,
-} from "@mantine/core";
-import { Link } from "@tanstack/react-router";
-import type { AdminUserFormProps } from "@web/features/admin-users/admin-users.type";
-import { useAdminPrograms } from "@web/features/admin-users/hooks/useAdminDetail";
-import { useAdminForm } from "@web/features/admin-users/hooks/useAdminForm";
-import { useAdminSave } from "@web/features/admin-users/hooks/useAdminSave";
-import { Controller } from "react-hook-form";
+} from '@mantine/core';
+import { Link } from '@tanstack/react-router';
+import { FormActions } from '@web/components/crud/FormActions';
+import { PERMISSION_OPTIONS } from '@web/constant/constant';
+import type { AdminUserFormProps } from '@web/features/admin-users/admin-users.type';
+import { useAdminPrograms } from '@web/features/admin-users/hooks/useAdminDetail';
+import { useAdminForm } from '@web/features/admin-users/hooks/useAdminForm';
+import { useAdminSave } from '@web/features/admin-users/hooks/useAdminSave';
+import { Controller } from 'react-hook-form';
+
 export function AdminUserForm({
   token,
   id: editId,
@@ -48,25 +50,25 @@ export function AdminUserForm({
         <TextInput
           label="Username administrator"
           required
-          {...register("username")}
+          {...register('username')}
           error={errors.username?.message}
         />
         <TextInput
           label="Email administrator"
           type="email"
           required
-          {...register("email")}
+          {...register('email')}
           error={errors.email?.message}
         />
         <PasswordInput
           label="Password administrator"
           required={!editId}
-          {...register("password")}
+          {...register('password')}
           error={errors.password?.message}
         />
         <Checkbox
           label="Aktif"
-          {...register("isActive")}
+          {...register('isActive')}
           error={errors.isActive?.message}
         />
         <Controller
@@ -75,28 +77,27 @@ export function AdminUserForm({
           render={({ field }) => (
             <>
               {users.options.map((p) => (
-                <Select
+                <MultiSelect
                   key={p.value}
                   label={p.label}
-                  clearable
-                  data={[
-                    { value: "READ", label: "READ" },
-                    { value: "WRITE", label: "WRITE" },
-                  ]}
-                  value={
-                    field.value.find((r) => r.programId === Number(p.value))
-                      ?.value ?? null
-                  }
+                  data={PERMISSION_OPTIONS}
+                  value={field.value
+                    .filter((r) => r.programId === Number(p.value))
+                    .map((r) => r.value)}
                   onBlur={field.onBlur}
                   error={errors.roles?.message}
-                  onChange={(v) =>
+                  onChange={(values) =>
                     field.onChange([
                       ...field.value.filter(
                         (r) => r.programId !== Number(p.value),
                       ),
-                      ...(v === "READ" || v === "WRITE"
-                        ? [{ programId: Number(p.value), value: v }]
-                        : []),
+                      ...values.flatMap((value) => {
+                        const parsed = adminRoleSchema.safeParse({
+                          programId: Number(p.value),
+                          value,
+                        });
+                        return parsed.success ? [parsed.data] : [];
+                      }),
                     ])
                   }
                 />
@@ -107,16 +108,11 @@ export function AdminUserForm({
             </>
           )}
         />
-        <Group>
-          <Button
-            type="submit"
-            loading={save.isPending}
-            disabled={!programs.isSuccess}
-          >
-            Simpan
-          </Button>
-          <Link to="/admin-users">Batal</Link>
-        </Group>
+        <FormActions
+          pending={save.isPending}
+          disabled={!programs.isSuccess}
+          cancel={<Link to="/admin-users">Batal</Link>}
+        />
       </Stack>
     </form>
   );

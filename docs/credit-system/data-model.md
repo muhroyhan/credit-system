@@ -1,12 +1,12 @@
 # Model data credit-system
 
-Spesifikasi awal 24 entitas MySQL. Nama kolom dan tipe di bawah adalah acuan model; skema fisik, nullable, default, ukuran, index, FK dan isi database belum diverifikasi. Tidak mengasumsikan bahwa relasi konseptual otomatis menjadi constraint.
+Sumber tunggal kamus data dan status skema. Kamus berikut adalah model konseptual 24 entitas; tidak seluruhnya sudah menjadi tabel. Status migration saat ini ada di bagian terakhir. DDL/data sistem lama belum diverifikasi dan relasi konseptual tidak otomatis menjadi constraint.
 
 ## Kolom umum
 
 - Semua entitas: `id` bertipe `INTEGER.UNSIGNED` sebagai primary key; `created_at` dan `updated_at` bertipe `DATE`.
 - `created_by` dan `updated_by` bertipe `STRING`, kecuali pada `entity_type`, `program`, `role`.
-- Auto-increment ditentukan untuk id, kecuali `entity_type`, `program`, `role` yang mekanisme id-nya masih perlu diputuskan. Tipe `NUMBER` dalam kamus perlu dipetakan ke tipe MySQL yang tepat.
+- Model awal mengecualikan `entity_type`, `program`, `role` dari ketetapan auto-increment; keputusan schema baru P01 ada di bagian terakhir. Tipe `NUMBER` dalam kamus perlu dipetakan ke tipe MySQL yang tepat.
 - Field umum tidak diulang di bawah. Nama bertipe `STRING`/`DOUBLE` adalah bentuk model konseptual, bukan spesifikasi panjang atau presisi DDL.
 
 ## Entitas dan kolom
@@ -224,45 +224,12 @@ Kardinalitas menunjukkan kebutuhan model. Nullability, keunikan dan enforcement 
 
 `credit_score`, `sum_pengajuan`, `total_angsuran` dan `company_entity` merupakan hasil turunan, bukan kolom yang perlu ditambahkan hanya karena tersedia pada DTO.
 
-## ERD
+## Skema yang sudah diimplementasikan
 
-Simbol hubungan bersifat konseptual; tidak menetapkan NOT NULL atau keunikan fisik.
+`packages/database/src/schema.ts` dan migration 0000 mendefinisikan sepuluh tabel: admin_user, role, program, entity_type, constant, country, user, user_bunga_kredit, user_biaya dan debitor minimum. Entitas profil/kredit pada kamus di atas menunggu phase pemilik; jangan menganggapnya tabel aktif.
 
-```mermaid
-erDiagram
-    admin_user ||--o{ role : "admin_user_id"
-    program ||--o{ role : "program_id"
-    entity_type ||--o{ user : "entity_type_id"
-    user ||--o{ user_bunga_kredit : "user_id"
-    user ||--o{ user_biaya : "user_id"
-    user ||--o{ debitor : "user_id"
-    debitor ||--o{ credit : "debitor_id"
-    debitor ||--o| debitor_data : "debitor_id"
-    debitor ||--o| debitor_family : "debitor_id"
-    debitor ||--o| debitor_financial : "debitor_id"
-    debitor ||--o| debitor_gps : "debitor_id"
-    debitor ||--o| debitor_others : "debitor_id"
-    debitor ||--o| debitor_slik : "debitor_id"
-    credit ||--o{ credit_expense : "credit_id"
-    credit ||--o| credit_collection : "credit_id"
-    credit ||--o| credit_guarantor : "credit_id"
-    credit ||--o| credit_insurance : "credit_id"
-    credit ||--o| credit_potongan : "credit_id"
-    credit ||--o| credit_slik_bmpk : "credit_id"
-    credit ||--o| credit_spouse : "credit_id"
-    country {
-        int id PK
-        string code
-        string value
-    }
-    constant {
-        int id PK
-        string type
-        string name
-        string value
-    }
-```
+Schema database baru memakai ID integer unsigned auto-increment termasuk program/role/entity_type, varchar(255), kolom bisnis nullable, audit datetime default database. debitor.user_id adalah integer unsigned; field akun minimum saja tersedia. Tidak ada FK/unique/index tambahan. Ini rancangan baru yang telah diuji di database disposable, bukan bukti kompatibilitas DDL/data lama.
 
-## Rancangan database baru P01
+Migration 0001 hanya mengubah data ACL: setiap WRITE menjadi CREATE/READ/UPDATE/DELETE tanpa APPROVAL, mempertahankan aksi yang sudah ada tanpa menambah duplikasi, lalu menghapus WRITE. Jalankan migration sebelum versi aplikasi yang menolak WRITE digunakan pada database lama. Cara menjalankan migration/seed hanya pada local-development.md.
 
-Migration P01 adalah rancangan untuk database baru, bukan salinan DDL yang telah diverifikasi. Semua ID termasuk `program`, `role` dan `entity_type` menggunakan integer unsigned auto-increment; seed sintetis dapat menentukan ID eksplisit. String memakai varchar(255), kolom bisnis nullable, tanggal audit datetime dengan default waktu database. Tidak ada FK, unique atau index tambahan yang dianggap telah ada; tipe, panjang, nullable, default dan constraint harus dibandingkan dengan DDL/data lama sebelum migrasi kompatibilitas. `debitor.user_id` dipetakan ke integer unsigned dan tabel debitor hanya memuat field akun minimum; field profil diselesaikan P05. Tidak ada perubahan formula bisnis.
+Sebelum menambah constraint atau mengubah tipe, verifikasi DDL tujuan, duplikasi/orphan, precision/scale, nullable dan mapping DTO. Simpan keputusan/dampak pada logic-holes.md; jangan menganggap data turunan seperti score/agregat sebagai kolom tanpa keputusan.

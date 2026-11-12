@@ -1,17 +1,15 @@
-import { Container, Title } from "@mantine/core";
+import { Container, Title } from '@mantine/core';
 import {
   createRootRoute,
   createRoute,
   createRouter,
   Link,
   Outlet,
-} from "@tanstack/react-router";
-import { AdminUsersAddPage } from "@web/features/admin-users/AdminUsersAddPage";
-import { AdminUsersEditPage } from "@web/features/admin-users/AdminUsersEditPage";
-import { AdminUsersPage } from "@web/features/admin-users/AdminUsersPage";
-import { AdminUsersViewPage } from "@web/features/admin-users/AdminUsersViewPage";
-import { LoginPage } from "@web/features/auth/LoginPage";
-import { DashboardPage } from "@web/features/dashboard/DashboardPage";
+} from '@tanstack/react-router';
+import { adminUsersRoutes } from '@web/features/admin-users/admin-users.routes';
+import { LoginPage } from '@web/features/auth/LoginPage';
+import { companiesRoutes } from '@web/features/companies/companies.routes';
+import { DashboardPage } from '@web/features/dashboard/DashboardPage';
 
 const rootRoute = createRootRoute({
   component: Outlet,
@@ -24,45 +22,33 @@ const rootRoute = createRootRoute({
 });
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/",
+  path: '/',
   component: DashboardPage,
 });
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/login",
+  path: '/login',
   component: LoginPage,
 });
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/admin-users",
-  component: AdminUsersPage,
+  path: '/admin-users',
+  component: Outlet,
 });
-const adminAddRoute = createRoute({
+const companyRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/admin-users/add",
-  component: AdminUsersAddPage,
-});
-const adminEditRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/admin-users/$id/edit",
-  component: AdminUsersEditPage,
-});
-const adminViewRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/admin-users/$id",
-  component: AdminUsersViewPage,
+  path: '/companies',
+  component: Outlet,
 });
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
     indexRoute,
     loginRoute,
-    adminRoute,
-    adminAddRoute,
-    adminEditRoute,
-    adminViewRoute,
+    adminUsersRoutes(adminRoute),
+    companiesRoutes(companyRoute),
   ]),
 });
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }

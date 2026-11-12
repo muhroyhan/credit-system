@@ -16,6 +16,56 @@
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
-  }
+    "indentStyle": "space",
+    "lineWidth": 80,
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noBannedTypes": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noUnsafeDeclarationMerging": "error",
+        "noVar": "error"
+      },
+      "style": {
+        "noNamespace": "error",
+        "useImportType": "error",
+        "useExportType": "error",
+        "noNonNullAssertion": "error",
+        "useBlockStatements": "error",
+        "useConst": "error",
+        "noCommonJs": "error",
+        "noDefaultExport": "error",
+        "useConsistentTypeDefinitions": {
+          "level": "error",
+          "options": {
+            "style": "interface"
+          }
+        }
+      },
+      "preset": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.config.ts", "apps/server/src/index.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    }
+  ]
 }

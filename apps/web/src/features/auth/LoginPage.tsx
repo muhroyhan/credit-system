@@ -8,13 +8,14 @@ import {
   Text,
   TextInput,
   Title,
-} from "@mantine/core";
-import { Navigate } from "@tanstack/react-router";
+} from '@mantine/core';
+import { Navigate } from '@tanstack/react-router';
 
-import { useCompanies } from "@web/features/auth/hooks/useCompanies";
-import { useLoginForm } from "@web/features/auth/hooks/useLoginForm";
-import { useSession } from "@web/features/auth/hooks/useSession";
-import { Controller, useWatch } from "react-hook-form";
+import { useCompanies } from '@web/features/auth/hooks/useCompanies';
+import { useLoginForm } from '@web/features/auth/hooks/useLoginForm';
+import { useSession } from '@web/features/auth/hooks/useSession';
+import { Controller, useWatch } from 'react-hook-form';
+
 export function LoginPage() {
   const { session, loading, error, login } = useSession();
   const {
@@ -24,9 +25,11 @@ export function LoginPage() {
     setValue,
     formState: { errors },
   } = useLoginForm();
-  const type = useWatch({ control, name: "type" });
+  const type = useWatch({ control, name: 'type' });
   const { companies, companyError } = useCompanies(type);
-  if (session) return <Navigate to="/" replace />;
+  if (session) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <Container size="xs">
       <Stack>
@@ -43,24 +46,24 @@ export function LoginPage() {
                 <Select
                   label="Jenis akun"
                   data={[
-                    { value: "admin", label: "Admin bank" },
-                    { value: "company", label: "Perusahaan / HRD" },
-                    { value: "debitor", label: "Debitor" },
+                    { value: 'admin', label: 'Admin bank' },
+                    { value: 'company', label: 'Perusahaan / HRD' },
+                    { value: 'debitor', label: 'Debitor' },
                   ]}
                   value={field.value}
                   onBlur={field.onBlur}
                   allowDeselect={false}
                   error={errors.type?.message}
                   onChange={(v) => {
-                    if (v === "admin" || v === "company" || v === "debitor") {
+                    if (v === 'admin' || v === 'company' || v === 'debitor') {
                       field.onChange(v);
-                      setValue("slug", undefined, { shouldValidate: true });
+                      setValue('slug', undefined, { shouldValidate: true });
                     }
                   }}
                 />
               )}
             />
-            {type !== "admin" && (
+            {type !== 'admin' && (
               <Controller
                 name="slug"
                 control={control}
@@ -80,13 +83,13 @@ export function LoginPage() {
             <TextInput
               label="Username atau email"
               required
-              {...register("username")}
+              {...register('username')}
               error={errors.username?.message}
             />
             <PasswordInput
               label="Password"
               required
-              {...register("password")}
+              {...register('password')}
               error={errors.password?.message}
             />
             <Button type="submit" loading={loading}>

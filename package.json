@@ -5,7 +5,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "typecheck": "turbo run typecheck",
+    "typecheck": "turbo run typecheck && tsc --project tsconfig.json && tsc --project tests/tsconfig.json",
     "lint": "biome check .",
     "format": "biome format --write .",
     "start": "bun apps/server/dist/index.js",
@@ -19,13 +19,15 @@
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
     "@credit/contracts": "workspace:*",
+    "@credit/database": "workspace:*",
     "@credit/server": "workspace:*",
     "@credit/test-utils": "workspace:*",
     "@playwright/test": "^1.65.0",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^22.20.5",
     "drizzle-kit": "^0.31.0",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
-    "vitest": "^5.1.0",
-    "@credit/database": "workspace:*"
+    "vitest": "^5.1.0"
   }
 }

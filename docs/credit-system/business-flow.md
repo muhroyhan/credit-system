@@ -1,6 +1,6 @@
 # Alur bisnis credit-system
 
-Dokumen ini menetapkan perilaku bisnis yang perlu dipertahankan. Validasi database dan keputusan atas celah logika masih diperlukan; lihat [logic-holes.md](logic-holes.md).
+Sumber tunggal aturan dan cakupan bisnis. Status pengerjaan ada di [development-plan.md](development-plan.md); risiko dan keputusan terbuka ada di [logic-holes.md](logic-holes.md).
 
 ## Aktor
 
@@ -58,4 +58,24 @@ Persyaratan tertulis pada dokumen menyebut annuitas dan bunga tahunan, sementara
 
 Nomor perjanjian ditampilkan sebagai `<nomor urut>/BPR-<nama perusahaan uppercase tanpa pemisah>/<MM/YYYY>`. Nomor urut berasal dari hitungan dokumen pada bulan pembuatan kredit, ditambah satu, dengan setidaknya dua digit. Tanggal perjanjian mengikuti acknowledgment; cicilan pertama adalah satu bulan sesudahnya dan tanggal akhir adalah acknowledgment ditambah tenor.
 
-PDF memuat identitas bank, perusahaan dan debitor, nominal dan terbilang, tenor, bunga, biaya, denda, ketentuan perjanjian dan surat persetujuan. Teks mengenai pembayaran, pelunasan, atau pencairan tidak dengan sendirinya mendefinisikan fitur transaksi otomatis.
+PDF memuat identitas bank, perusahaan dan debitor, nominal dan terbilang, tenor, bunga, biaya, denda, delapan pasal perjanjian dan surat persetujuan. Teks mengenai pembayaran, pelunasan, atau pencairan tidak dengan sendirinya mendefinisikan fitur transaksi otomatis.
+
+## Cakupan fitur dan data nasabah
+
+| Kelompok fitur | Cakupan di luar alur kredit utama |
+| --- | --- |
+| Administrasi | CRUD administrator/role dan perusahaan; pengaman hapus perusahaan yang memiliki debitor. |
+| Master Karyawan | Registrasi publik melalui slug, pendaftaran oleh HRD, profil, penghasilan, dokumen, daftar/detail/edit dan pengaman hapus bila memiliki kredit. |
+| Review dan pelaporan | Daftar Kredit Karyawan lintas perusahaan untuk BPR, ekspor sesuai filter, PDF tunggal dan ZIP dokumen. |
+| Dashboard | Total perusahaan active/inactive (blocked tidak dihitung), jumlah debitor sesuai aktor (nol bagi debitor), nominal pengajuan per status HRD. Total perusahaan global tetap perlu keputusan untuk aktor debitor (SUPPORT-04). |
+| Referensi dan navigasi | Kamus program, badan usaha, negara, constant; menu sesuai aktor, breadcrumb, kondisi kosong/gagal dan tampilan mobile. |
+
+Registrasi memerlukan nama lengkap, username, password dan konfirmasi. Password registrasi minimal delapan karakter, mengandung huruf besar/kecil dan angka; username menerima huruf, angka, titik, underscore dan tanda hubung. Ini kebutuhan registrasi nasabah, bukan klaim validasi seluruh form sudah tersedia.
+
+Profil mencakup nomor induk, NIK, NPWP, identitas/agama, tempat/tanggal lahir, keluarga, kontak, alamat KTP/domisili, pekerjaan/pendidikan, kewarganegaraan dan pendapatan bersih bulanan. Yang wajib: nomor induk, NIK, nama, jenis kelamin, agama, tempat/tanggal lahir, status perkawinan, nama ibu, alamat KTP beserta provinsi/kota/kecamatan/kelurahan/kode pos, domisili dan pendapatan.
+
+Lima dokumen wajib: KTP, selfie KTP, KK, slip gaji dan tanda tangan; NPWP opsional. JPG, PNG dan PDF didukung, satu file per jenis. Pemetaan slip gaji/tanda tangan harus dibedakan.
+
+Pada review BPR, form approved membuat nominal tidak dapat diedit dan tidak menawarkan penolakan; kunci rejected/completed mengikuti tabel status di atas. Daftar BPR awalnya memfilter HRD approved. Master Karyawan mendukung urutan id/nomor induk/nama; filter dan transport API dirinci hanya dalam kontrak API.
+
+Tidak menambah ledger cicilan, pencairan otomatis, autodebit payroll, amortisasi, integrasi SLIK, OTP, e-KYC atau tanda tangan tersertifikasi. Data keluarga/GPS/SLIK/BMPK/penjamin pada model tidak otomatis menjadi form wajib.
