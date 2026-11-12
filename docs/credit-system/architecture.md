@@ -79,4 +79,4 @@ Setiap fitur CRUD memisahkan listing (`FeaturePage.tsx`), tambah (`FeatureAddPag
 
 Gate halaman dan action mengikuti CRUDA: Create, Read, Update, Delete, Approval. Pemetaan Admin User sesuai API: USA_READ atau USA_WRITE untuk Read dan ekspor, USA_WRITE untuk Create/Update/Delete. Approval belum memiliki endpoint/permission pada fitur ini dan selalu ditolak. Pemetaan fitur lain harus mengikuti endpoint server masing-masing; WRITE tidak otomatis memberi Approval. Frontend memakai snapshot role dari login; API tetap memverifikasi izin terkini setiap request.
 
-Ekspor Admin User dibuat oleh server melalui endpoint yang menerapkan filter dan sorting tanpa pagination. Endpoint memerlukan USA_READ atau USA_WRITE dan menghasilkan PDF/XLSX tanpa password atau role.
+Ekspor PDF/XLSX dibuat oleh utilitas bersama `apps/server/src/utils/export-file.ts`; service fitur menyiapkan data dan kolom. Ekspor Admin User dibuat oleh server melalui endpoint yang menerapkan filter dan sorting tanpa pagination. Endpoint memerlukan USA_READ atau USA_WRITE dan menghasilkan PDF/XLSX tanpa password atau role.
