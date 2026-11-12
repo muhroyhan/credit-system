@@ -1,5 +1,8 @@
 {
   "name": "@credit/test-utils",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "exports": {
+    "./adapters": "./src/adapters.ts"
+  }
 }

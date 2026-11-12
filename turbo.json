@@ -13,5 +13,5 @@
       "dependsOn": ["^typecheck"]
     }
   },
-  "globalPassThroughEnv": ["PLAYWRIGHT_BROWSER_PATH"]
+  "globalPassThroughEnv": ["PLAYWRIGHT_BROWSER_PATH", "DATABASE_URL"]
 }

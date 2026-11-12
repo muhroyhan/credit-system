@@ -11,6 +11,18 @@ importers:
       '@biomejs/biome':
         specifier: ^2.2.4
         version: 2.6.7
+      '@credit/contracts':
+        specifier: workspace:*
+        version: link:packages/contracts
+      '@credit/database':
+        specifier: workspace:*
+        version: link:packages/database
+      '@credit/server':
+        specifier: workspace:*
+        version: link:apps/server
+      '@credit/test-utils':
+        specifier: workspace:*
+        version: link:packages/test-utils
       '@playwright/test':
         specifier: ^1.65.0
         version: 1.65.0
@@ -32,6 +44,12 @@ importers:
       '@credit/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@credit/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      drizzle-orm:
+        specifier: ^0.44.7
+        version: 0.44.7(bun-types@1.4.4)(mysql2@3.24.6(@types/node@26.6.6))
       hono:
         specifier: ^4.10.0
         version: 4.13.18

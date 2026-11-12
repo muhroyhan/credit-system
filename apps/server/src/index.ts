@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { closeDatabase } from "@credit/database/client";
 import { serveStatic } from "hono/bun";
 import { app } from "./app";
 
@@ -19,3 +20,18 @@ app.get("/*", async (c) => {
     : c.notFound();
 });
 export default { port: Number(process.env.PORT ?? 3000), fetch: app.fetch };
+
+let shuttingDown = false;
+async function shutdown() {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  try {
+    await closeDatabase();
+    process.exit(0);
+  } catch (error) {
+    console.error("Database shutdown failed", error);
+    process.exit(1);
+  }
+}
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

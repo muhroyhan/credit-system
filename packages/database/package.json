@@ -12,5 +12,9 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./client": "./src/client.ts",
+    "./schema": "./src/schema.ts"
   }
 }
