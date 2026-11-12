@@ -61,14 +61,15 @@ PUT /profile menerima {id, profile}: identitas wajib sesuai business-flow, takeh
 
 Detail menambahkan profile dan documents (URL unduhan privat atau null). GET /document?id&kind memeriksa READ dan ownership sebelum mengirim attachment no-store. File disimpan lewat adapter disk privat; kegagalan upload/SQL membersihkan file baru, SQL rollback. GET /export?format=pdf|xlsx memakai query listing yang sama tanpa pagination/batas data dan scope identik. CSV mengikuti P11.
 
-## Rancangan API P06–P12 (belum tersedia)
+### Pengajuan kredit (P06, dalam implementasi)
+
+Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected. Implementasi dan bukti pengujian belum final sampai P06-T04.
+
+## Rancangan API P07–P12 (belum tersedia)
 
 | Method dan path | Fungsi |
 | --- | --- |
 | `GET /debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
-| `POST /credit/create` | Membuat pengajuan; return id. |
-| `GET /credit/list`, `GET /credit/detail` | Daftar/detail, filter, pagination, total angsuran dan skor untuk admin. |
-| `PUT /credit/update` | Update pengajuan dan detail terkait; proses status HRD/BPR, biaya dan notifikasi sesuai [business-flow.md](business-flow.md). |
 | `GET /credit/export` | CSV kredit sesuai filter; format karyawan BPR memakai tipe `/kredit-karyawan`. |
 | `GET /credit/export/bulk` | Mengumpulkan dokumen PDF terfilter sebagai ZIP dan mengembalikan URL/nama. |
 | `GET /credit/export/doc` | Meminta render PDF dan menyimpan URL pada kredit. |

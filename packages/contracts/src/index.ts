@@ -158,5 +158,6 @@ export const companyQuerySchema = z.object({
   sortDirection: z.enum(['asc', 'desc']).default('desc'),
 });
 
+export * from './credit.type';
 export * from './employees.constant';
 export * from './employees.type';

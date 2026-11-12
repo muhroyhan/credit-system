@@ -1,3 +1,4 @@
+import type { CreditApplication, CreditQuery } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   creditCollection,
@@ -10,6 +11,7 @@ import {
   debitorFinancial,
   debitors,
   userBungaKredit,
+  users,
 } from '@credit/database/schema';
 import type { DatabaseTransaction } from '@server/constant/type';
 import type {
@@ -20,11 +22,22 @@ import type {
   CreditSlikBmpkInput,
   CreditSpouseInput,
 } from '@server/features/credit/credit.type';
-import { and, eq, inArray } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  inArray,
+  like,
+  lte,
+  sql,
+} from 'drizzle-orm';
 
 export const creditRepository = {
-  async simulationData(debitorId: number) {
-    const db = connectDatabase().db;
+  async simulationData(debitorId: number, tx?: DatabaseTransaction) {
+    const db = tx ?? connectDatabase().db;
     const [debitor] = await db
       .select({ userId: debitors.userId, income: debitorFinancial.takehomePay })
       .from(debitors)
@@ -36,6 +49,7 @@ export const creditRepository = {
     }
     const rates = await db
       .select({
+        id: userBungaKredit.id,
         jangkaWaktuBulan: userBungaKredit.jangkaWaktuBulan,
         bungaPercentage: userBungaKredit.bungaPercentage,
       })
@@ -51,6 +65,155 @@ export const creditRepository = {
         ),
       );
     return { income: debitor.income, rates, open };
+  },
+  async detail(id: number, tx?: DatabaseTransaction) {
+    const db = tx ?? connectDatabase().db;
+    const query = db
+      .select({
+        credit: credits,
+        userId: debitors.userId,
+        nama: debitors.namaLengkap,
+        companyName: users.companyName,
+      })
+      .from(credits)
+      .innerJoin(debitors, eq(credits.debitorId, debitors.id))
+      .leftJoin(users, eq(debitors.userId, users.id))
+      .where(eq(credits.id, id));
+    const [row] = await (tx ? query.for('update') : query);
+    return row ?? null;
+  },
+  async children(id: number) {
+    const db = connectDatabase().db;
+    const [collection, guarantor, insurance, potongan, slikBmpk, spouse] =
+      await Promise.all([
+        db
+          .select()
+          .from(creditCollection)
+          .where(eq(creditCollection.creditId, id))
+          .limit(1),
+        db
+          .select()
+          .from(creditGuarantor)
+          .where(eq(creditGuarantor.creditId, id))
+          .limit(1),
+        db
+          .select()
+          .from(creditInsurance)
+          .where(eq(creditInsurance.creditId, id))
+          .limit(1),
+        db
+          .select()
+          .from(creditPotongan)
+          .where(eq(creditPotongan.creditId, id))
+          .limit(1),
+        db
+          .select()
+          .from(creditSlikBmpk)
+          .where(eq(creditSlikBmpk.creditId, id))
+          .limit(1),
+        db
+          .select()
+          .from(creditSpouse)
+          .where(eq(creditSpouse.creditId, id))
+          .limit(1),
+      ]);
+    return {
+      collection: collection[0] ?? null,
+      guarantor: guarantor[0] ?? null,
+      insurance: insurance[0] ?? null,
+      potongan: potongan[0] ?? null,
+      slikBmpk: slikBmpk[0] ?? null,
+      spouse: spouse[0] ?? null,
+    };
+  },
+  async list(
+    query: CreditQuery,
+    userId?: number,
+    debitorId?: number,
+    paginate = true,
+  ) {
+    const db = connectDatabase().db;
+    const where = and(
+      userId === undefined ? undefined : eq(debitors.userId, userId),
+      debitorId === undefined ? undefined : eq(credits.debitorId, debitorId),
+      query.userId === undefined
+        ? undefined
+        : eq(debitors.userId, query.userId),
+      query.debitorId === undefined
+        ? undefined
+        : eq(credits.debitorId, query.debitorId),
+      query.nama ? like(debitors.namaLengkap, `%${query.nama}%`) : undefined,
+      query.noKtp ? like(debitors.noKtp, `%${query.noKtp}%`) : undefined,
+      query.status ? eq(credits.status, query.status) : undefined,
+      query.statusAdminApproval
+        ? eq(credits.statusAdminApproval, query.statusAdminApproval)
+        : undefined,
+      query.createdFrom
+        ? gte(credits.createdAt, new Date(`${query.createdFrom}T00:00:00`))
+        : undefined,
+      query.createdTo
+        ? lte(credits.createdAt, new Date(`${query.createdTo}T23:59:59.999`))
+        : undefined,
+    );
+    const [total] = await db
+      .select({ count: count() })
+      .from(credits)
+      .innerJoin(debitors, eq(credits.debitorId, debitors.id))
+      .where(where);
+    const selection = db
+      .select({
+        credit: credits,
+        userId: debitors.userId,
+        nama: debitors.namaLengkap,
+        companyName: users.companyName,
+      })
+      .from(credits)
+      .innerJoin(debitors, eq(credits.debitorId, debitors.id))
+      .leftJoin(users, eq(debitors.userId, users.id))
+      .where(where)
+      .orderBy(
+        (query.sortDirection === 'asc' ? asc : desc)(
+          query.sortBy === 'jumlahPengajuan'
+            ? sql`CAST(${credits.jumlahPengajuan} AS DECIMAL(20, 0))`
+            : credits[query.sortBy],
+        ),
+        desc(credits.id),
+      );
+    return {
+      count: total?.count ?? 0,
+      data: await (paginate
+        ? selection.limit(query.limit).offset((query.page - 1) * query.limit)
+        : selection),
+    };
+  },
+  async save(
+    input: CreditApplication,
+    values: { principal: number; installment: number; percentage: number },
+    actor: string,
+    tx: DatabaseTransaction,
+    id?: number,
+  ) {
+    const data = {
+      debitorId: input.debitorId,
+      tanggalPengajuan: input.tanggalPengajuan,
+      jumlahPengajuan: String(values.principal),
+      jangkaWaktuBulan: input.jangkaWaktuBulan,
+      jumlahAngsuran: String(values.installment),
+      nilaiAngsuran: String(values.installment),
+      pokokAngsuran: String(values.principal / input.jangkaWaktuBulan),
+      bungaAngsuranBulanan: String(values.percentage),
+      updatedBy: actor,
+      updatedAt: new Date(),
+    };
+    if (id !== undefined) {
+      await tx.update(credits).set(data).where(eq(credits.id, id));
+      return id;
+    }
+    const [row] = await tx
+      .insert(credits)
+      .values({ ...data, status: 'pending', createdBy: actor })
+      .$returningId();
+    return row?.id;
   },
   async collection(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx

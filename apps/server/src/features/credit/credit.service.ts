@@ -1,6 +1,56 @@
-import { CreditInvalid } from '@server/features/credit/credit.error';
+import type { CreditApplication, CreditQuery } from '@credit/contracts';
+import type { Identity } from '@server/constant/interface';
+import type { DatabaseTransaction } from '@server/constant/type';
+import { authService } from '@server/features/auth/auth.service';
+import {
+  CreditConflict,
+  CreditForbidden,
+  CreditInvalid,
+  CreditNotFound,
+} from '@server/features/credit/credit.error';
 import { creditRepository } from '@server/features/credit/credit.repository';
 import type { CreditRate } from '@server/features/credit/credit.type';
+import { employeesRepository } from '@server/features/employees/employees.repository';
+import { exportFile } from '@server/utils/export-file';
+import { withTransaction } from '@server/utils/transaction';
+
+function authorize(identity: Identity, action: 'READ' | 'CREATE' | 'UPDATE') {
+  if (
+    identity.type === 'admin' &&
+    !authService.hasAclPermission(identity, `CGP_${action}`)
+  ) {
+    throw new CreditForbidden();
+  }
+}
+
+async function companyScope(identity: Identity, tx?: DatabaseTransaction) {
+  if (identity.type === 'admin') {
+    return undefined;
+  }
+  const company = await employeesRepository.company(identity.slug, tx);
+  if (!company) {
+    throw new CreditForbidden();
+  }
+  return company.id;
+}
+
+async function requireDebitor(
+  identity: Identity,
+  debitorId: number,
+  tx?: DatabaseTransaction,
+) {
+  const row = await employeesRepository.account(debitorId, tx);
+  if (!row) {
+    throw new CreditNotFound();
+  }
+  const companyId = await companyScope(identity, tx);
+  if (
+    (companyId !== undefined && companyId !== row.userId) ||
+    (identity.type === 'debitor' && identity.id !== debitorId)
+  ) {
+    throw new CreditForbidden();
+  }
+}
 
 function parseAmount(value: string) {
   const trimmed = value.trim();
@@ -15,8 +65,179 @@ function parseAmount(value: string) {
 }
 
 export const creditService = {
-  async simulateForDebitor(debitorId: number, amount: string, months: number) {
+  async rates(debitorId: number, identity: Identity) {
+    authorize(identity, 'READ');
+    await requireDebitor(identity, debitorId);
     const data = await creditRepository.simulationData(debitorId);
+    if (!data) {
+      throw new CreditNotFound();
+    }
+    return data.rates;
+  },
+  async exportFile(
+    query: CreditQuery,
+    identity: Identity,
+    format: 'pdf' | 'xlsx',
+  ) {
+    authorize(identity, 'READ');
+    const result = await creditRepository.list(
+      query,
+      await companyScope(identity),
+      identity.type === 'debitor' ? identity.id : undefined,
+      false,
+    );
+    return exportFile({
+      title: 'Pengajuan Kredit',
+      columns: ['ID', 'Nama', 'Perusahaan', 'Nominal', 'Tenor', 'Status'],
+      values: result.data.map(({ credit, nama, companyName }) => [
+        String(credit.id),
+        nama ?? '',
+        companyName ?? '',
+        credit.jumlahPengajuan ?? '',
+        String(credit.jangkaWaktuBulan ?? ''),
+        credit.status ?? '',
+      ]),
+      format,
+    });
+  },
+  async list(query: CreditQuery, identity: Identity) {
+    authorize(identity, 'READ');
+    const result = await creditRepository.list(
+      query,
+      await companyScope(identity),
+      identity.type === 'debitor' ? identity.id : undefined,
+    );
+    return {
+      ...result,
+      data: await Promise.all(
+        result.data.map(async (row) => {
+          const totalAngsuran =
+            Number(row.credit.jumlahAngsuran ?? 0) *
+            Number(row.credit.jangkaWaktuBulan ?? 0);
+          if (identity.type !== 'admin' || row.credit.debitorId === null) {
+            return { ...row, totalAngsuran };
+          }
+          const data = await creditRepository.simulationData(
+            row.credit.debitorId,
+          );
+          if (
+            !data ||
+            data.income === null ||
+            data.open.some((item) => item.amount === null)
+          ) {
+            return {
+              ...row,
+              totalAngsuran,
+              sumPengajuan: null,
+              creditScore: null,
+            };
+          }
+          const summary = creditService.summary(
+            data.income,
+            data.open.map((item) => item.amount ?? ''),
+          );
+          return {
+            ...row,
+            totalAngsuran,
+            sumPengajuan: summary.open,
+            creditScore: summary.score,
+          };
+        }),
+      ),
+    };
+  },
+  async detail(id: number, identity: Identity) {
+    authorize(identity, 'READ');
+    const row = await creditRepository.detail(id);
+    if (!row || row.credit.debitorId === null) {
+      throw new CreditNotFound();
+    }
+    await requireDebitor(identity, row.credit.debitorId);
+    return {
+      ...row,
+      children: await creditRepository.children(id),
+      totalAngsuran:
+        Number(row.credit.jumlahAngsuran ?? 0) *
+        Number(row.credit.jangkaWaktuBulan ?? 0),
+    };
+  },
+  async simulation(input: CreditApplication, identity: Identity) {
+    authorize(identity, 'READ');
+    await requireDebitor(identity, input.debitorId);
+    return creditService.simulateForDebitor(
+      input.debitorId,
+      input.jumlahPengajuan,
+      input.jangkaWaktuBulan,
+    );
+  },
+  async save(input: CreditApplication, identity: Identity, id?: number) {
+    authorize(identity, id === undefined ? 'CREATE' : 'UPDATE');
+    return withTransaction(async (tx) => {
+      await requireDebitor(identity, input.debitorId, tx);
+      if (id !== undefined) {
+        const old = await creditRepository.detail(id, tx);
+        if (!old) {
+          throw new CreditNotFound();
+        }
+        if (old.credit.debitorId !== input.debitorId) {
+          throw new CreditForbidden();
+        }
+        if (
+          old.credit.status === 'approved' ||
+          old.credit.status === 'rejected'
+        ) {
+          throw new CreditConflict('Pengajuan sudah terkunci');
+        }
+      }
+      const simulation = await creditService.simulateForDebitor(
+        input.debitorId,
+        input.jumlahPengajuan,
+        input.jangkaWaktuBulan,
+        tx,
+      );
+      const result = await creditRepository.save(
+        input,
+        simulation,
+        `${identity.type}:${identity.id}`,
+        tx,
+        id,
+      );
+      if (result === undefined) {
+        throw new CreditInvalid('Gagal menyimpan pengajuan');
+      }
+      const actor = `${identity.type}:${identity.id}`;
+      if (input.collection) {
+        await creditRepository.saveCollection(
+          result,
+          input.collection,
+          actor,
+          tx,
+        );
+      }
+      if (input.guarantor) {
+        await creditRepository.saveGuarantor(
+          result,
+          input.guarantor,
+          actor,
+          tx,
+        );
+      }
+      if (input.slikBmpk) {
+        await creditRepository.saveSlikBmpk(result, input.slikBmpk, actor, tx);
+      }
+      if (input.spouse) {
+        await creditRepository.saveSpouse(result, input.spouse, actor, tx);
+      }
+      return result;
+    });
+  },
+  async simulateForDebitor(
+    debitorId: number,
+    amount: string,
+    months: number,
+    tx?: DatabaseTransaction,
+  ) {
+    const data = await creditRepository.simulationData(debitorId, tx);
     if (
       !data ||
       data.income === null ||

@@ -65,7 +65,7 @@ Hasil: nasabah mendaftar melalui slug, login setelah registrasi dan melengkapi i
 
 Hasil: pengajuan dan simulasi nasabah/HRD dapat dipakai dengan status HRD awal pending, tanpa membutuhkan review BPR.
 
-Status: doing. P06-T01–T02 selesai; verifikasi dilakukan pada P06-T04. P06-T03–T04 belum selesai.
+Status: doing. P06-T01–T03 selesai secara implementasi; verifikasi dan perbaikan hasil pemeriksaan dilakukan pada P06-T04.
 
 | Kode task | Task dan keluaran |
 | --- | --- |
