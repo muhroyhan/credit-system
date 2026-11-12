@@ -9,6 +9,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { AdminUsers } from "@web/features/admin-users/presentation/AdminUsers";
 import { useCompanies } from "@web/features/auth/application/useCompanies";
 import { useSession } from "@web/features/auth/application/useSession";
 import { useState } from "react";
@@ -33,6 +34,21 @@ export function Login() {
           <Text>Beranda</Text>
           <Title>Credit System</Title>
           <Text>Masuk sebagai {session.type}</Text>
+          {session.type === "admin" &&
+            Array.isArray(session.userData.roles) &&
+            session.userData.roles.some(
+              (r: { program?: string; value?: string }) =>
+                r.program === "USA" &&
+                (r.value === "READ" || r.value === "WRITE"),
+            ) && (
+              <AdminUsers
+                token={session.authToken}
+                canWrite={session.userData.roles.some(
+                  (r: { program?: string; value?: string }) =>
+                    r.program === "USA" && r.value === "WRITE",
+                )}
+              />
+            )}
           <Button onClick={logout}>Keluar</Button>
         </Stack>
       </Container>
