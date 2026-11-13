@@ -1,23 +1,39 @@
 # Backend
 
-Urutan akses sekaligus import: global routes → feature routes → controller → service → repository. Global routes menggabungkan feature.routes.ts; route fitur mengimpor controller dan middleware; controller mengimpor service; hanya service yang mengimpor repository. Type/kontrak bersama merupakan dependency tersendiri. Test boleh mengimpor unit yang sedang diuji.
+The dependency order is global routes → feature routes → controller → service →
+repository. Tests may import the unit under test. Credit applications and BPR
+reviews are separate features; review services may reuse the credit repository,
+and review routes share the credit URL prefix.
 
-Pengajuan kredit dan review BPR memakai fitur terpisah. Service review boleh memakai repository kredit untuk query bersama; route review digabung dalam prefix kredit agar kontrak URL tetap sama.
-
-- app.ts hanya memasang /api sekali dan mengekspor AppType. Definisikan method/path pada feature.routes.ts, controller hanya handler. Gunakan const app = new Hono() dan pemanggilan method terpisah, bukan chaining panjang; pasang satu prefix fitur dan tulis path endpoint sekali bersama middleware/handler.
-- Urutan request: autentikasi, izin/scope yang diperlukan, validasi Zod, service, respons. Route publik tetap publik. JSON malformed menjadi input invalid; kegagalan internal tidak disamarkan sebagai validasi.
-- Controller menerima request dan mengirim respons. Gunakan input untuk body tervalidasi, query untuk filter dan result untuk hasil service. Detail bentuk respons/status hanya di [api-contract.md](../../docs/credit-system/api-contract.md).
-- Service berisi aturan bisnis dan satu-satunya tempat throw error bisnis. Satu service boleh memakai banyak repository. Service non-GET membuka satu withTransaction dan meneruskan transaksi yang sama ke seluruh operasi DB; error harus keluar dari callback agar rollback. Pekerjaan non-DB dapat dilakukan sebelum transaksi.
-- Repository hanya query dan mapping data dengan interface bertipe di feature.type.ts. Terima transaksi service untuk penulisan; jangan membuka transaksi sendiri atau membuat error bisnis. Error teknis driver diteruskan. Kembalikan DTO konkret/null/boolean/ID, bukan unknown; pilih kolom publik secara eksplisit dan jangan sertakan hash password.
-- Untuk pembacaan tanpa transaksi ambil const db = connectDatabase().db sekali per fungsi. Jangan menutup pool per repository; tutup hanya saat aplikasi/runner mandiri berakhir. Audit actor berasal server; createdAt dan updatedAt dikelola otomatis oleh MySQL dan tidak diisi repository.
-- Middleware hanya dibuat ketika dipakai, diimpor route fitur dan mengakses aturan bisnis melalui service. Bungkus middleware bawaan di folder middleware yang sama. ACL berupa PROGRAM_ACTION melalui permission(...); daftar aksi dan mapping program hanya di kontrak API.
-- Pertahankan tipe Hono RPC saat route digabung. Tipe AppType boleh diimpor frontend dengan import type; jangan memasukkan kode server atau kredensial ke bundle browser.
-- Ekspor PDF/XLSX/CSV dibentuk di server memakai utils/export-file.ts; controller memakai exportHeaders dari utilitas yang sama untuk MIME dan nama attachment. Service menyiapkan kolom/data, memakai repository listing yang sama tanpa pagination atau batas jumlah data, menerapkan filter/sort/scope. Frontend hanya mengunduh hasil.
-
-Rujuk [kontrak API](../../docs/credit-system/api-contract.md) dan [model data](../../docs/credit-system/data-model.md) untuk perubahan terkait.
-
-Helper controller di utils/controller.ts menangani pembacaan JSON dan pemetaan kategori service-error; error teknis diteruskan. Error fitur mewarisi kategori bersama. Hash password akun memakai utils/password.ts. Child kredit memakai saveChild bertipe di repository dengan transaksi dari service.
-
-ZIP dokumen menggunakan query listing dengan scope yang sama, membaca key privat yang dihasilkan server maksimal lima paralel dan mengembalikan arsip kosong jika tidak ada dokumen. Jangan mengambil URL klien atau URL eksternal.
-
-Fungsi utilitas khusus fitur ditempatkan di folder utils fitur; service berisi use case dan aturan bisnis yang mengakses repository, bukan definisi utilitas. Utilitas lintas fitur berada di src/utils.
+- `app.ts` mounts `/api` once and exports `AppType`. Define method, path and
+  middleware in feature routes, using a `new Hono()` instance and separate
+  method calls. Controllers handle requests and responses; use `input` for
+  validated bodies, `query` for filters and `result` for service results.
+- Apply authentication, required permission/scope, Zod validation, service and
+  response in that order. Public routes stay public. Malformed JSON is invalid
+  input; do not disguise internal errors as validation failures. Inspect routes,
+  contracts and tests for existing status and response behavior.
+- Services own business rules and business errors. A non-GET service opens one
+  `withTransaction` and passes the same transaction to all DB operations; let
+  errors escape for rollback. Non-DB work can happen before the transaction.
+- Repositories query and map typed data; they do not start transactions or create
+  business errors. Return concrete DTOs, null, booleans or IDs, select public
+  columns explicitly and never expose password hashes. For nontransactional
+  reads obtain `connectDatabase().db` once per function. Close the pool only at
+  application or standalone runner shutdown. Audit actors come from the server;
+  MySQL manages `createdAt` and `updatedAt`.
+- Middleware is created when used, imported by feature routes and accesses
+  business rules through services. Wrap built-in middleware in the same folder.
+  ACL uses `PROGRAM_ACTION` via `permission(...)`; inspect shared contracts and
+  existing routes for program and action mappings.
+- Preserve Hono RPC types while combining routes. The frontend may import
+  `AppType` with `import type`, never server code or secrets into its bundle.
+- Exports use `utils/export-file.ts` and `exportHeaders`; services reuse listing
+  queries without pagination, preserving filters, sort and scope. ZIP exports
+  read only server-generated private keys, at most five in parallel, and return
+  an empty archive when appropriate. Do not fetch client or external URLs.
+- `utils/controller.ts` handles JSON and service-error categories; feature
+  errors inherit shared categories. Use `utils/password.ts` for password hashes
+  and typed `saveChild` for credit children with the service transaction. Put
+  feature-specific utilities under that feature and shared utilities in
+  `src/utils`.
