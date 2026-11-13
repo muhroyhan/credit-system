@@ -6,7 +6,7 @@ simulation and applications, HR and bank review, customer confirmation,
 agreement documents, exports and dashboards into one workflow.
 
 The MVP is complete. A Bun/Hono API and React/Vite frontend run together with
-MySQL, Drizzle and shared Zod contracts. See [open risks and decisions](docs/credit-system/logic-holes.md)
+MySQL, Drizzle and shared Zod contracts. See [open risks and decisions](docs/logic-holes.md)
 before changing business behavior or migrating existing data.
 
 ## Getting started
@@ -46,12 +46,12 @@ was not tested in the recorded MVP verification.
 
 ## Checks and tests
 
-| Purpose | Command |
-| --- | --- |
-| Lint / typecheck / build | `pnpm lint` / `pnpm typecheck` / `pnpm build` |
-| Unit tests | `pnpm test:unit` |
-| Integration and HTTP tests | `pnpm test:integration` |
-| Browser E2E tests | `pnpm test:e2e` |
+| Purpose                            | Command                                                 |
+| ---------------------------------- | ------------------------------------------------------- |
+| Lint / typecheck / build           | `pnpm lint` / `pnpm typecheck` / `pnpm build`           |
+| Unit tests                         | `pnpm test:unit`                                        |
+| Integration and HTTP tests         | `pnpm test:integration`                                 |
+| Browser E2E tests                  | `pnpm test:e2e`                                         |
 | Generate baseline / migrate / seed | `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:seed` |
 
 Integration and E2E tests need a separate disposable local MySQL database named

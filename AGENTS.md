@@ -4,7 +4,7 @@ The MVP phases P00–P13 are complete. Improve the existing application without
 changing business rules unless the user instructs it. Inspect the implementation,
 contracts, schema and tests before changing behavior; distinguish requirements,
 implementation and verification. Record unresolved risks, compatibility impacts
-and decisions in [logic-holes.md](docs/credit-system/logic-holes.md).
+and decisions in [logic-holes.md](docs/logic-holes.md).
 
 ## Architecture
 
