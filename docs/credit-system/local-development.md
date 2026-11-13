@@ -32,3 +32,5 @@ Bun memuat .env dari working directory. Untuk perintah Node seperti Vitest/Playw
 Cakupan/jadwal test bukan di runbook ini; ikuti testing.md dan development-plan.md dari peta sumber.
 
 Dokumen P05 disimpan privat pada .data/documents (override DOCUMENT_STORAGE_DIR). Direktori ini bukan aset web dan harus persisten pada deployment; unduhan melalui API berotorisasi.
+
+P08 menyiapkan konfigurasi Meta WhatsApp Cloud API melalui WHATSAPP_GRAPH_VERSION, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ACCESS_TOKEN, WHATSAPP_TEMPLATE_NAME, WHATSAPP_TEMPLATE_LANGUAGE dan PUBLIC_APP_URL. Gunakan template yang telah disetujui dengan parameter body pertama berupa tautan status. Jangan isi token produksi pada lingkungan pengujian; pengiriman nyata tidak diuji dalam P08 sesuai instruksi pengguna.
