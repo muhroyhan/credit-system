@@ -1,6 +1,5 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { creditExpense, credits } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { Identity } from '@server/constant/interface';
 import {
   CreditConflict,
@@ -9,9 +8,8 @@ import {
 import { creditService } from '@server/features/credit/credit.service';
 import { creditReviewService } from '@server/features/credit-review/credit-review.service';
 import { eq } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
 const company: Identity = {
   id: 900001,
   type: 'company',
@@ -34,12 +32,7 @@ const application = {
   jangkaWaktuBulan: 12,
   tanggalPengajuan: '2026-11-13',
 };
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
-describe.skipIf(!url)('BPR review', () => {
+describe('BPR review', () => {
   for (const status of ['approved', 'rejected', 'completed'] as const) {
     it(`saves ${status} and enforces actor and repeat rules`, async () => {
       const db = connectDatabase().db;

@@ -33,6 +33,26 @@ describe('program and tenant access', () => {
   });
 });
 
+describe('ACL-U complete action isolation matrix', () => {
+  const actions = ['CREATE', 'READ', 'UPDATE', 'DELETE', 'APPROVAL'] as const;
+  it.each(actions)(
+    'granting %s grants no other action or program',
+    (granted) => {
+      const identity: Identity = {
+        ...admin,
+        permissions: [{ program: 'USA', value: granted }],
+      };
+      for (const requested of actions) {
+        expect(hasAclPermission(identity, `USA_${requested}`)).toBe(
+          granted === requested,
+        );
+        expect(hasAclPermission(identity, `USC_${requested}`)).toBe(false);
+      }
+      expect(belongsToCompany(identity, 'any-tenant')).toBe(true);
+    },
+  );
+});
+
 describe('granular ACL', () => {
   it('checks each action and requires explicit approval', () => {
     const identity: Identity = {

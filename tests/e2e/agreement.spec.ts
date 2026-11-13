@@ -6,10 +6,6 @@ import { eq } from 'drizzle-orm';
 import { loginBrowser, loginHeaders } from './fixtures/login';
 import { test } from './fixtures/test';
 
-test.skip(
-  !process.env.DATABASE_URL || !process.env.SEED_PASSWORD,
-  'Synthetic DB required',
-);
 test('confirmed customer creates, revisits and downloads a private agreement', async ({
   page,
   request,

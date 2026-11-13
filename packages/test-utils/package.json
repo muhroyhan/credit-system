@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./adapters": "./src/adapters.ts",
     "./database": "./src/database.ts"
   },
   "scripts": {

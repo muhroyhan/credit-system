@@ -1,17 +1,9 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { countries } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
 import { eq } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
-
-describe.skipIf(!url)('database-managed audit timestamps', () => {
+describe('database-managed audit timestamps', () => {
   it('sets insert defaults and only auto-updates updated_at', async () => {
     const { pool } = connectDatabase();
     const [rows] = await pool.query(

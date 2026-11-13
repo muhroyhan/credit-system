@@ -5,5 +5,10 @@
     "types": ["bun", "node"],
     "jsx": "react-jsx"
   },
-  "include": ["unit/**/*.ts", "integration/**/*.ts", "e2e/**/*.ts"]
+  "include": [
+    "unit/**/*.ts",
+    "integration/**/*.ts",
+    "e2e/**/*.ts",
+    "setup/**/*.ts"
+  ]
 }

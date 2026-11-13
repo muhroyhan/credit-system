@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P12 selesai. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P13 selesai. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -19,6 +19,7 @@ Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md
 | P10 | Perjanjian, PDF dan halaman terima kasih | P09 |
 | P11 | Ekspor CSV dan ZIP dokumen | P10 |
 | P12 | Dashboard aktor | P08 |
+| P13 | QA cleanup, happy path dan perluasan automation | P00–P12 |
 
 P03 dan P04 independen setelah P02. P12 tidak membutuhkan P09–P11; regresi lintas fitur dilakukan pada phase yang selesai paling akhir. P09 menyimpan konfirmasi; pembuatan dokumen baru disambungkan P10. CSV/ZIP P11 melengkapi ekspor PDF/XLSX fitur yang telah tersedia.
 
@@ -150,3 +151,27 @@ Hasil: admin, HRD dan debitor melihat ringkasan sesuai kontrak, dengan navigasi 
 | P12-T01 | Implementasikan agregasi totalUsers active/inactive tanpa blocked, totalDebitor sesuai aktor (nol bagi debitor), totalCredits berupa nominal per status HRD pending/approved/completed. Catat totalUsers global dan dampak cancellation sesuai SUPPORT-04/15, bukan mengubah agregat menjadi saldo cicilan. |
 | P12-T02 | Pasang GET dashboard/data dan UI ringkasan sesuai aktor, state kosong/loading/gagal dan nominal/tanggal konsisten; gunakan query sesuai scope backend. |
 | P12-T03 | Verifikasi akhir phase: unit agregasi, integration dua tenant/seluruh aktor dan status, E2E dashboard. Regresikan seluruh fitur yang telah selesai; jika P09–P11 belum dikerjakan, regresinya dilakukan pada task terakhir phase tersebut ketika selesai. Hapus script test sementara dan catat hasil aktual. |
+
+
+## P13 — QA cleanup dan perluasan automation
+
+Status: done. Tidak mengubah source aplikasi, schema atau aturan bisnis.
+Seluruh test ditulis sebelum batch eksekusi; hasil dan batas bukti pada testing.md.
+Commit per fitur memakai footer Task yang sama dengan kode berikut. Hash task
+terakhir ditelusuri melalui footer commit-nya. Tidak ada task diblokir keputusan bisnis.
+
+| Kode | Task | Status | Commit |
+| --- | --- | --- | --- |
+| P13-T01 | Harness, isolasi lingkungan, fixture bersama dan cleanup adapter | done | b925bdf |
+| P13-T02 | Auth, referensi dan ACL | done | 080f94f |
+| P13-T03 | Administrator dan role | done | 98786ff |
+| P13-T04 | Perusahaan dan konfigurasi child | done | aa7bc9e |
+| P13-T05 | Registrasi, profil dan dokumen karyawan | done | a570900 |
+| P13-T06 | Simulasi, scope dan child kredit | done | 4672330 |
+| P13-T07 | Approval HRD dan konkurensi | done | 7b55030 |
+| P13-T08 | Review BPR, snapshot dan kegagalan notifikasi | done | fc00169 |
+| P13-T09 | Konfirmasi/pembatalan nasabah dan matriks status | done | 6b47935 |
+| P13-T10 | Perjanjian, penomoran dan PDF | done | c9e93dd |
+| P13-T11 | Ekspor, ZIP dan parameter listing | done | 370183e |
+| P13-T12 | Dashboard dan agregat scoped | done | bc08c64 |
+| P13-T13 | Dokumentasi, analisis, bukti verifikasi dan cleanup akhir | done | footer Task: P13-T13 |

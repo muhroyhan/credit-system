@@ -5,10 +5,6 @@ import { inArray } from 'drizzle-orm';
 import { loginBrowser, loginHeaders } from './fixtures/login';
 import { test } from './fixtures/test';
 
-test.skip(
-  !process.env.DATABASE_URL || !process.env.SEED_PASSWORD,
-  'Synthetic database required',
-);
 test('dashboard shows scoped totals and rejects anonymous requests', async ({
   page,
   request,

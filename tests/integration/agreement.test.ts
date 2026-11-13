@@ -1,6 +1,5 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { agreementSequences, credits } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { Identity } from '@server/constant/interface';
 import {
   AgreementConflict,
@@ -11,9 +10,8 @@ import {
   createAgreementService,
 } from '@server/features/agreement/agreement.service';
 import { eq, inArray } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
 const customer: Identity = {
   id: 900001,
   type: 'debitor',
@@ -26,13 +24,8 @@ const other: Identity = {
   slug: 'sintetis-dua',
   permissions: [],
 };
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
 
-describe.skipIf(!url)('agreement numbering', () => {
+describe('agreement numbering', () => {
   it('locks monthly numbers across credits and preserves numbers on retry', async () => {
     const db = connectDatabase().db;
     const month = '2003-02';

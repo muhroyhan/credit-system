@@ -6,10 +6,6 @@ import { inArray } from 'drizzle-orm';
 import { loginBrowser, loginHeaders } from './fixtures/login';
 import { test } from './fixtures/test';
 
-test.skip(
-  !process.env.SEED_PASSWORD || !process.env.DATABASE_URL,
-  'Synthetic database required',
-);
 test('CSV and ZIP respect filters and tenant access', async ({
   request,
   page,

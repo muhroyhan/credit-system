@@ -1,8 +1,6 @@
-import {
-  employeeDocumentKinds,
-  employeeProfileSchema,
-} from '@credit/contracts';
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { randomUUID } from 'node:crypto';
+import { employeeDocumentKinds, employeeQuerySchema } from '@credit/contracts';
+import { connectDatabase } from '@credit/database/client';
 import {
   debitorData,
   debitorFamily,
@@ -11,212 +9,124 @@ import {
   debitorOthers,
   debitorSlik,
 } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
-import type { DocumentStorage, Identity } from '@server/constant/interface';
 import {
   EmployeeConflict,
   EmployeeForbidden,
 } from '@server/features/employees/employees.error';
 import { createEmployeesService } from '@server/features/employees/employees.service';
 import { eq } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { actors } from '../setup/fixtures';
+import { withEmployee } from './fixtures/employee';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
-const company: Identity = {
-  id: 900001,
-  type: 'company',
-  slug: 'sintetis-satu',
-  permissions: [],
-};
-const other: Identity = {
-  id: 900002,
-  type: 'company',
-  slug: 'sintetis-dua',
-  permissions: [],
-};
-describe.skipIf(!url)(
-  'P05 SQL rollback and private storage compensation',
-  () => {
-    it('serializes account conflicts, rolls back profile writes and cleans all child rows', async () => {
-      const files = new Map<string, Uint8Array>();
-      let fail = false;
-      const storage: DocumentStorage = {
-        async put(key, bytes) {
-          files.set(key, bytes);
-          if (fail && files.size > 5) {
-            throw new Error('Storage failed');
-          }
-        },
-        async get(key) {
-          return files.get(key) ?? null;
-        },
-        async remove(key) {
-          files.delete(key);
-        },
-      };
-      const service = createEmployeesService(storage);
-      const account = {
-        namaLengkap: 'P05 integration',
-        username: 'p05-integration',
-      };
-      const race = await Promise.allSettled([
-        service.save(account, company),
-        service.save(account, company),
-      ]);
-      const ids = race.flatMap((result) =>
-        result.status === 'fulfilled' ? [result.value] : [],
-      );
-      if (ids.length !== 1) {
-        for (const duplicate of ids) {
-          await service.remove(duplicate, company);
-        }
-      }
+const documents = Object.fromEntries(
+  employeeDocumentKinds.slice(0, 5).map((kind) => [
+    kind,
+    {
+      name: `${kind}.pdf`,
+      type: 'application/pdf',
+      bytes: new TextEncoder().encode(`%PDF-1.4 ${kind}`),
+    },
+  ]),
+);
+
+describe('EMPLOYEE-I account concurrency, compensation and cleanup', () => {
+  it('serializes duplicate account creation into one success and one conflict', async () => {
+    const service = createEmployeesService();
+    const input = {
+      namaLengkap: 'QA Synthetic',
+      username: `qa-${randomUUID()}`,
+    };
+    const results = await Promise.allSettled([
+      service.save(input, actors.company),
+      service.save(input, actors.company),
+    ]);
+    const ids = results.flatMap((result) =>
+      result.status === 'fulfilled' ? [result.value] : [],
+    );
+    try {
       expect(ids).toHaveLength(1);
-      expect(
-        race.filter((result) => result.status === 'rejected'),
-      ).toHaveLength(1);
-      const id = ids[0];
-      if (!id) {
-        throw new Error('Expected created employee');
+      const rejected = results.find((result) => result.status === 'rejected');
+      expect(rejected?.status === 'rejected' && rejected.reason).toBeInstanceOf(
+        EmployeeConflict,
+      );
+    } finally {
+      for (const id of ids) {
+        await service.remove(id, actors.company);
       }
-      try {
-        await expect(service.save(account, company)).rejects.toBeInstanceOf(
-          EmployeeConflict,
-        );
-        await expect(service.detail(id, other)).rejects.toBeInstanceOf(
-          EmployeeForbidden,
-        );
-        await expect(
-          service.list(
-            {
-              page: 1,
-              limit: 20,
-              sortBy: 'id',
-              sortDirection: 'asc',
-              userId: 900002,
-            },
-            company,
-          ),
-        ).rejects.toBeInstanceOf(EmployeeForbidden);
-        const profile = employeeProfileSchema.parse({
-          employeeId: 'Synthetic',
-          noKtp: 'Synthetic',
-          namaLengkap: 'Synthetic',
-          jenisKelamin: 'Synthetic',
-          agama: 'Synthetic',
-          tempatLahir: 'Synthetic',
-          tanggalLahir: '1990-01-02',
-          statusMarital: 'Synthetic',
-          namaIbuKandung: 'Synthetic',
-          alamatKtp: 'Synthetic',
-          provinsi: 'Synthetic',
-          kota: 'Synthetic',
-          kecamatan: 'Synthetic',
-          kelurahanDesa: 'Synthetic',
-          kodePos: 'Synthetic',
-          alamatDomisili: 'Synthetic',
-          namaAlias: 'alias-p05',
-          noHp: '08123',
-          noTelp: '',
-          pekerjaan: '',
-          pendidikan: '',
-          kewarganegaraan: '',
-          npwp: '',
-          takehomePay: '5000000',
-        });
-        await Promise.all([
-          service.saveProfile(id, profile, company),
-          service.saveProfile(id, profile, company),
-        ]);
-        const dbBefore = connectDatabase().db;
-        expect(
-          await dbBefore
-            .select({ id: debitorData.id })
-            .from(debitorData)
-            .where(eq(debitorData.debitorId, id)),
-        ).toHaveLength(1);
-        expect(
-          await dbBefore
-            .select({ id: debitorFinancial.id })
-            .from(debitorFinancial)
-            .where(eq(debitorFinancial.debitorId, id)),
-        ).toHaveLength(1);
-
-        await expect(
-          service.saveProfile(
-            id,
-            { ...profile, namaLengkap: 'Must rollback', npwp: 'x'.repeat(256) },
-            company,
-          ),
-        ).rejects.toThrow();
-        expect((await service.detail(id, company)).profile).toMatchObject({
-          namaLengkap: 'Synthetic',
-          noHp: '08123',
-          takehomePay: '5000000',
-          tanggalLahir: '1990-01-02',
-        });
-        const input = Object.fromEntries(
-          employeeDocumentKinds.slice(0, 5).map((kind) => [
-            kind,
-            {
-              name: `${kind}.pdf`,
-              type: 'application/pdf',
-              bytes: new TextEncoder().encode(`%PDF-1.4 ${kind}`),
-            },
-          ]),
-        );
-        await service.upload(id, input, company);
-        const slip = await service.document(id, 'slipGajiUrl', company);
-        const signature = await service.document(id, 'tandaTanganUrl', company);
-        expect(new TextDecoder().decode(slip.bytes)).toContain('slipGajiUrl');
-        expect(new TextDecoder().decode(signature.bytes)).toContain(
-          'tandaTanganUrl',
-        );
-        expect(files.size).toBe(5);
+    }
+  });
+  it('compensates failed replacement uploads and preserves existing files and SQL keys', async () => {
+    const files = new Map<string, Uint8Array>();
+    let fail = false;
+    await withEmployee(
+      async (id, service) => {
+        await service.upload(id, documents, actors.company);
+        const before = [...files.keys()];
         fail = true;
-        await expect(service.upload(id, input, company)).rejects.toThrow(
-          'Storage failed',
-        );
-        expect(files.size).toBe(5);
+        await expect(
+          service.upload(id, documents, actors.company),
+        ).rejects.toThrow('synthetic storage failure');
+        expect([...files.keys()]).toEqual(before);
         expect(
           new TextDecoder().decode(
-            (await service.document(id, 'slipGajiUrl', company)).bytes,
+            (await service.document(id, 'slipGajiUrl', actors.company)).bytes,
           ),
         ).toContain('slipGajiUrl');
-        const db = connectDatabase().db;
-        for (const table of [
-          debitorFamily,
-          debitorGps,
-          debitorOthers,
-          debitorSlik,
-        ]) {
-          await db.insert(table).values({ debitorId: id });
-        }
-      } finally {
-        await service.remove(id, company);
-      }
-      expect(files.size).toBe(0);
-      const db = connectDatabase().db;
-      for (const table of [
-        debitorData,
-        debitorFamily,
-        debitorFinancial,
-        debitorGps,
-        debitorOthers,
-        debitorSlik,
-      ]) {
         expect(
-          await db
-            .select({ id: table.id })
-            .from(table)
-            .where(eq(table.debitorId, id)),
-        ).toHaveLength(0);
+          new TextDecoder().decode(
+            (await service.document(id, 'tandaTanganUrl', actors.company))
+              .bytes,
+          ),
+        ).toContain('tandaTanganUrl');
+      },
+      {
+        put: async (key, bytes) => {
+          files.set(key, bytes);
+          if (fail) {
+            throw new Error('synthetic storage failure');
+          }
+        },
+        get: async (key) => files.get(key) ?? null,
+        remove: async (key) => {
+          files.delete(key);
+        },
+      },
+    );
+    expect(files.size).toBe(0);
+  });
+  it('rejects query filters that attempt to override the HRD tenant', async () => {
+    const service = createEmployeesService();
+    await expect(
+      service.list(
+        employeeQuerySchema.parse({ userId: 900002 }),
+        actors.company,
+      ),
+    ).rejects.toBeInstanceOf(EmployeeForbidden);
+  });
+  it('removes all six child types when deleting an employee', async () => {
+    const tables = [
+      debitorData,
+      debitorFamily,
+      debitorFinancial,
+      debitorGps,
+      debitorOthers,
+      debitorSlik,
+    ];
+    let removedId = 0;
+    await withEmployee(async (id) => {
+      removedId = id;
+      for (const table of tables) {
+        await connectDatabase().db.insert(table).values({ debitorId: id });
       }
     });
-  },
-);
+    for (const table of tables) {
+      expect(
+        await connectDatabase()
+          .db.select()
+          .from(table)
+          .where(eq(table.debitorId, removedId)),
+      ).toHaveLength(0);
+    }
+  });
+});

@@ -5,10 +5,6 @@ import { eq, inArray } from 'drizzle-orm';
 import { loginBrowser, loginHeaders } from './fixtures/login';
 import { test } from './fixtures/test';
 
-test.skip(
-  !process.env.SEED_PASSWORD || !process.env.DATABASE_URL,
-  'Synthetic database required',
-);
 test('customer confirms an approved credit and cancels another', async ({
   page,
   request,

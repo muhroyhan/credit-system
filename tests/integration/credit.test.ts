@@ -1,6 +1,5 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { creditCollection, credits } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { Identity } from '@server/constant/interface';
 import {
   CreditConflict,
@@ -10,9 +9,8 @@ import { creditService } from '@server/features/credit/credit.service';
 import { EmployeeConflict } from '@server/features/employees/employees.error';
 import { employeesService } from '@server/features/employees/employees.service';
 import { eq } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
 const company: Identity = {
   id: 900001,
   type: 'company',
@@ -25,12 +23,7 @@ const other: Identity = {
   slug: 'sintetis-dua',
   permissions: [],
 };
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
-describe.skipIf(!url)('P06 credit transactions and tenant scope', () => {
+describe('P06 credit transactions and tenant scope', () => {
   it('creates, updates child, guards deletion and locks approved applications', async () => {
     const input = {
       debitorId: 900001,

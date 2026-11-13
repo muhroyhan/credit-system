@@ -1,6 +1,5 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { credits } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { Identity } from '@server/constant/interface';
 import {
   CreditConflict,
@@ -9,9 +8,8 @@ import {
 } from '@server/features/credit/credit.error';
 import { creditService } from '@server/features/credit/credit.service';
 import { eq } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
 const company: Identity = {
   id: 900001,
   type: 'company',
@@ -30,12 +28,7 @@ const other: Identity = {
   slug: 'sintetis-dua',
   permissions: [],
 };
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
-describe.skipIf(!url)('customer credit confirmation', () => {
+describe('customer credit confirmation', () => {
   it('requires ownership, approvals and exact name, and prevents repeated writes', async () => {
     const db = connectDatabase().db;
     const id = await creditService.save(
