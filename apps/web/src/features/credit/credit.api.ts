@@ -1,10 +1,15 @@
-import type { CreditApplication, CreditApproval } from '@credit/contracts';
+import type {
+  CreditApplication,
+  CreditApproval,
+  CreditConfirmation,
+} from '@credit/contracts';
 import type { ExportFormat } from '@web/constant/type';
 import {
   creditListSchema,
   creditRatesSchema,
   creditRowSchema,
   creditSimulationSchema,
+  creditStatusSchema,
 } from '@web/features/credit/credit.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
@@ -77,4 +82,25 @@ export async function exportCredits(
     apiOptions(token),
   );
   await downloadFile(response, `credits.${format}`, 'Unduhan gagal');
+}
+
+export async function creditStatus(token: string, id: number) {
+  return creditStatusSchema.parse(
+    await readApiResponse(
+      await api.status.$get(
+        { query: { id: String(id) } } as never,
+        apiOptions(token),
+      ),
+    ),
+  );
+}
+export async function cancelCredit(token: string, id: number) {
+  return readApiResponse(
+    await api.cancel.$put({ json: { id } } as never, apiOptions(token)),
+  );
+}
+export async function confirmCredit(token: string, input: CreditConfirmation) {
+  return readApiResponse(
+    await api.confirm.$put({ json: input } as never, apiOptions(token)),
+  );
 }

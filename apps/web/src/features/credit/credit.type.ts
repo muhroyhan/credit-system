@@ -38,3 +38,32 @@ export const creditRatesSchema = z.array(
   }),
 );
 export type CreditRow = z.infer<typeof creditRowSchema>;
+
+export const creditStatusSchema = creditRowSchema.extend({
+  expenses: z.array(
+    z.object({
+      id: z.number(),
+      expenseName: z.string().nullable(),
+      amount: z.string().nullable(),
+    }),
+  ),
+});
+export const creditConfirmationFormSchema = z.object({
+  bankName: z.string().trim().min(1, 'Bank wajib diisi').max(255),
+  bankBranch: z.string().trim().min(1, 'Cabang wajib diisi').max(255),
+  bankAccountName: z
+    .string()
+    .trim()
+    .min(1, 'Nama rekening wajib diisi')
+    .max(255),
+  bankAccountNumber: z
+    .string()
+    .trim()
+    .min(1, 'Nomor rekening wajib diisi')
+    .max(255),
+  confirmationName: z.string().min(1, 'Nama wajib diisi').max(255),
+  confirmed: z.boolean().refine((value) => value, 'Persetujuan wajib diisi'),
+});
+export type CreditConfirmationForm = z.infer<
+  typeof creditConfirmationFormSchema
+>;
