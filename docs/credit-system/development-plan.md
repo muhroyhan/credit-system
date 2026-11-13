@@ -117,6 +117,7 @@ Hasil: sesudah rekening tersimpan, dokumen dibentuk, URL disimpan dan halaman te
 
 | Kode task | Task dan keluaran |
 | --- | --- |
+| P10-T01a | doing | Siapkan fungsi tanggal dan terbilang serta unit test; pengujian pada P10-T04. |
 | P10-T01 | Tetapkan kontrak render/count, penomoran global berdasarkan bulan created_at, format nomor, tanggal acknowledgment/angsuran pertama/akhir tenor dan terbilang. Putuskan penanganan konkurensi/render ulang, label bunga/denda dan string null dalam logic-holes sebelum perubahan kompatibilitas (FLOW-10, FE-07/08). Jika keputusan membutuhkan kolom/tabel, sertakan migration Drizzle pada task ini. |
 | P10-T02 | Buat template perjanjian delapan pasal/surat persetujuan A4, adapter PDF dan storage, route render/count dengan scope akses dan penyimpanan doc_url. Kelola browser/resource, sumber URL dan kegagalan upload secara eksplisit (FLOW-11, SUPPORT-12). |
 | P10-T03 | Hubungkan simpan rekening sukses ke pembuatan PDF, halaman dokumen, unduh individual dan terima kasih; gunakan kondisi acknowledgment+BPR approved+doc_url, tunggu fetch selesai sebelum redirect. Tangani kegagalan render tanpa keberhasilan palsu (FE-04/15). |
