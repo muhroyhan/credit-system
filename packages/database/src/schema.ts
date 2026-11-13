@@ -14,9 +14,7 @@ import {
 
 const id = () => int('id', { unsigned: true }).primaryKey().autoincrement();
 const timestamps = () => ({
-  createdAt: datetime('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+  createdAt: datetime('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: datetime('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),

@@ -12,26 +12,34 @@ afterAll(async () => {
 });
 
 describe.skipIf(!url)('database-managed audit timestamps', () => {
-  it('installs automatic defaults and updates on every audit column', async () => {
+  it('sets insert defaults and only auto-updates updated_at', async () => {
     const { pool } = connectDatabase();
     const [rows] = await pool.query(
       `SELECT TABLE_NAME, COLUMN_NAME, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS
        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME <> '__drizzle_migrations' AND COLUMN_NAME IN ('created_at', 'updated_at')`,
     );
-    const columns = rows as Array<{ COLUMN_DEFAULT: string; EXTRA: string }>;
+    const columns = rows as Array<{
+      COLUMN_NAME: string;
+      COLUMN_DEFAULT: string;
+      EXTRA: string;
+    }>;
     expect(columns.length).toBeGreaterThan(0);
     for (const row of columns) {
       expect(String(row.COLUMN_DEFAULT).toLowerCase()).toContain(
         'current_timestamp',
       );
-      expect(String(row.EXTRA).toLowerCase()).toContain(
-        'on update current_timestamp',
-      );
+      if (row.COLUMN_NAME === 'updated_at') {
+        expect(String(row.EXTRA).toLowerCase()).toContain(
+          'on update current_timestamp',
+        );
+      } else {
+        expect(String(row.EXTRA).toLowerCase()).not.toContain('on update');
+      }
     }
     expect(columns.length).toBe(48);
   });
 
-  it('updates both dates on real changes from raw SQL and Drizzle', async () => {
+  it('preserves created_at and updates updated_at through SQL and Drizzle', async () => {
     const { db, pool } = connectDatabase();
     const [result] = await db
       .insert(countries)
@@ -41,6 +49,16 @@ describe.skipIf(!url)('database-managed audit timestamps', () => {
       throw new Error('Test country was not inserted');
     }
     try {
+      const [inserted] = await pool.query(
+        'SELECT created_at, updated_at FROM country WHERE id = ?',
+        [result.id],
+      );
+      const created = (
+        inserted as Array<{ created_at: Date; updated_at: Date }>
+      )[0];
+      expect(created?.created_at).toBeInstanceOf(Date);
+      expect(created?.updated_at).toBeInstanceOf(Date);
+      expect(created?.created_at.getTime()).toBe(created?.updated_at.getTime());
       await pool.execute(
         "UPDATE country SET created_at = '2001-01-01 00:00:00', updated_at = '2001-01-01 00:00:00' WHERE id = ?",
         [result.id],
@@ -57,7 +75,7 @@ describe.skipIf(!url)('database-managed audit timestamps', () => {
         new Date(
           (raw as Array<{ created_at: Date }>)[0]?.created_at ?? 0,
         ).getFullYear(),
-      ).toBeGreaterThan(2001);
+      ).toBe(2001);
       expect(
         new Date(
           (raw as Array<{ updated_at: Date }>)[0]?.updated_at ?? 0,
@@ -79,7 +97,7 @@ describe.skipIf(!url)('database-managed audit timestamps', () => {
         new Date(
           (updated as Array<{ created_at: Date }>)[0]?.created_at ?? 0,
         ).getFullYear(),
-      ).toBeGreaterThan(2002);
+      ).toBe(2002);
       expect(
         new Date(
           (updated as Array<{ updated_at: Date }>)[0]?.updated_at ?? 0,

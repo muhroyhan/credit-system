@@ -78,7 +78,7 @@ Pemindaian blok identik/serupa pada 190 file TS/TSX terlacak (aplikasi, package,
 
 Audit ini belum menyatakan proyek bebas duplikasi: kandidat kontrak/query/form dan ekstraksi lokal yang belum disepakati tetap dicatat untuk keputusan berikutnya. Hasil pemeriksaan perubahan dicatat di testing.md.
 
-- Perintah pengguna menerapkan auto-update pada `created_at` dan `updated_at`: kedua kolom berubah saat row berubah. Bulan `created_at` untuk penomoran P10 tidak lagi merekam bulan pembuatan; perlu keputusan sumber tanggal sebelum implementasi P10.
+- Migration 0005 sempat mengubah `created_at` ketika row diperbarui. Migration 0006 menghentikan perilaku itu, tetapi tidak dapat memulihkan tanggal yang sudah tertimpa; data yang melewati 0005 memerlukan verifikasi sumber historis sebelum dipakai untuk penomoran P10.
 
 ## Risiko pemetaan data
 
