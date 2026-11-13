@@ -26,8 +26,10 @@ export function CustomerCreditStatus({
           )}
           {row.credit.debitorAcknowledgmentTimestamp && (
             <Alert color="green">
-              Konfirmasi tersimpan pada{' '}
-              {row.credit.debitorAcknowledgmentTimestamp}.
+              {row.credit.statusAdminApproval === 'rejected'
+                ? 'Pembatalan'
+                : 'Konfirmasi'}{' '}
+              tersimpan pada {row.credit.debitorAcknowledgmentTimestamp}.
             </Alert>
           )}
           {(cancel.error || confirm.error) && (
