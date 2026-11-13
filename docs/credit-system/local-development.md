@@ -31,6 +31,85 @@ Bun memuat .env dari working directory. Untuk perintah Node seperti Vitest/Playw
 
 Cakupan/jadwal test bukan di runbook ini; ikuti testing.md dan development-plan.md dari peta sumber.
 
+## Batch QA P13 (PowerShell, native)
+
+Tulis seluruh kasus lebih dahulu. Unit, integration dan E2E masing-masing satu
+perintah suite lengkap; jangan gunakan filter kasus dalam verifikasi phase.
+Integration menjalankan Vitest lalu proyek Playwright API secara berurutan;
+E2E hanya proyek browser. Kedua jenis berbasis database tidak boleh dijalankan
+paralel pada tenant seed yang sama. Jalankan dari root repository.
+
+Contoh berikut memakai nilai sintetis lokal dan container disposable khusus,
+bukan container development. Ganti nama/port jika sudah digunakan.
+
+```powershell
+docker run --detach --rm --name credit-qa-refine `
+  --publish 127.0.0.1:33316:3306 `
+  --env MYSQL_ROOT_PASSWORD=SyntheticQaDb123 `
+  --env MYSQL_DATABASE=credit_qa_test mysql:8.4
+if ($LASTEXITCODE -ne 0) { throw 'Container QA gagal dibuat' }
+for ($attempt = 0; $attempt -lt 60; $attempt++) {
+  docker exec credit-qa-refine mysqladmin ping --silent
+  if ($LASTEXITCODE -eq 0) { break }
+  Start-Sleep -Seconds 1
+}
+if ($LASTEXITCODE -ne 0) { throw 'MySQL QA belum siap' }
+
+$env:DATABASE_URL = 'mysql://root:SyntheticQaDb123@127.0.0.1:33316/credit_qa_test'
+$env:JWT_SECRET = 'synthetic-qa-secret-never-for-production-123456'
+$env:SEED_PASSWORD = 'Synthetic123'
+$env:SEED_SYNTHETIC = 'true'
+$env:TZ = 'Asia/Jakarta'
+$env:DOCUMENT_STORAGE_DIR = [IO.Path]::GetFullPath((Join-Path (Get-Location) '.data/qa/documents'))
+$env:AGREEMENT_BANK_NAME = 'BPR Sintetis QA'
+$env:AGREEMENT_BANK_ADDRESS = 'Alamat Bank Sintetis QA'
+$env:AGREEMENT_BANK_REPRESENTATIVE = 'Wakil Bank Sintetis QA'
+Remove-Item Env:WHATSAPP_ACCESS_TOKEN -ErrorAction SilentlyContinue
+# Opsional jika memakai Chrome yang sudah terpasang; jika tidak, sediakan
+# browser Playwright yang sesuai versi dependency proyek.
+$env:PLAYWRIGHT_BROWSER_PATH = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+
+bun --no-env-file packages/database/src/migrate.ts
+if ($LASTEXITCODE -ne 0) { throw 'Migration QA gagal' }
+bun --no-env-file packages/database/src/seed.ts
+if ($LASTEXITCODE -ne 0) { throw 'Seed QA gagal' }
+
+pnpm lint
+if ($LASTEXITCODE -ne 0) { throw 'Lint gagal' }
+pnpm typecheck
+if ($LASTEXITCODE -ne 0) { throw 'Typecheck gagal' }
+pnpm build
+if ($LASTEXITCODE -ne 0) { throw 'Build gagal' }
+
+pnpm test:unit
+if ($LASTEXITCODE -ne 0) { throw 'Suite unit gagal' }
+pnpm test:integration
+if ($LASTEXITCODE -ne 0) { throw 'Suite integration gagal' }
+pnpm test:e2e
+if ($LASTEXITCODE -ne 0) { throw 'Suite E2E gagal' }
+```
+
+Playwright memulai Bun dengan pemuatan `.env` otomatis dimatikan. Konfigurasi
+test wajib memenuhi guard URL MySQL lokal `credit_*test`, JWT_SECRET,
+SEED_PASSWORD dan storage di dalam `.data/qa`. Jangan mengarahkan storage ke
+folder dokumen development. Identitas bank wajib untuk kasus PDF berhasil.
+
+Setelah semua runner berhenti, tinjau hasil dan simpan trace kegagalan yang
+diperlukan dari test-results sebelum batch berikutnya. Cleanup container dan
+artefak dokumen QA dilakukan hanya pada target khusus berikut:
+
+```powershell
+docker stop credit-qa-refine
+$qaRoot = [IO.Path]::GetFullPath((Join-Path (Get-Location) '.data/qa'))
+$qaDocuments = [IO.Path]::GetFullPath((Join-Path $qaRoot 'documents'))
+if (-not $qaDocuments.StartsWith($qaRoot + [IO.Path]::DirectorySeparatorChar)) {
+  throw 'Target cleanup keluar dari direktori QA'
+}
+if (Test-Path -LiteralPath $qaDocuments) {
+  Remove-Item -LiteralPath $qaDocuments -Recurse -Force
+}
+```
+
 Dokumen P05 disimpan privat pada .data/documents (override DOCUMENT_STORAGE_DIR). Direktori ini bukan aset web dan harus persisten pada deployment; unduhan melalui API berotorisasi.
 
 P08 menyiapkan konfigurasi Meta WhatsApp Cloud API melalui WHATSAPP_GRAPH_VERSION, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ACCESS_TOKEN, WHATSAPP_TEMPLATE_NAME, WHATSAPP_TEMPLATE_LANGUAGE dan PUBLIC_APP_URL. Gunakan template yang telah disetujui dengan parameter body pertama berupa tautan status. Jangan isi token produksi pada lingkungan pengujian; pengiriman nyata tidak diuji dalam P08 sesuai instruksi pengguna.

@@ -2,6 +2,34 @@
 
 Sumber tunggal cakupan test dan bukti hasil. Jadwal task verifikasi ada pada development-plan.md; cara menyiapkan lingkungan/perintah pada local-development.md.
 
+Analisis menyeluruh P13 ada pada [qa-analysis.md](qa-analysis.md). Happy path,
+partisi input, matriks status/peran dan katalog 200 deklarasi/family test ada
+pada [test-cases.md](test-cases.md). Jumlah deklarasi berbeda dari jumlah kasus
+yang diekspansi runner.
+
+## Strategi lapisan dan eksekusi
+
+- Static: Biome, TypeScript strict seluruh workspace/tooling/test, serta build
+  untuk membuktikan bundling aplikasi. Build melengkapi pemeriksaan statis.
+- Unit: 20 berkas, perilaku terisolasi dan kontrak runtime; tanpa koneksi SQL
+  atau jaringan provider. Storage palsu digunakan hanya pada boundary unit.
+- Integration: 24 berkas Vitest untuk service/repository/API bersama MySQL dan
+  encoder/renderer nyata; empat berkas integration HTTP melalui proses Bun
+  untuk bcrypt, role revalidation dan kontrak request.
+- E2E: 14 berkas browser fullstack; API dan database nyata. Request setup dan
+  assertion keamanan boleh melengkapi aksi browser, bukan menggantikannya.
+
+Seluruh test ditulis sebelum batch eksekusi. Setiap jenis dijalankan dengan satu
+perintah suite lengkap dari runbook. Integration SQL/HTTP dan E2E tidak berjalan
+bersamaan pada dataset yang sama. Pengulangan karena koreksi test dilakukan
+pada seluruh jenis suite yang terdampak, tanpa menjalankan satu kasus saja.
+
+Setup wajib memakai database lokal disposable dan direktori dokumen QA.
+Konfigurasi hilang/berbahaya gagal secara eksplisit, bukan membuat suite SQL
+terlewati. Token provider nyata dilarang; pengujian notifikasi memalsukan
+transport secara terkontrol. Timezone server/browser Asia/Jakarta, fixture date
+tetap, nama akun skenario terpisah dan resource dibersihkan setelah skenario.
+
 ## Cakupan acceptance
 
 | Area | Vitest/unit/integration | E2E fullstack |
@@ -23,6 +51,7 @@ Instruksi E2E ada di [tests/e2e/AGENTS.md](../../tests/e2e/AGENTS.md).
 
 | Verifikasi | Hasil tercatat |
 | --- | --- |
+| P13 — QA cleanup dan perluasan, 13 November 2026 | Lint, typecheck lima workspace/tooling/test dan build lulus. **317 unit (20 berkas), 203 integration Vitest (24 berkas), 7 integration HTTP Bun (4 berkas), 23 E2E browser (14 berkas): total 550 kasus, tanpa skip.** MySQL 8.4 disposable `credit_qa_test`, baseline migration dan seed sintetis; Chrome lokal, runner native. Unit 2,03 detik, integration Vitest 23,60 detik + HTTP 4,5 detik, E2E 30,7 detik pada pengulangan terakhir. Typecheck awal gagal pada nullability fixture perusahaan dan tipe pembaca XLSX; diperbaiki pada test. E2E awal 21 lulus/2 gagal karena expected teks error dan locator exact pada label wajib; setelah koreksi serta penambahan finally cleanup, seluruh suite integration/E2E dijalankan ulang dan lulus. Tidak ada perubahan aturan bisnis atau source aplikasi/schema. Pengiriman Meta nyata tidak diuji. |
 | Audit duplikasi, 13 November 2026 | Lint, typecheck workspace/tooling dan pemeriksaan tipe test lulus; build lulus, 23 unit, 14 integration dan 20 E2E lulus. MySQL disposable, migration/seed, aplikasi native. Percobaan awal unit gagal karena import Hono dari workspace test; diperbaiki. Integration awal kekurangan JWT_SECRET; diulang dengan konfigurasi sintetis. E2E awal menemukan pool ditutup per test; fixture kini menutup sekali saat worker berakhir. WhatsApp nyata tidak diuji. |
 | Baseline migration tunggal | Schema snapshot setara dengan schema sebelumnya; pada MySQL disposable migration dan seed masing-masing berhasil dua kali, 18 integration, 23 unit, lint, typecheck dan build lulus. Histori berbeda ditolak tanpa mengubah database. |
 | Koreksi created_at | Migration 0006, seed, lint, typecheck, build, 23 unit dan 18 integration lulus pada MySQL disposable. Test memeriksa default insert dan perilaku update SQL serta Drizzle untuk created_at/updated_at pada 24 tabel. |
@@ -40,4 +69,4 @@ Instruksi E2E ada di [tests/e2e/AGENTS.md](../../tests/e2e/AGENTS.md).
 | Migration ACL 0001 | Role WRITE lama dengan READ yang sudah ada menghasilkan tepat satu aksi CRUD per program tanpa Approval; seed dua kali tidak menggandakan role. |
 | Probe declaration dependency | Pemeriksaan tanpa skipLibCheck gagal; rincian masalah aktif hanya di logic-holes.md. |
 
-Ini bukti pada revisi tersebut, bukan jaminan test telah dijalankan ulang setelah perubahan selanjutnya. Histori hasil phase ada pada commit task di development-plan.md, bukan diulang sebagai log panjang di sini. Pekerjaan P09–P12 belum diklaim lulus. Warning build dependency Zod dan ukuran chunk frontend tetap muncul. Tidak ada script test sementara yang disimpan.
+Ini bukti pada revisi tersebut, bukan jaminan test telah dijalankan ulang setelah perubahan selanjutnya. Histori hasil phase ada pada commit task di development-plan.md, bukan diulang sebagai log panjang di sini. P13 meregresikan implementasi yang tersedia sampai P12. Warning build dependency Zod dan ukuran chunk frontend tetap muncul. Tidak ada script test sementara yang disimpan. Cakupan tidak menyatakan coverage baris 100%, seluruh input tak terbatas, seluruh browser/viewport, atau seluruh interleaving konkurensi.

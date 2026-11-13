@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P12 selesai. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P13 selesai. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -19,6 +19,7 @@ Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md
 | P10 | Perjanjian, PDF dan halaman terima kasih | P09 |
 | P11 | Ekspor CSV dan ZIP dokumen | P10 |
 | P12 | Dashboard aktor | P08 |
+| P13 | QA cleanup, happy path dan perluasan automation | P00–P12 |
 
 P03 dan P04 independen setelah P02. P12 tidak membutuhkan P09–P11; regresi lintas fitur dilakukan pada phase yang selesai paling akhir. P09 menyimpan konfirmasi; pembuatan dokumen baru disambungkan P10. CSV/ZIP P11 melengkapi ekspor PDF/XLSX fitur yang telah tersedia.
 
@@ -154,10 +155,10 @@ Hasil: admin, HRD dan debitor melihat ringkasan sesuai kontrak, dengan navigasi 
 
 ## P13 — QA cleanup dan perluasan automation
 
-Status: doing. Tidak mengubah source aplikasi, schema atau aturan bisnis.
+Status: done. Tidak mengubah source aplikasi, schema atau aturan bisnis.
 Seluruh test ditulis sebelum batch eksekusi; hasil dan batas bukti pada testing.md.
-Commit per fitur memakai footer Task yang sama dengan kode berikut; hash final
-dilengkapi pada task dokumentasi terakhir. Tidak ada task diblokir keputusan bisnis.
+Commit per fitur memakai footer Task yang sama dengan kode berikut. Hash task
+terakhir ditelusuri melalui footer commit-nya. Tidak ada task diblokir keputusan bisnis.
 
 | Kode | Task | Status | Commit |
 | --- | --- | --- | --- |
@@ -172,5 +173,5 @@ dilengkapi pada task dokumentasi terakhir. Tidak ada task diblokir keputusan bis
 | P13-T09 | Konfirmasi/pembatalan nasabah dan matriks status | done | 6b47935 |
 | P13-T10 | Perjanjian, penomoran dan PDF | done | c9e93dd |
 | P13-T11 | Ekspor, ZIP dan parameter listing | done | 370183e |
-| P13-T12 | Dashboard dan agregat scoped | done | footer Task: P13-T12 |
-| P13-T13 | Dokumentasi, analisis, bukti verifikasi dan cleanup akhir | doing | footer Task: P13-T13 |
+| P13-T12 | Dashboard dan agregat scoped | done | bc08c64 |
+| P13-T13 | Dokumentasi, analisis, bukti verifikasi dan cleanup akhir | done | footer Task: P13-T13 |

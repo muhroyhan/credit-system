@@ -2,6 +2,18 @@
 
 Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisis sumber bisnis awal, bukan bukti bahwa implementasi sekarang masih memiliki semua celah tersebut. Fitur P06–P12 belum tersedia; evaluasi ID terkait sebelum mengimplementasikannya. Status perbaikan P00–P04 dan isu teknis terkini ada setelah tabel.
 
+Catatan audit P13: kalimat status phase pada pembuka di atas adalah acuan
+historis. Source sekarang menyediakan implementasi sampai P12; bukti regresi
+terkini ada pada testing.md. Jangan menafsirkan semua risiko awal sebagai bug
+aktif tanpa memeriksa bagian keputusan dan test terkait.
+
+## Temuan QA P13
+
+| ID | Kebutuhan, implementasi dan verifikasi | Risiko / keputusan |
+| --- | --- | --- |
+| QA-01 | Analisis statis: companyInterestSchema menerima string yang Number-nya finite/nonnegatif, sedangkan simulator kredit mensyaratkan digit dengan pecahan desimal opsional. Konfigurasi eksponen/whitespace bisa lolos schema tetapi ditolak simulator. Test P13 memverifikasi bunga desimal normal serta penolakan rate eksponen di simulator; belum merupakan regression test untuk semua bentuk yang diterima schema. | Normalisasi/batas format perlu keputusan agar konfigurasi yang diterima bisa digunakan. P13 tidak mengubah schema atau rumus. |
+| QA-DOC-01 | Pembuka beberapa dokumen masih membatasi API berjalan ke P00–P05 atau menyebut DKN rancangan; source/suite menyediakan P06–P12. P13 memperbarui dokumen testing dan menandai ketertinggalan ini. | Sinkronisasi dokumen bisnis/API lebih luas perlu memisahkan kebutuhan dari implementasi; hasil test bukan otorisasi perubahan aturan. |
+
 | ID | Risiko acuan yang harus diperiksa pada phase pemilik |
 | --- | --- |
 | FLOW-01 | Create credit menerima debitor_id, nominal, status langsung dari body; tidak ada cek kepemilikan/role/kelayakan. |
