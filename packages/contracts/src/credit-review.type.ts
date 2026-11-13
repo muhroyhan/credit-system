@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { creditApplicationSchema } from './credit.type';
-import { CreditStatusEnum } from './creditstatus.enum';
+import { CreditStatusEnum } from './credit-status.enum';
 
 export const creditReviewSchema = z.strictObject({
   id: z.number().int().positive(),

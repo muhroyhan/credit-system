@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { AccountTypeEnum } from './accounttype.enum';
-import { CompanyStatusEnum } from './companystatus.enum';
-import { PermissionActionEnum } from './permissionaction.enum';
-import { SortDirectionEnum } from './sortdirection.enum';
+import { AccountTypeEnum } from './account-type.enum';
+import { CompanyStatusEnum } from './company-status.enum';
+import { PermissionActionEnum } from './permission-action.enum';
+import { SortDirectionEnum } from './sort-direction.enum';
 
 export const referenceItemSchema = z.object({
   id: z.number(),
@@ -162,13 +162,13 @@ export const companyQuerySchema = z.object({
   sortDirection: z.enum(SortDirectionEnum).default('desc'),
 });
 
-export * from './accounttype.enum';
-export * from './companystatus.enum';
+export * from './account-type.enum';
+export * from './company-status.enum';
 export * from './credit.type';
 export * from './credit-review.type';
-export * from './creditstatus.enum';
+export * from './credit-status.enum';
 export * from './employees.constant';
 export * from './employees.type';
-export * from './exporttype.enum';
-export * from './permissionaction.enum';
-export * from './sortdirection.enum';
+export * from './export-type.enum';
+export * from './permission-action.enum';
+export * from './sort-direction.enum';

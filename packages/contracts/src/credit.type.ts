@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { CreditStatusEnum } from './creditstatus.enum';
-import { SortDirectionEnum } from './sortdirection.enum';
+import { CreditStatusEnum } from './credit-status.enum';
+import { SortDirectionEnum } from './sort-direction.enum';
 
 const amount = z
   .string()

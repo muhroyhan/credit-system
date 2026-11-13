@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { employeeDocumentKinds } from './employees.constant';
-import { SortDirectionEnum } from './sortdirection.enum';
+import { SortDirectionEnum } from './sort-direction.enum';
 
 export const employeeAccountSchema = z
   .object({
