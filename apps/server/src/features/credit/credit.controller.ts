@@ -1,6 +1,7 @@
 import {
   creditApplicationSchema,
   creditQuerySchema,
+  creditReviewSchema,
   creditUpdateRequestSchema,
   idQuerySchema,
 } from '@credit/contracts';
@@ -114,6 +115,72 @@ async function rates(c: Context<AuthEnv>) {
     return failure(c, error);
   }
 }
+async function review(c: Context<AuthEnv>) {
+  const input = creditReviewSchema.safeParse(
+    await c.req.json().catch(() => null),
+  );
+  if (!input.success) {
+    return c.json({ error: 'invalid request' }, 400);
+  }
+  try {
+    return c.json(await creditService.review(input.data, c.get('identity')));
+  } catch (error) {
+    return failure(c, error);
+  }
+}
+async function reviewList(c: Context<AuthEnv>) {
+  const query = creditQuerySchema.safeParse(c.req.query());
+  if (!query.success) {
+    return c.json({ error: 'invalid query' }, 400);
+  }
+  try {
+    return c.json(
+      await creditService.reviewList(query.data, c.get('identity')),
+    );
+  } catch (error) {
+    return failure(c, error);
+  }
+}
+async function reviewDetail(c: Context<AuthEnv>) {
+  const input = idQuerySchema.safeParse(c.req.query());
+  if (!input.success) {
+    return c.json({ error: 'invalid id' }, 400);
+  }
+  try {
+    return c.json(
+      await creditService.reviewDetail(input.data.id, c.get('identity')),
+    );
+  } catch (error) {
+    return failure(c, error);
+  }
+}
+async function reviewExport(c: Context<AuthEnv>) {
+  const query = creditQuerySchema.safeParse(c.req.query());
+  const format = c.req.query('format');
+  if (!query.success || (format !== 'pdf' && format !== 'xlsx')) {
+    return c.json({ error: 'invalid query' }, 400);
+  }
+  try {
+    const result = await creditService.exportReviews(
+      query.data,
+      c.get('identity'),
+      format,
+    );
+    c.header(
+      'Content-Type',
+      format === 'pdf'
+        ? 'application/pdf'
+        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    c.header(
+      'Content-Disposition',
+      `attachment; filename="credit-reviews.${format}"`,
+    );
+    return c.body(result);
+  } catch (error) {
+    return failure(c, error);
+  }
+}
 async function exporting(c: Context<AuthEnv>) {
   const input = creditQuerySchema.safeParse(c.req.query());
   const format = c.req.query('format');
@@ -145,5 +212,9 @@ export const creditController = {
   update,
   simulation,
   rates,
+  review,
+  reviewList,
+  reviewDetail,
+  reviewExport,
   exporting,
 };

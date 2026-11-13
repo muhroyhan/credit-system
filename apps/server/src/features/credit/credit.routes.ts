@@ -11,6 +11,22 @@ export function creditRoutes() {
   const rates = app.get('/rates', identityContext, creditController.rates);
   const create = app.post('/create', identityContext, creditController.create);
   const update = app.put('/update', identityContext, creditController.update);
+  const review = app.put('/review', identityContext, creditController.review);
+  const reviewList = app.get(
+    '/review/list',
+    identityContext,
+    creditController.reviewList,
+  );
+  const reviewDetail = app.get(
+    '/review/detail',
+    identityContext,
+    creditController.reviewDetail,
+  );
+  const reviewExport = app.get(
+    '/review/export',
+    identityContext,
+    creditController.reviewExport,
+  );
   const simulation = app.post(
     '/simulation',
     identityContext,
@@ -28,6 +44,10 @@ export function creditRoutes() {
       SchemaOf<typeof detail> &
       SchemaOf<typeof create> &
       SchemaOf<typeof update> &
+      SchemaOf<typeof review> &
+      SchemaOf<typeof reviewList> &
+      SchemaOf<typeof reviewDetail> &
+      SchemaOf<typeof reviewExport> &
       SchemaOf<typeof simulation> &
       SchemaOf<typeof exporting>
   >;
