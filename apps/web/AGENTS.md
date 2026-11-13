@@ -2,6 +2,8 @@
 
 Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Setiap hook dalam feature/hooks memiliki file sendiri dengan nama persis nama hook, misalnya useEmployeeDetail.ts untuk useEmployeeDetail. Tipe yang sudah diekspor package diimpor langsung dari ekspor publik package oleh file pemakai; jangan meneruskannya melalui feature.type.ts. Dashboard terpisah dari auth.
 
+Helper transport API lintas fitur memakai src/utils/api-client.ts dan download-file.ts: client RPC, header sesi, pembacaan JSON/error dan unduhan. Validasi DTO tetap di fitur; ekspor menyalin parameter filter agar tidak mengubah query pemanggil.
+
 Root router.tsx mendefinisikan /, /login dan prefix fitur. Child route di feature.routes.ts melalui createCrudRoutes. Empat halaman standar:
 
 | Page            | Tugas                                                                |

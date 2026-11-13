@@ -1,6 +1,3 @@
-import type { AppType } from '@credit/server/app';
-import type { ApiResponse } from '@web/constant/interface';
-import { apiErrorSchema } from '@web/constant/schema';
 import type { ExportFormat } from '@web/constant/type';
 import {
   type CompanyInput,
@@ -8,44 +5,35 @@ import {
   companyListSchema,
   entityListSchema,
 } from '@web/features/companies/companies.type';
-import { hc } from 'hono/client';
+import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
+import { downloadFile } from '@web/utils/download-file';
 
-const client = hc<AppType>(window.location.origin);
-const options = (token: string) => ({
-  headers: { Authorization: `Bearer ${token}` },
-});
-async function read(response: ApiResponse) {
-  const value = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      apiErrorSchema.safeParse(value).data?.error ?? 'Operasi gagal',
-    );
-  }
-  return value;
-}
+const client = apiClient;
 export async function listCompanies(token: string, query: URLSearchParams) {
   return companyListSchema.parse(
-    await read(
+    await readApiResponse(
       await client.api.user.list.$get(
         { query: Object.fromEntries(query) } as never,
-        options(token),
+        apiOptions(token),
       ),
     ),
   );
 }
 export async function companyDetail(token: string, id: number) {
   return companyDetailSchema.parse(
-    await read(
+    await readApiResponse(
       await client.api.user.detail.$get(
         { query: { id: String(id) } } as never,
-        options(token),
+        apiOptions(token),
       ),
     ),
   );
 }
 export async function entities(token: string) {
   return entityListSchema.parse(
-    await read(await client.api['entity-types'].$get({}, options(token))),
+    await readApiResponse(
+      await client.api['entity-types'].$get({}, apiOptions(token)),
+    ),
   );
 }
 export async function saveCompany(
@@ -53,23 +41,23 @@ export async function saveCompany(
   input: CompanyInput,
   id?: number,
 ) {
-  return read(
+  return readApiResponse(
     id
       ? await client.api.user.update.$put(
           { json: { ...input, id } } as never,
-          options(token),
+          apiOptions(token),
         )
       : await client.api.user.create.$post(
           { json: input } as never,
-          options(token),
+          apiOptions(token),
         ),
   );
 }
 export async function deleteCompany(token: string, id: number) {
-  return read(
+  return readApiResponse(
     await client.api.user.delete.$put(
       { json: { id } } as never,
-      options(token),
+      apiOptions(token),
     ),
   );
 }
@@ -78,18 +66,11 @@ export async function exportCompanies(
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  query.set('format', format);
+  const exportQuery = new URLSearchParams(query);
+  exportQuery.set('format', format);
   const response = await client.api.user.export.$get(
-    { query: Object.fromEntries(query) } as never,
-    options(token),
+    { query: Object.fromEntries(exportQuery) } as never,
+    apiOptions(token),
   );
-  if (!response.ok) {
-    throw new Error('Ekspor gagal');
-  }
-  const url = URL.createObjectURL(await response.blob());
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `companies.${format}`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  await downloadFile(response, `companies.${format}`, 'Ekspor gagal');
 }

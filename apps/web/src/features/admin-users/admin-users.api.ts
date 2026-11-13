@@ -1,7 +1,4 @@
-import { adminInputSchema } from '@credit/contracts';
-import type { AppType } from '@credit/server/app';
-import type { ApiResponse } from '@web/constant/interface';
-import { apiErrorSchema } from '@web/constant/schema';
+import { adminInputSchema, programSchema } from '@credit/contracts';
 import type { ExportFormat } from '@web/constant/type';
 import {
   type Admin,
@@ -10,63 +7,51 @@ import {
   adminListSchema,
   adminSchema,
 } from '@web/features/admin-users/admin-users.type';
-import { hc } from 'hono/client';
+import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
+import { downloadFile } from '@web/utils/download-file';
 
-const client = hc<AppType>(window.location.origin);
-function options(token: string) {
-  return { headers: { Authorization: `Bearer ${token}` } };
-}
-async function read(response: ApiResponse): Promise<unknown> {
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      apiErrorSchema.safeParse(data).data?.error ?? 'Operasi gagal',
-    );
-  }
-  return data;
-}
+const client = apiClient;
 export async function listAdmins(
   token: string,
   query: URLSearchParams,
 ): Promise<AdminList> {
   const response = await client.api['admin-user'].list.$get(
     { query: Object.fromEntries(query) } as never,
-    options(token),
+    apiOptions(token),
   );
-  return adminListSchema.parse(await read(response));
+  return adminListSchema.parse(await readApiResponse(response));
 }
 export async function adminDetail(token: string, id: number): Promise<Admin> {
   const response = await client.api['admin-user'].detail.$get(
     { query: { id: String(id) } } as never,
-    options(token),
+    apiOptions(token),
   );
-  return adminSchema.parse(await read(response));
+  return adminSchema.parse(await readApiResponse(response));
 }
 export async function programs(token: string) {
-  const response = await client.api.programs.$get({}, options(token));
-  if (!response.ok) {
-    throw new Error('Gagal memuat program');
-  }
-  return response.json();
+  const response = await client.api.programs.$get({}, apiOptions(token));
+  return programSchema
+    .array()
+    .parse(await readApiResponse(response, 'Gagal memuat program'));
 }
 export async function saveAdmin(token: string, input: AdminInput, id?: number) {
   const parsed = adminInputSchema.parse(input);
   const response = id
     ? await client.api['admin-user'].update.$put(
         { json: { ...parsed, id } } as never,
-        options(token),
+        apiOptions(token),
       )
     : await client.api['admin-user'].create.$post(
         { json: parsed } as never,
-        options(token),
+        apiOptions(token),
       );
-  return read(response);
+  return readApiResponse(response);
 }
 export async function deleteAdmin(token: string, id: number) {
-  return read(
+  return readApiResponse(
     await client.api['admin-user'].delete.$put(
       { json: { id } } as never,
-      options(token),
+      apiOptions(token),
     ),
   );
 }
@@ -76,18 +61,15 @@ export async function exportAdmins(
   filters: URLSearchParams,
   format: ExportFormat,
 ): Promise<void> {
-  filters.set('format', format);
+  const exportQuery = new URLSearchParams(filters);
+  exportQuery.set('format', format);
   const response = await client.api['admin-user'].export.$get(
-    { query: Object.fromEntries(filters) } as never,
-    options(token),
+    { query: Object.fromEntries(exportQuery) } as never,
+    apiOptions(token),
   );
-  if (!response.ok) {
-    throw new Error('Gagal mengekspor administrator');
-  }
-  const url = URL.createObjectURL(await response.blob());
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `admin-users.${format}`;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  await downloadFile(
+    response,
+    `admin-users.${format}`,
+    'Gagal mengekspor administrator',
+  );
 }

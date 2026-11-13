@@ -1,17 +1,15 @@
 import { loginSchema } from '@credit/contracts';
-import type { AppType } from '@credit/server/app';
 import { sessionSchema } from '@web/constant/schema';
 import type { Session } from '@web/constant/type';
 import { type LoginInput, slugListSchema } from '@web/features/auth/auth.type';
-import { hc } from 'hono/client';
+import { apiClient, readApiResponse } from '@web/utils/api-client';
 
-const client = hc<AppType>(window.location.origin);
+const client = apiClient;
 export async function getSlugs() {
   const response = await client.api.user.slugs.$get();
-  if (!response.ok) {
-    throw new Error('Gagal memuat perusahaan');
-  }
-  return slugListSchema.parse(await response.json());
+  return slugListSchema.parse(
+    await readApiResponse(response, 'Gagal memuat perusahaan'),
+  );
 }
 export async function signIn(input: LoginInput): Promise<Session> {
   const payload = loginSchema.parse(input);
@@ -24,8 +22,10 @@ export async function signIn(input: LoginInput): Promise<Session> {
       },
     },
   );
-  if (!response.ok) {
-    throw new Error('Login gagal. Periksa kredensial dan perusahaan.');
-  }
-  return sessionSchema.parse(await response.json());
+  return sessionSchema.parse(
+    await readApiResponse(
+      response,
+      'Login gagal. Periksa kredensial dan perusahaan.',
+    ),
+  );
 }
