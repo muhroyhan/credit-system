@@ -13,6 +13,8 @@ export function ListingTable<T extends { id: number }>({
   onPageChange,
   exporting,
   onExport,
+  onExportZip,
+  zipping,
   addAction,
   filters,
 }: {
@@ -25,6 +27,8 @@ export function ListingTable<T extends { id: number }>({
   total: number;
   onPageChange: (page: number) => void;
   exporting: boolean;
+  onExportZip?: () => void;
+  zipping?: boolean;
   onExport: (format: 'pdf' | 'xlsx' | 'csv') => void;
   addAction?: ReactNode;
   filters: ReactNode;
@@ -57,6 +61,11 @@ export function ListingTable<T extends { id: number }>({
         >
           Export CSV
         </Button>
+        {onExportZip && (
+          <Button loading={zipping} disabled={loading} onClick={onExportZip}>
+            Export ZIP
+          </Button>
+        )}
       </Group>
       {loading && <Text>Memuat...</Text>}
       <Table>

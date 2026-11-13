@@ -21,11 +21,17 @@ export function creditReviewRoutes() {
     identityContext,
     creditReviewController.reviewExport,
   );
+  const zip = app.get(
+    '/export-zip',
+    identityContext,
+    creditReviewController.exportZip,
+  );
   return app as Hono<
     AuthEnv,
     SchemaOf<typeof review> &
       SchemaOf<typeof list> &
       SchemaOf<typeof detail> &
-      SchemaOf<typeof exporting>
+      SchemaOf<typeof exporting> &
+      SchemaOf<typeof zip>
   >;
 }

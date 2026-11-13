@@ -50,3 +50,13 @@ export async function exportReviews(
     `credit-reviews.${format}`,
   );
 }
+
+export async function exportReviewZip(token: string, query: URLSearchParams) {
+  await downloadFile(
+    await api.review['export-zip'].$get(
+      { query: Object.fromEntries(query) } as never,
+      apiOptions(token),
+    ),
+    'credit-documents.zip',
+  );
+}

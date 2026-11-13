@@ -122,3 +122,13 @@ export async function downloadAgreement(token: string, id: number) {
     `agreement-${id}.pdf`,
   );
 }
+
+export async function exportCreditZip(token: string, query: URLSearchParams) {
+  await downloadFile(
+    await api['export-zip'].$get(
+      { query: Object.fromEntries(query) } as never,
+      apiOptions(token),
+    ),
+    'credit-documents.zip',
+  );
+}

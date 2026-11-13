@@ -14,7 +14,7 @@ export function CreditorReviewPage() {
 }
 function Content() {
   const { session } = useSession();
-  const { queries, setQueries, list, exporting } = useCreditReviews(
+  const { queries, setQueries, list, exporting, zip } = useCreditReviews(
     session?.authToken ?? '',
   );
   return (
@@ -24,12 +24,14 @@ function Content() {
         id: row.credit.id,
       }))}
       loading={list.isFetching}
-      error={(list.error ?? exporting.error)?.message}
+      error={(list.error ?? exporting.error ?? zip.error)?.message}
       page={queries.page}
       total={list.data?.count ?? 0}
       onPageChange={(page) => setQueries((current) => ({ ...current, page }))}
       exporting={exporting.isPending}
       onExport={(format) => exporting.mutate(format)}
+      onExportZip={() => zip.mutate()}
+      zipping={zip.isPending}
       filters={
         <>
           <TextInput

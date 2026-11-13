@@ -7,6 +7,7 @@
     "exceljs": "^4.4.0",
     "hono": "^4.10.0",
     "jspdf": "^4.2.1",
+    "jszip": "^3.10.2",
     "zod": "^4.1.0"
   },
   "devDependencies": {

@@ -12,9 +12,11 @@ import { creditService } from '@server/features/credit/credit.service';
 import { creditReviewRepository } from '@server/features/credit-review/credit-review.repository';
 import type { CreditExpenseInput } from '@server/features/credit-review/credit-review.type';
 import { employeesRepository } from '@server/features/employees/employees.repository';
+import { createDocumentStorage } from '@server/utils/document-storage';
 import { exportFile } from '@server/utils/export-file';
 import { withTransaction } from '@server/utils/transaction';
 import { createWhatsAppSender } from '@server/utils/whatsapp';
+import { zipDocuments } from '@server/utils/zip-documents';
 
 function decimalFromCents(value: bigint) {
   const sign = value < 0n ? '-' : '';
@@ -23,6 +25,29 @@ function decimalFromCents(value: bigint) {
 }
 
 export const creditReviewService = {
+  async exportZip(query: CreditQuery, identity: Identity) {
+    if (
+      identity.type !== 'admin' ||
+      !authService.hasAclPermission(identity, 'DKN_READ')
+    ) {
+      throw new CreditForbidden();
+    }
+    const result = await creditRepository.list(
+      { ...query, status: query.status ?? 'approved' },
+      undefined,
+      undefined,
+      false,
+    );
+    const entries = result.data
+      .filter((row) => row.credit.docUrl)
+      .map(({ credit }) => ({ id: credit.id, key: credit.docStorageKey }));
+    const data = await zipDocuments(entries, createDocumentStorage());
+    if (!data) {
+      throw new CreditNotFound('Dokumen tidak tersedia');
+    }
+    return data;
+  },
+
   async reviewList(query: CreditQuery, identity: Identity) {
     if (
       identity.type !== 'admin' ||

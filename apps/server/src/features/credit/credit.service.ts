@@ -17,8 +17,10 @@ import { creditRepository } from '@server/features/credit/credit.repository';
 import type { CreditRate } from '@server/features/credit/credit.type';
 import { creditReviewRepository } from '@server/features/credit-review/credit-review.repository';
 import { employeesRepository } from '@server/features/employees/employees.repository';
+import { createDocumentStorage } from '@server/utils/document-storage';
 import { exportFile } from '@server/utils/export-file';
 import { withTransaction } from '@server/utils/transaction';
+import { zipDocuments } from '@server/utils/zip-documents';
 
 function authorize(identity: Identity, action: 'READ' | 'CREATE' | 'UPDATE') {
   if (
@@ -71,6 +73,24 @@ function parseAmount(value: string) {
 }
 
 export const creditService = {
+  async exportZip(query: CreditQuery, identity: Identity) {
+    authorize(identity, 'READ');
+    const result = await creditRepository.list(
+      query,
+      await companyScope(identity),
+      identity.type === 'debitor' ? identity.id : undefined,
+      false,
+    );
+    const entries = result.data
+      .filter((row) => row.credit.docUrl)
+      .map(({ credit }) => ({ id: credit.id, key: credit.docStorageKey }));
+    const data = await zipDocuments(entries, createDocumentStorage());
+    if (!data) {
+      throw new CreditNotFound('Dokumen tidak tersedia');
+    }
+    return data;
+  },
+
   parseAmount,
   async confirm(input: CreditConfirmation, identity: Identity) {
     if (identity.type !== 'debitor') {

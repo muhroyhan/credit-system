@@ -68,7 +68,27 @@ async function reviewExport(c: Context<AuthEnv>) {
     return controllerFailure(c, error);
   }
 }
+async function exportZip(c: Context<AuthEnv>) {
+  const query = creditQuerySchema.safeParse(c.req.query());
+  if (!query.success) {
+    return c.json({ error: 'invalid query' }, 400);
+  }
+  try {
+    const result = await creditReviewService.exportZip(
+      query.data,
+      c.get('identity'),
+    );
+    return c.body(new Uint8Array(result), 200, {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': 'attachment; filename="credit-documents.zip"',
+      'Cache-Control': 'private, no-store',
+    });
+  } catch (error) {
+    return controllerFailure(c, error);
+  }
+}
 export const creditReviewController = {
+  exportZip,
   review,
   reviewList,
   reviewDetail,

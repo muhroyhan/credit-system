@@ -24,7 +24,9 @@ function Content() {
         id: row.credit.id,
       }))}
       loading={rows.list.isFetching}
-      error={(rows.list.error ?? rows.exporting.error)?.message}
+      error={
+        (rows.list.error ?? rows.exporting.error ?? rows.zip.error)?.message
+      }
       page={rows.queries.page}
       total={rows.list.data?.count ?? 0}
       onPageChange={(page) =>
@@ -32,6 +34,8 @@ function Content() {
       }
       exporting={rows.exporting.isPending}
       onExport={(format) => rows.exporting.mutate(format)}
+      onExportZip={() => rows.zip.mutate()}
+      zipping={rows.zip.isPending}
       columns={[
         { label: 'Nama', render: (r) => r.nama },
         { label: 'Perusahaan', render: (r) => r.companyName },
