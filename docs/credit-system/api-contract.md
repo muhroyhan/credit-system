@@ -92,3 +92,5 @@ GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCr
 Path di bagian rancangan belum final. Normalisasi list/detail mengikuti pola fitur saat diimplementasikan; operasi GET yang mengubah dokumen harus ditinjau pada FLOW-11, bukan dianggap endpoint berjalan.
 
 P09-T01: `PUT /credit/cancel` menerima `{ "id": number }` dari debitor pemilik. Dua status approval harus approved dan acknowledgment belum ada; transaksi menetapkan status BPR rejected serta tanggal acknowledgment server, tanpa mengubah HRD. Pengulangan menghasilkan 409. Kolom acknowledgment bertipe DATE sehingga hanya tanggal disimpan.
+
+P09-T02: `GET /credit/status?id=` hanya untuk debitor pemilik dan memuat rincian biaya snapshot. `PUT /credit/confirm` menerima `id`, `bankName`, `bankBranch`, `bankAccountName`, `bankAccountNumber`, `confirmationName`, `confirmed: true`; nama konfirmasi harus sama persis dengan nama debitor. Kedua approval harus approved dan acknowledgment belum ada. Server menetapkan tanggal acknowledgment; pengulangan menghasilkan 409.

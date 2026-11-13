@@ -1,4 +1,8 @@
-import type { CreditApplication, CreditQuery } from '@credit/contracts';
+import type {
+  CreditApplication,
+  CreditConfirmation,
+  CreditQuery,
+} from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   creditCollection,
@@ -64,6 +68,24 @@ async function saveChild<T extends CreditChildTable>(
 }
 
 export const creditRepository = {
+  async confirm(
+    input: CreditConfirmation,
+    actor: string,
+    tx: DatabaseTransaction,
+  ) {
+    await tx
+      .update(credits)
+      .set({
+        bankName: input.bankName,
+        bankBranch: input.bankBranch,
+        bankAccountName: input.bankAccountName,
+        bankAccountNumber: input.bankAccountNumber,
+        debitorAcknowledgmentTimestamp: sql`CURRENT_DATE`,
+        updatedBy: actor,
+        updatedAt: new Date(),
+      })
+      .where(eq(credits.id, input.id));
+  },
   async cancel(id: number, actor: string, tx: DatabaseTransaction) {
     await tx
       .update(credits)

@@ -14,6 +14,12 @@ export function creditRoutes() {
   const create = app.post('/create', identityContext, creditController.create);
   const update = app.put('/update', identityContext, creditController.update);
   const cancel = app.put('/cancel', identityContext, creditController.cancel);
+  const status = app.get('/status', identityContext, creditController.status);
+  const confirm = app.put(
+    '/confirm',
+    identityContext,
+    creditController.confirm,
+  );
   const review = creditReviewRoutes();
   app.route('/review', review);
   const simulation = app.post(
@@ -34,6 +40,8 @@ export function creditRoutes() {
       SchemaOf<typeof create> &
       SchemaOf<typeof update> &
       SchemaOf<typeof cancel> &
+      SchemaOf<typeof status> &
+      SchemaOf<typeof confirm> &
       MergeSchemaPath<SchemaOf<typeof review>, '/review'> &
       SchemaOf<typeof simulation> &
       SchemaOf<typeof exporting>

@@ -1,6 +1,7 @@
 import type {
   CreditApplication,
   CreditApproval,
+  CreditConfirmation,
   CreditQuery,
 } from '@credit/contracts';
 import type { Identity } from '@server/constant/interface';
@@ -14,6 +15,7 @@ import {
 } from '@server/features/credit/credit.error';
 import { creditRepository } from '@server/features/credit/credit.repository';
 import type { CreditRate } from '@server/features/credit/credit.type';
+import { creditReviewRepository } from '@server/features/credit-review/credit-review.repository';
 import { employeesRepository } from '@server/features/employees/employees.repository';
 import { exportFile } from '@server/utils/export-file';
 import { withTransaction } from '@server/utils/transaction';
@@ -70,6 +72,43 @@ function parseAmount(value: string) {
 
 export const creditService = {
   parseAmount,
+  async confirm(input: CreditConfirmation, identity: Identity) {
+    if (identity.type !== 'debitor') {
+      throw new CreditForbidden();
+    }
+    return withTransaction(async (tx) => {
+      const row = await creditRepository.detail(input.id, tx);
+      if (!row || row.credit.debitorId === null) {
+        throw new CreditNotFound();
+      }
+      await requireDebitor(identity, row.credit.debitorId, tx);
+      if (
+        row.credit.status !== 'approved' ||
+        row.credit.statusAdminApproval !== 'approved' ||
+        row.credit.debitorAcknowledgmentTimestamp
+      ) {
+        throw new CreditConflict('Pengajuan tidak dapat dikonfirmasi');
+      }
+      if (!row.nama || input.confirmationName !== row.nama) {
+        throw new CreditInvalid(
+          'Nama konfirmasi harus sama dengan nama debitor',
+        );
+      }
+      await creditRepository.confirm(
+        input,
+        `${identity.type}:${identity.id}`,
+        tx,
+      );
+      return input.id;
+    });
+  },
+  async status(id: number, identity: Identity) {
+    if (identity.type !== 'debitor') {
+      throw new CreditForbidden();
+    }
+    const row = await creditService.detail(id, identity);
+    return { ...row, expenses: await creditReviewRepository.expenses(id) };
+  },
   async cancel(id: number, identity: Identity) {
     if (identity.type !== 'debitor') {
       throw new CreditForbidden();
