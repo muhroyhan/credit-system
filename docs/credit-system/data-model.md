@@ -2,6 +2,8 @@
 
 Sumber tunggal kamus data dan status skema. Kamus berikut adalah model konseptual 24 entitas; tidak seluruhnya sudah menjadi tabel. Status migration saat ini ada di bagian terakhir. DDL/data sistem lama belum diverifikasi dan relasi konseptual tidak otomatis menjadi constraint.
 
+Baseline pra-production: satu `0000_baseline.sql` menggambarkan schema terkini untuk database kosong. Riwayat migration lama dan konversi data WRITE tidak lagi dijalankan oleh baseline; data lama memerlukan migrasi tersendiri sebelum digunakan. Paragraf histori di bawah merujuk keadaan saat phase dikerjakan, bukan file migration yang masih tersedia.
+
 ## Kolom umum
 
 - Semua entitas: `id` bertipe `INTEGER.UNSIGNED` sebagai primary key; `created_at` dan `updated_at` bertipe `DATE`.
@@ -232,7 +234,7 @@ Migration 0000 mendefinisikan sepuluh tabel awal: admin_user, role, program, ent
 
 Schema database baru memakai ID integer unsigned auto-increment termasuk program/role/entity_type, varchar(255), kolom bisnis nullable, audit datetime default database. debitor.user_id adalah integer unsigned; field akun minimum tersedia pada migration awal. Tidak ada FK/unique/index tambahan. Ini rancangan baru yang telah diuji di database disposable, bukan bukti kompatibilitas DDL/data lama.
 
-Migration 0001 hanya mengubah data ACL: setiap WRITE menjadi CREATE/READ/UPDATE/DELETE tanpa APPROVAL, mempertahankan aksi yang sudah ada tanpa menambah duplikasi, lalu menghapus WRITE. Jalankan migration sebelum versi aplikasi yang menolak WRITE digunakan pada database lama. Cara menjalankan migration/seed hanya pada local-development.md.
+Migration 0001 hanya mengubah data ACL: setiap WRITE menjadi CREATE/READ/UPDATE/DELETE tanpa APPROVAL, mempertahankan aksi yang sudah ada tanpa menambah duplikasi, lalu menghapus WRITE. Konversi ini tidak termasuk baseline baru dan perlu disiapkan terpisah jika data lama digunakan. Cara menjalankan migration/seed hanya pada local-development.md.
 
 Sebelum menambah constraint atau mengubah tipe, verifikasi DDL tujuan, duplikasi/orphan, precision/scale, nullable dan mapping DTO. Simpan keputusan/dampak pada logic-holes.md; jangan menganggap data turunan seperti score/agregat sebagai kolom tanpa keputusan.
 

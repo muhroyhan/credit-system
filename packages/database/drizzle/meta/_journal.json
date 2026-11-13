@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1794449255270,
-      "tag": "0000_workable_mysterio",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1794449255271,
-      "tag": "0001_replace_write_acl",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1794492561823,
-      "tag": "0002_milky_christian_walker",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1794520358308,
-      "tag": "0003_daffy_sunfire",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1794536256987,
-      "tag": "0004_luxuriant_albert_cleary",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1794559310501,
-      "tag": "0005_lame_selene",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1794560049050,
-      "tag": "0006_nostalgic_obadiah_stane",
+      "when": 1794560204660,
+      "tag": "0000_baseline",
       "breakpoints": true
     }
   ]

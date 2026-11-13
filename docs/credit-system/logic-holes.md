@@ -80,6 +80,8 @@ Audit ini belum menyatakan proyek bebas duplikasi: kandidat kontrak/query/form d
 
 - Migration 0005 sempat mengubah `created_at` ketika row diperbarui. Migration 0006 menghentikan perilaku itu, tetapi tidak dapat memulihkan tanggal yang sudah tertimpa; data yang melewati 0005 memerlukan verifikasi sumber historis sebelum dipakai untuk penomoran P10.
 
+- Baseline migration tunggal berlaku untuk database kosong; histori migration terdahulu dan transformasi ACL WRITE tidak otomatis diterapkan pada database lama. Runner menolak histori yang berbeda; migrasi data lama perlu dirancang terpisah.
+
 ## Risiko pemetaan data
 
 Pemetaan NUMBER/telepon, koordinat unsigned, precision nominal, nullable DTO, kardinalitas child serta orphan memerlukan verifikasi sebelum phase terkait. Kamus dan status DDL hanya di [data-model.md](data-model.md); nilai turunan seperti score/agregat bukan otomatis kolom persistence. Jangan mengubah rumus atau menganggap relasi konseptual sebagai FK/unique fisik.

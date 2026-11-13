@@ -9,7 +9,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "start": "bun apps/server/dist/index.js",
-    "db:generate": "drizzle-kit generate --config packages/database/drizzle.config.ts",
+    "db:generate": "bun packages/database/src/generate.ts",
     "db:migrate": "bun packages/database/src/migrate.ts",
     "db:seed": "bun packages/database/src/seed.ts",
     "test:unit": "vitest run --project unit",
