@@ -1,12 +1,10 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { credits, users } from '@credit/database/schema';
-import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { Identity } from '@server/constant/interface';
 import { dashboardService } from '@server/features/dashboard/dashboard.service';
 import { inArray } from 'drizzle-orm';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-const url = testDatabaseUrl(process.env.DATABASE_URL);
 const admin: Identity = {
   id: 900001,
   type: 'admin',
@@ -31,12 +29,7 @@ const debitor: Identity = {
   slug: 'sintetis-satu',
   permissions: [],
 };
-afterAll(async () => {
-  if (url) {
-    await closeDatabase();
-  }
-});
-describe.skipIf(!url)('dashboard aggregates', () => {
+describe('dashboard aggregates', () => {
   it('applies actor scopes and HRD status to exact nominal totals', async () => {
     const db = connectDatabase().db;
     const before = await Promise.all([
