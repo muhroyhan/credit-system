@@ -49,7 +49,7 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     const row = page
       .getByRole('row')
       .filter({ hasText: 'Debitor Sintetis Satu' })
-      .first();
+      .filter({ has: page.locator(`a[href="/credits/${id}/edit"]`) });
     await expect(row).toContainText('pending');
     const href = await row
       .getByRole('link', { name: 'Ubah' })

@@ -5,63 +5,45 @@ import {
   exportAdmins,
   listAdmins,
 } from '@web/features/admin-users/admin-users.api';
+import { toSearchParams } from '@web/utils/search-params';
 import { useState } from 'react';
-
 export function useAdminUsers(token: string) {
   const client = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [active, setActive] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortDirection, setSortDirection] = useState('desc');
-  const query = new URLSearchParams({ username, email, sortBy, sortDirection });
-  if (active) {
-    query.set('active', active);
-  }
-  const filters = query.toString();
+  const [queries, setQueries] = useState({
+    page: 1,
+    limit: 20,
+    username: undefined as string | undefined,
+    email: undefined as string | undefined,
+    active: undefined as string | undefined,
+    sortBy: 'createdAt',
+    sortDirection: 'desc',
+  });
   const list = useQuery({
-    queryKey: ['admin-users', token, 'list', filters, page],
-    queryFn: () =>
-      listAdmins(
-        token,
-        new URLSearchParams({
-          ...Object.fromEntries(query),
-          page: String(page),
-          limit: '20',
-        }),
-      ),
+    queryKey: ['admin-users', token, 'list', queries],
+    queryFn: () => listAdmins(token, toSearchParams(queries)),
   });
   const remove = useMutation({
     mutationFn: (id: number) => deleteAdmin(token, id),
     onSuccess: async (_, id) => {
       client.removeQueries({ queryKey: ['admin-users', token, 'detail', id] });
-      if (list.data?.data.length === 1 && page > 1) {
-        setPage(page - 1);
+      if (list.data?.data.length === 1) {
+        setQueries((current) => ({
+          ...current,
+          page: Math.max(1, current.page - 1),
+        }));
       }
       await client.invalidateQueries({ queryKey: ['admin-users', token] });
     },
   });
   const exporting = useMutation({
-    mutationFn: async (format: ExportFormat) => {
-      await exportAdmins(token, new URLSearchParams(filters), format);
-    },
+    mutationFn: (format: ExportFormat) =>
+      exportAdmins(token, toSearchParams(queries), format),
   });
   return {
     rows: list.data?.data ?? [],
     total: list.data?.count ?? 0,
-    page,
-    setPage,
-    username,
-    setUsername,
-    email,
-    setEmail,
-    active,
-    setActive,
-    sortBy,
-    setSortBy,
-    sortDirection,
-    setSortDirection,
+    queries,
+    setQueries,
     loading: list.isFetching,
     deleting: remove.isPending,
     exporting: exporting.isPending,

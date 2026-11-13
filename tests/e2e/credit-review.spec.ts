@@ -55,13 +55,16 @@ test('BPR can approve, reject and complete HRD-approved applications', async ({
     await page.getByLabel(/^Password/).fill(password ?? '');
     await page.getByRole('button', { name: 'Masuk', exact: true }).click();
     await page.getByRole('link', { name: 'Daftar Kredit Karyawan' }).click();
-    for (const [amount, status] of [
+    for (const [index, [amount, status]] of [
       ['17000000', 'approved'],
       ['18000000', 'rejected'],
       ['19000000', 'completed'],
-    ] as const) {
+    ].entries()) {
       await page
         .getByRole('row')
+        .filter({
+          has: page.locator(`a[href="/credit-reviews/${ids[index]}"]`),
+        })
         .filter({ hasText: amount })
         .getByRole('link', { name: 'Lihat' })
         .click();

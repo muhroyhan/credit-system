@@ -2,10 +2,12 @@ import { Select, TextInput } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
+import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { exportReviews } from '@web/features/credit/credit.api';
 import { useCreditReviews } from '@web/features/credit/hooks/useCreditReviews';
+import { toSearchParams } from '@web/utils/search-params';
 import { useState } from 'react';
 export function CreditorReviewPage() {
   return (
@@ -17,30 +19,21 @@ export function CreditorReviewPage() {
 function Content() {
   const { session } = useSession();
   const token = session?.authToken ?? '';
-  const [page, setPage] = useState(1);
-  const [name, setName] = useState('');
-  const [status, setStatus] = useState('approved');
-  const [companyId, setCompanyId] = useState('');
-  const [debitorId, setDebitorId] = useState('');
-  const [bprStatus, setBprStatus] = useState('');
-  const query = new URLSearchParams({
-    page: String(page),
-    limit: '20',
-    status,
-    nama: name,
+  const [queries, setQueries] = useState({
+    page: 1,
+    limit: 20,
+    nama: undefined as string | undefined,
+    status: 'approved',
+    sortBy: 'createdAt',
+    sortDirection: 'desc',
+    userId: undefined as string | undefined,
+    debitorId: undefined as string | undefined,
+    statusAdminApproval: undefined as string | undefined,
   });
-  if (companyId) {
-    query.set('userId', companyId);
-  }
-  if (debitorId) {
-    query.set('debitorId', debitorId);
-  }
-  if (bprStatus) {
-    query.set('statusAdminApproval', bprStatus);
-  }
-  const list = useCreditReviews(token, query);
+  const list = useCreditReviews(token, queries);
   const exporting = useMutation({
-    mutationFn: (format: 'pdf' | 'xlsx') => exportReviews(token, query, format),
+    mutationFn: (format: 'pdf' | 'xlsx') =>
+      exportReviews(token, toSearchParams(queries), format),
   });
   return (
     <ListingTable
@@ -50,9 +43,9 @@ function Content() {
       }))}
       loading={list.isFetching}
       error={(list.error ?? exporting.error)?.message}
-      page={page}
+      page={queries.page}
       total={list.data?.count ?? 0}
-      onPageChange={setPage}
+      onPageChange={(page) => setQueries((current) => ({ ...current, page }))}
       exporting={exporting.isPending}
       onExport={(format) => exporting.mutate(format)}
       filters={
@@ -61,48 +54,81 @@ function Content() {
             label="ID perusahaan"
             type="number"
             min={1}
-            value={companyId}
+            value={queries.userId ?? ''}
             onChange={(event) => {
-              setCompanyId(event.currentTarget.value);
-              setPage(1);
+              const value = event.currentTarget.value || undefined;
+              setQueries((current) => ({
+                ...current,
+                userId: value,
+                page: 1,
+              }));
             }}
           />
           <TextInput
             label="ID debitor"
             type="number"
             min={1}
-            value={debitorId}
+            value={queries.debitorId ?? ''}
             onChange={(event) => {
-              setDebitorId(event.currentTarget.value);
-              setPage(1);
+              const value = event.currentTarget.value || undefined;
+              setQueries((current) => ({
+                ...current,
+                debitorId: value,
+                page: 1,
+              }));
             }}
           />
           <Select
             label="Status BPR"
             data={['pending', 'approved', 'rejected', 'completed']}
             clearable
-            value={bprStatus || null}
+            value={queries.statusAdminApproval ?? null}
             onChange={(value) => {
-              setBprStatus(value ?? '');
-              setPage(1);
+              setQueries((current) => ({
+                ...current,
+                statusAdminApproval: value ?? undefined,
+                page: 1,
+              }));
             }}
           />
           <TextInput
             label="Nama"
-            value={name}
+            value={queries.nama ?? ''}
             onChange={(event) => {
-              setName(event.currentTarget.value);
-              setPage(1);
+              const value = event.currentTarget.value || undefined;
+              setQueries((current) => ({
+                ...current,
+                nama: value,
+                page: 1,
+              }));
             }}
           />
           <Select
             label="Status HRD"
             data={['pending', 'approved', 'rejected', 'completed']}
-            value={status}
+            value={queries.status ?? ''}
             onChange={(value) => {
-              setStatus(value ?? 'approved');
-              setPage(1);
+              setQueries((current) => ({
+                ...current,
+                status: value ?? 'approved',
+                page: 1,
+              }));
             }}
+          />
+          <ListingSort
+            value={queries.sortBy}
+            direction={queries.sortDirection}
+            options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
+            onSort={(value) =>
+              setQueries((current) => ({ ...current, sortBy: value, page: 1 }))
+            }
+            onDirection={(value) =>
+              setQueries((current) => ({
+                ...current,
+                sortDirection: value,
+                page: 1,
+              }))
+            }
           />
         </>
       }

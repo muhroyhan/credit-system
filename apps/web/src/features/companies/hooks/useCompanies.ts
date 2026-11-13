@@ -5,57 +5,41 @@ import {
   exportCompanies,
   listCompanies,
 } from '@web/features/companies/companies.api';
+import { toSearchParams } from '@web/utils/search-params';
 import { useState } from 'react';
 
 export function useCompanies(token: string) {
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({
-    companyName: '',
-    username: '',
-    email: '',
-    status: '',
-    entityTypeId: '',
+  const [queries, setQueries] = useState({
+    page: 1,
+    limit: 20,
+    companyName: undefined as string | undefined,
+    username: undefined as string | undefined,
+    email: undefined as string | undefined,
+    status: undefined as string | undefined,
+    entityTypeId: undefined as string | undefined,
     sortBy: 'createdAt',
     sortDirection: 'desc',
   });
-  const query = new URLSearchParams(
-    Object.entries(filters).filter(([, v]) => !!v),
-  );
   const list = useQuery({
-    queryKey: ['companies', token, 'list', query.toString(), page],
-    queryFn: () =>
-      listCompanies(
-        token,
-        new URLSearchParams({
-          ...Object.fromEntries(query),
-          page: String(page),
-          limit: '20',
-        }),
-      ),
+    queryKey: ['companies', token, 'list', queries],
+    queryFn: () => listCompanies(token, toSearchParams(queries)),
   });
   const client = useQueryClient();
   const remove = useMutation({
     mutationFn: (id: number) => deleteCompany(token, id),
     onSuccess: async () => {
-      if (list.data?.data.length === 1 && page > 1) {
-        setPage(page - 1);
+      if (list.data?.data.length === 1) {
+        setQueries((current) => ({
+          ...current,
+          page: Math.max(1, current.page - 1),
+        }));
       }
       await client.invalidateQueries({ queryKey: ['companies'] });
     },
   });
   const exporting = useMutation({
-    mutationFn: (format: ExportFormat) => exportCompanies(token, query, format),
+    mutationFn: (format: ExportFormat) =>
+      exportCompanies(token, toSearchParams(queries), format),
   });
-  return {
-    list,
-    page,
-    setPage,
-    filters,
-    filter: (key: keyof typeof filters, value: string) => {
-      setFilters((v) => ({ ...v, [key]: value }));
-      setPage(1);
-    },
-    remove,
-    exporting,
-  };
+  return { list, queries, setQueries, remove, exporting };
 }

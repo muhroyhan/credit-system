@@ -1,8 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { listReviews } from '@web/features/credit/credit.api';
-export function useCreditReviews(token: string, query: URLSearchParams) {
+import { toSearchParams } from '@web/utils/search-params';
+export function useCreditReviews(
+  token: string,
+  queries: Record<string, string | number | undefined>,
+) {
   return useQuery({
-    queryKey: ['credit-reviews', token, query.toString()],
-    queryFn: () => listReviews(token, query),
+    queryKey: ['credit-reviews', token, queries],
+    queryFn: () => listReviews(token, toSearchParams(queries)),
   });
 }

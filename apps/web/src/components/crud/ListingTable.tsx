@@ -1,4 +1,5 @@
 import { Alert, Button, Group, NumberInput, Table, Text } from '@mantine/core';
+import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 
 export function ListingTable<T extends { id: number }>({
@@ -31,7 +32,8 @@ export function ListingTable<T extends { id: number }>({
   return (
     <>
       {error && <Alert color="red">{error}</Alert>}
-      {filters}
+      <Link to="/">Beranda</Link>
+      <Group>{filters}</Group>
       <Group>
         {addAction}
         <Button

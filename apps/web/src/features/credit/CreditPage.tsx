@@ -1,6 +1,7 @@
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
+import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCredits } from '@web/features/credit/hooks/useCredits';
@@ -24,9 +25,11 @@ function Content() {
       }))}
       loading={rows.list.isFetching}
       error={(rows.list.error ?? rows.exporting.error)?.message}
-      page={rows.page}
+      page={rows.queries.page}
       total={rows.list.data?.count ?? 0}
-      onPageChange={rows.setPage}
+      onPageChange={(page) =>
+        rows.setQueries((current) => ({ ...current, page }))
+      }
       exporting={rows.exporting.isPending}
       onExport={(format) => rows.exporting.mutate(format)}
       columns={[
@@ -45,33 +48,47 @@ function Content() {
         <>
           <TextInput
             label="Nama"
-            value={rows.name}
+            value={rows.queries.nama ?? ''}
             onChange={(e) => {
-              rows.setName(e.currentTarget.value);
-              rows.setPage(1);
+              const value = e.currentTarget.value || undefined;
+              rows.setQueries((current) => ({
+                ...current,
+                nama: value,
+                page: 1,
+              }));
             }}
           />
           <Select
             label="Status"
             data={['pending', 'approved', 'rejected', 'completed']}
             clearable
-            value={rows.status || null}
+            value={rows.queries.status || null}
             onChange={(v) => {
-              rows.setStatus(v ?? '');
-              rows.setPage(1);
+              rows.setQueries((current) => ({
+                ...current,
+                status: v ?? undefined,
+                page: 1,
+              }));
             }}
           />
-          <Select
-            label="Urutkan"
-            data={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
-            value={rows.sortBy}
-            onChange={(v) => rows.setSortBy(v ?? 'createdAt')}
-          />
-          <Select
-            label="Arah"
-            data={['asc', 'desc']}
-            value={rows.sortDirection}
-            onChange={(v) => rows.setSortDirection(v ?? 'desc')}
+          <ListingSort
+            value={rows.queries.sortBy}
+            direction={rows.queries.sortDirection}
+            options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
+            onSort={(value) =>
+              rows.setQueries((current) => ({
+                ...current,
+                sortBy: value,
+                page: 1,
+              }))
+            }
+            onDirection={(value) =>
+              rows.setQueries((current) => ({
+                ...current,
+                sortDirection: value,
+                page: 1,
+              }))
+            }
           />
         </>
       }
