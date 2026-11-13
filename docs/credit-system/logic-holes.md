@@ -78,6 +78,8 @@ Pemindaian blok identik/serupa pada 190 file TS/TSX terlacak (aplikasi, package,
 
 Audit ini belum menyatakan proyek bebas duplikasi: kandidat kontrak/query/form dan ekstraksi lokal yang belum disepakati tetap dicatat untuk keputusan berikutnya. Hasil pemeriksaan perubahan dicatat di testing.md.
 
+- Perintah pengguna menerapkan auto-update pada `created_at` dan `updated_at`: kedua kolom berubah saat row berubah. Bulan `created_at` untuk penomoran P10 tidak lagi merekam bulan pembuatan; perlu keputusan sumber tanggal sebelum implementasi P10.
+
 ## Risiko pemetaan data
 
 Pemetaan NUMBER/telepon, koordinat unsigned, precision nominal, nullable DTO, kardinalitas child serta orphan memerlukan verifikasi sebelum phase terkait. Kamus dan status DDL hanya di [data-model.md](data-model.md); nilai turunan seperti score/agregat bukan otomatis kolom persistence. Jangan mengubah rumus atau menganggap relasi konseptual sebagai FK/unique fisik.

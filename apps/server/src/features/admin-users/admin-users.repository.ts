@@ -128,7 +128,6 @@ export const adminUsersRepository: AdminRepository = {
           isActive: input.isActive,
           ...(input.password ? { password: input.password } : {}),
           updatedBy: actor,
-          updatedAt: new Date(),
         })
         .where(eq(adminUsers.id, userId));
       await tx.delete(roles).where(eq(roles.adminUserId, userId));

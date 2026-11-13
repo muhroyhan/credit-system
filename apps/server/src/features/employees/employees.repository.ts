@@ -133,7 +133,7 @@ export const employeesRepository = {
     if (id) {
       await tx
         .update(debitors)
-        .set({ ...input, updatedBy: actor, updatedAt: new Date() })
+        .set({ ...input, updatedBy: actor })
         .where(eq(debitors.id, id));
       return id;
     }
@@ -174,13 +174,13 @@ export const employeesRepository = {
     const { npwp, takehomePay, ...parent } = profile;
     await tx
       .update(debitors)
-      .set({ ...parent, updatedBy: actor, updatedAt: new Date() })
+      .set({ ...parent, updatedBy: actor })
       .where(eq(debitors.id, id));
     const old = await employeesRepository.profile(id, tx);
     if (old.data) {
       await tx
         .update(debitorData)
-        .set({ npwp, updatedBy: actor, updatedAt: new Date() })
+        .set({ npwp, updatedBy: actor })
         .where(eq(debitorData.debitorId, id));
     } else {
       await tx
@@ -193,7 +193,6 @@ export const employeesRepository = {
         .set({
           takehomePay: Number(takehomePay),
           updatedBy: actor,
-          updatedAt: new Date(),
         })
         .where(eq(debitorFinancial.debitorId, id));
     } else {
@@ -215,7 +214,7 @@ export const employeesRepository = {
     if (old.data) {
       await tx
         .update(debitorData)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
+        .set({ ...values, updatedBy: actor })
         .where(eq(debitorData.debitorId, id));
     } else {
       await tx.insert(debitorData).values({

@@ -58,7 +58,7 @@ async function saveChild<T extends CreditChildTable>(
   if (row) {
     await tx
       .update(childTable)
-      .set({ ...values, updatedBy: actor, updatedAt: new Date() })
+      .set({ ...values, updatedBy: actor })
       .where(eq(childTable.id, row.id));
   } else {
     await tx
@@ -82,7 +82,6 @@ export const creditRepository = {
         bankAccountNumber: input.bankAccountNumber,
         debitorAcknowledgmentTimestamp: sql`CURRENT_DATE`,
         updatedBy: actor,
-        updatedAt: new Date(),
       })
       .where(eq(credits.id, input.id));
   },
@@ -93,7 +92,6 @@ export const creditRepository = {
         statusAdminApproval: 'rejected',
         debitorAcknowledgmentTimestamp: sql`CURRENT_DATE`,
         updatedBy: actor,
-        updatedAt: new Date(),
       })
       .where(eq(credits.id, id));
   },
@@ -113,7 +111,7 @@ export const creditRepository = {
   ) {
     await tx
       .update(credits)
-      .set({ status, updatedBy: actor, updatedAt: new Date() })
+      .set({ status, updatedBy: actor })
       .where(eq(credits.id, id));
   },
   async simulationData(debitorId: number, tx?: DatabaseTransaction) {
@@ -284,7 +282,6 @@ export const creditRepository = {
       pokokAngsuran: String(values.principal / input.jangkaWaktuBulan),
       bungaAngsuranBulanan: String(values.percentage),
       updatedBy: actor,
-      updatedAt: new Date(),
     };
     if (id !== undefined) {
       await tx.update(credits).set(data).where(eq(credits.id, id));
