@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P07 selesai; P08–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P08 selesai; P09–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -89,6 +89,8 @@ Status: done. P07-T01: 0d88281; P07-T02: c83654d; P07-T03: lihat footer commit T
 ## P08 — Review BPR dan notifikasi
 
 Hasil: BPR meninjau kredit yang disetujui HRD, menetapkan status, menghasilkan snapshot biaya dan notifikasi melalui adapter.
+
+Status: done. Commit task ditelusuri melalui footer Task: P08-T01 sampai P08-T04. Pengiriman WhatsApp nyata belum diuji sesuai instruksi pengguna; bukti lainnya pada testing.md.
 
 | Kode task | Task dan keluaran |
 | --- | --- |
