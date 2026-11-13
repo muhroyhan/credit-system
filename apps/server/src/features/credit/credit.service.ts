@@ -83,7 +83,13 @@ export const creditService = {
     );
     const entries = result.data
       .filter((row) => row.credit.docUrl)
-      .map(({ credit }) => ({ id: credit.id, key: credit.docStorageKey }));
+      .map(({ credit, companyName }) => ({
+        id: credit.id,
+        debitorId: credit.debitorId,
+        companyName,
+        createdAt: credit.createdAt,
+        key: credit.docStorageKey,
+      }));
     const data = await zipDocuments(entries, createDocumentStorage());
     if (!data) {
       throw new CreditNotFound('Dokumen tidak tersedia');
