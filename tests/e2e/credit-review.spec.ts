@@ -6,10 +6,6 @@ import { loginBrowser } from './fixtures/login';
 import { test } from './fixtures/test';
 
 const password = process.env.SEED_PASSWORD;
-test.skip(
-  !password || !process.env.DATABASE_URL,
-  'Synthetic database required',
-);
 test('BPR can approve, reject and complete HRD-approved applications', async ({
   page,
   request,

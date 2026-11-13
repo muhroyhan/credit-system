@@ -167,8 +167,8 @@ dilengkapi pada task dokumentasi terakhir. Tidak ada task diblokir keputusan bis
 | P13-T04 | Perusahaan dan konfigurasi child | done | aa7bc9e |
 | P13-T05 | Registrasi, profil dan dokumen karyawan | done | a570900 |
 | P13-T06 | Simulasi, scope dan child kredit | done | 4672330 |
-| P13-T07 | Approval HRD dan konkurensi | done | footer Task: P13-T07 |
-| P13-T08 | Review BPR, snapshot dan kegagalan notifikasi | doing | footer Task: P13-T08 |
+| P13-T07 | Approval HRD dan konkurensi | done | 7b55030 |
+| P13-T08 | Review BPR, snapshot dan kegagalan notifikasi | done | footer Task: P13-T08 |
 | P13-T09 | Konfirmasi/pembatalan nasabah dan matriks status | doing | footer Task: P13-T09 |
 | P13-T10 | Perjanjian, penomoran dan PDF | doing | footer Task: P13-T10 |
 | P13-T11 | Ekspor, ZIP dan parameter listing | doing | footer Task: P13-T11 |
