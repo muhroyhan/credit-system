@@ -9,6 +9,7 @@ import {
 import { adminUsersRoutes } from '@web/features/admin-users/admin-users.routes';
 import { LoginPage } from '@web/features/auth/LoginPage';
 import { companiesRoutes } from '@web/features/companies/companies.routes';
+import { creditRoutes } from '@web/features/credit/credit.routes';
 import { DashboardPage } from '@web/features/dashboard/DashboardPage';
 import {
   employeesRoutes,
@@ -49,6 +50,11 @@ const employeeRoute = createRoute({
   path: '/employees',
   component: Outlet,
 });
+const creditRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/credits',
+  component: Outlet,
+});
 const registrationRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/registration',
@@ -61,6 +67,7 @@ export const router = createRouter({
     adminUsersRoutes(adminRoute),
     companiesRoutes(companyRoute),
     employeesRoutes(employeeRoute),
+    creditRoutes(creditRoute),
     registrationRoutes(registrationRoute),
   ]),
 });

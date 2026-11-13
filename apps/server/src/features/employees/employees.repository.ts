@@ -5,6 +5,7 @@ import type {
 } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
+  credits,
   debitorData,
   debitorFamily,
   debitorFinancial,
@@ -25,7 +26,6 @@ import {
   getTableColumns,
   like,
   ne,
-  sql,
 } from 'drizzle-orm';
 
 const columns = {
@@ -227,16 +227,13 @@ export const employeesRepository = {
     }
   },
   async hasCredit(id: number, tx: DatabaseTransaction) {
-    const [tables] = await tx.execute(
-      sql`SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'credit'`,
-    );
-    if (!Array.isArray(tables) || !tables.length) {
-      return false;
-    }
-    const [rows] = await tx.execute(
-      sql`SELECT id FROM credit WHERE debitor_id = ${id} LIMIT 1 FOR UPDATE`,
-    );
-    return Array.isArray(rows) && rows.length > 0;
+    const rows = await tx
+      .select({ id: credits.id })
+      .from(credits)
+      .where(eq(credits.debitorId, id))
+      .limit(1)
+      .for('update');
+    return rows.length > 0;
   },
   async remove(id: number, tx: DatabaseTransaction) {
     for (const table of [

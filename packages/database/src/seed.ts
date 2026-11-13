@@ -4,6 +4,7 @@ import {
   adminUsers,
   constants,
   countries,
+  debitorFinancial,
   debitors,
   entityTypes,
   programs,
@@ -177,6 +178,18 @@ try {
         },
       ])
       .onDuplicateKeyUpdate({ set: { id: sql`id` } });
+    for (const debitorId of [900001, 900002]) {
+      const [existing] = await tx
+        .select({ id: debitorFinancial.id })
+        .from(debitorFinancial)
+        .where(eq(debitorFinancial.debitorId, debitorId))
+        .limit(1);
+      if (!existing) {
+        await tx
+          .insert(debitorFinancial)
+          .values({ debitorId, takehomePay: 6000000 });
+      }
+    }
     await tx
       .insert(userBiaya)
       .values([
