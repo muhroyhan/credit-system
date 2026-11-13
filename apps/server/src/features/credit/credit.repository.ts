@@ -64,6 +64,17 @@ async function saveChild<T extends CreditChildTable>(
 }
 
 export const creditRepository = {
+  async cancel(id: number, actor: string, tx: DatabaseTransaction) {
+    await tx
+      .update(credits)
+      .set({
+        statusAdminApproval: 'rejected',
+        debitorAcknowledgmentTimestamp: sql`CURRENT_DATE`,
+        updatedBy: actor,
+        updatedAt: new Date(),
+      })
+      .where(eq(credits.id, id));
+  },
   async debitorId(id: number, tx: DatabaseTransaction) {
     const [row] = await tx
       .select({ debitorId: credits.debitorId })

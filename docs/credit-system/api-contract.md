@@ -90,3 +90,5 @@ Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK da
 GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCredits dengan agregasi sesuai business-flow.md. CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
 
 Path di bagian rancangan belum final. Normalisasi list/detail mengikuti pola fitur saat diimplementasikan; operasi GET yang mengubah dokumen harus ditinjau pada FLOW-11, bukan dianggap endpoint berjalan.
+
+P09-T01: `PUT /credit/cancel` menerima `{ "id": number }` dari debitor pemilik. Dua status approval harus approved dan acknowledgment belum ada; transaksi menetapkan status BPR rejected serta tanggal acknowledgment server, tanpa mengubah HRD. Pengulangan menghasilkan 409. Kolom acknowledgment bertipe DATE sehingga hanya tanggal disimpan.

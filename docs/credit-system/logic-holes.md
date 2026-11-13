@@ -10,7 +10,7 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 | FLOW-04 | Approval berulang menggandakan snapshot biaya/notifikasi; tidak ada transaksi dan rollback bila child/notifikasi gagal. |
 | FLOW-05 | Nominal biaya diambil dari payload parsial, dapat NaN; cabang actor debitor salah memilih id perusahaan. |
 | FLOW-06 / FE-03 | Rekening, persetujuan nama, checkbox dan syarat dua approval diperiksa UI; backend menerima update tanpa validasi yang setara. |
-| FLOW-07 | Pembatalan nasabah mengubah BPR saja; saldo terbuka dan dashboard bergantung status HRD sehingga bisa tidak selaras. |
+| FLOW-07 | P09-T01: pembatalan nasabah mengubah BPR menjadi rejected dan mencatat tanggal server; HRD tetap approved. Agregat pengajuan terbuka dan dashboard yang mengikuti HRD tetap menghitung pengajuan tersebut. |
 | FLOW-08 / FE-01 | Formula flat vs label annuitas/tahunan; score membandingkan gaji bulanan dengan total pokok, bukan angsuran. Jangan mengganti diam-diam. |
 | FLOW-09 / FE-06 | Total diterima memakai tabungan tetap, mengabaikan nilai snapshot tabungan dinamis; potensi ketidakselarasan biaya. |
 | FLOW-10 / FE-07 | Nomor PKS berdasarkan count global bulan created_at, string 'null', dan tidak tersimpan/atomic; rawan duplikasi/perubahan saat render ulang. |

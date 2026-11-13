@@ -1,4 +1,5 @@
 import {
+  adminDeleteSchema,
   creditApplicationSchema,
   creditQuerySchema,
   creditUpdateRequestSchema,
@@ -9,6 +10,20 @@ import { creditService } from '@server/features/credit/credit.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
 import type { Context } from 'hono';
+
+async function cancel(c: Context<AuthEnv>) {
+  const input = await parseJsonInput(c, adminDeleteSchema);
+  if (!input.success) {
+    return c.json({ error: 'invalid request' }, 400);
+  }
+  try {
+    return c.json({
+      id: await creditService.cancel(input.data.id, c.get('identity')),
+    });
+  } catch (error) {
+    return controllerFailure(c, error);
+  }
+}
 
 async function list(c: Context<AuthEnv>) {
   const input = creditQuerySchema.safeParse(c.req.query());
@@ -107,6 +122,7 @@ async function exporting(c: Context<AuthEnv>) {
   }
 }
 export const creditController = {
+  cancel,
   list,
   detail,
   create,

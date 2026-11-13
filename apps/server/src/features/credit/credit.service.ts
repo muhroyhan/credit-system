@@ -70,6 +70,27 @@ function parseAmount(value: string) {
 
 export const creditService = {
   parseAmount,
+  async cancel(id: number, identity: Identity) {
+    if (identity.type !== 'debitor') {
+      throw new CreditForbidden();
+    }
+    return withTransaction(async (tx) => {
+      const row = await creditRepository.detail(id, tx);
+      if (!row || row.credit.debitorId === null) {
+        throw new CreditNotFound();
+      }
+      await requireDebitor(identity, row.credit.debitorId, tx);
+      if (
+        row.credit.status !== 'approved' ||
+        row.credit.statusAdminApproval !== 'approved' ||
+        row.credit.debitorAcknowledgmentTimestamp
+      ) {
+        throw new CreditConflict('Pengajuan tidak dapat dibatalkan');
+      }
+      await creditRepository.cancel(id, `${identity.type}:${identity.id}`, tx);
+      return id;
+    });
+  },
   async approve(input: CreditApproval, identity: Identity) {
     if (identity.type !== 'company') {
       throw new CreditForbidden();
