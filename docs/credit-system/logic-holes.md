@@ -62,6 +62,22 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 - Validasi response runtime belum seragam; schema input runtime tidak dengan sendirinya membuktikan seluruh DTO keluaran valid.
 - Hak UI memakai snapshot login yang dapat tertinggal; server memeriksa ulang. Ekspor tanpa batas menyimpan data/dokumen dalam memori server selama pembuatan.
 
+## Audit duplikasi — 13 November 2026
+
+Pemindaian blok identik/serupa pada 190 file TS/TSX terlacak (aplikasi, package, konfigurasi dan test), disertai review kandidat. Artefak generated/build/dependency bukan target refactor; kemiripan deklarasi field atau wiring fitur bukan otomatis duplikasi perilaku.
+
+| Area | Hasil / keputusan |
+| --- | --- |
+| Ekspor | Header lima controller dan parameter lima API frontend dipusatkan pada utilitas ekspor/query yang ada; format file, filter, nama unduhan dan status respons dipertahankan. |
+| Schema frontend | Referensi entity dan enum ACL memakai schema kontrak; proxy ekspor schema employee dihapus agar pemakai mengimpor langsung. Schema admin DTO tidak disatukan begitu saja: nullability dan optional roles berbeda. |
+| Controller | Pemetaan error credit/review identik; pola validasi request berulang lintas fitur. Pengguna menyetujui helper bersama; implementasi di utils/controller.ts. Error tidak dikenal harus tetap menjadi kegagalan internal, bukan 400. |
+| Hooks | Query/list/export dan penanganan delete berulang. Pengguna menyetujui dan implementasi memakai useListing; invalidasi cache dan default filter tiap fitur berbeda. |
+| Test | Guard database disposable, identitas sintetis dan login browser berulang. Pengguna menyetujui helper fixture; guard DB dan login fitur dipusatkan. |
+| Service/repository | Hash bcrypt di tiga fitur dan enam pola simpan child kredit berulang. Pengguna menyetujui sentralisasi; hashPassword dan saveChild telah diterapkan; transaksi service dan tipe tiap tabel harus dipertahankan. Guard ownership employee serta query permission auth juga kandidat ekstraksi lokal. |
+| Kontrak/query/form | Pagination, validasi password admin/perusahaan dan bentuk list DTO serupa; belum ada factory bersama. Ekstraksi lebih luas perlu keputusan standar baru, tanpa menyamakan aturan password employee atau scope tenant yang berbeda. |
+
+Audit ini belum menyatakan proyek bebas duplikasi: kandidat kontrak/query/form dan ekstraksi lokal yang belum disepakati tetap dicatat untuk keputusan berikutnya. Hasil pemeriksaan perubahan dicatat di testing.md.
+
 ## Risiko pemetaan data
 
 Pemetaan NUMBER/telepon, koordinat unsigned, precision nominal, nullable DTO, kardinalitas child serta orphan memerlukan verifikasi sebelum phase terkait. Kamus dan status DDL hanya di [data-model.md](data-model.md); nilai turunan seperti score/agregat bukan otomatis kolom persistence. Jangan mengubah rumus atau menganggap relasi konseptual sebagai FK/unique fisik.

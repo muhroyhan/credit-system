@@ -1,7 +1,9 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { creditExpense, credits } from '@credit/database/schema';
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { inArray } from 'drizzle-orm';
+import { loginBrowser } from './fixtures/login';
+import { test } from './fixtures/test';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(
@@ -48,12 +50,7 @@ test('BPR can approve, reject and complete HRD-approved applications', async ({
         ).status(),
       ).toBe(200);
     }
-    await page.goto('/login');
-    await page.getByRole('textbox', { name: 'Jenis akun' }).click();
-    await page.getByRole('option', { name: 'Admin bank' }).click();
-    await page.getByLabel('Username atau email').fill('admin_sintetis');
-    await page.getByLabel(/^Password/).fill(password ?? '');
-    await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+    await loginBrowser(page, { type: 'admin', username: 'admin_sintetis' });
     await page.getByRole('link', { name: 'Daftar Kredit Karyawan' }).click();
     for (const [index, [amount, status]] of [
       ['17000000', 'approved'],
@@ -90,6 +87,5 @@ test('BPR can approve, reject and complete HRD-approved applications', async ({
         .where(inArray(creditExpense.creditId, ids));
       await db.delete(credits).where(inArray(credits.id, ids));
     }
-    await closeDatabase();
   }
 });

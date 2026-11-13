@@ -1,43 +1,27 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { ExportFormat } from '@web/constant/type';
 import {
   deleteAdmin,
   exportAdmins,
   listAdmins,
 } from '@web/features/admin-users/admin-users.api';
-import { toSearchParams } from '@web/utils/search-params';
-import { useState } from 'react';
+import { useListing } from '@web/hooks/useListing';
+
 export function useAdminUsers(token: string) {
-  const client = useQueryClient();
-  const [queries, setQueries] = useState({
-    page: 1,
-    limit: 20,
-    username: undefined as string | undefined,
-    email: undefined as string | undefined,
-    active: undefined as string | undefined,
-    sortBy: 'createdAt',
-    sortDirection: 'desc',
-  });
-  const list = useQuery({
-    queryKey: ['admin-users', token, 'list', queries],
-    queryFn: () => listAdmins(token, toSearchParams(queries)),
-  });
-  const remove = useMutation({
-    mutationFn: (id: number) => deleteAdmin(token, id),
-    onSuccess: async (_, id) => {
-      client.removeQueries({ queryKey: ['admin-users', token, 'detail', id] });
-      if (list.data?.data.length === 1) {
-        setQueries((current) => ({
-          ...current,
-          page: Math.max(1, current.page - 1),
-        }));
-      }
-      await client.invalidateQueries({ queryKey: ['admin-users', token] });
+  const { queries, setQueries, list, exporting, remove } = useListing({
+    initialQueries: {
+      page: 1,
+      limit: 20,
+      username: undefined as string | undefined,
+      email: undefined as string | undefined,
+      active: undefined as string | undefined,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
     },
-  });
-  const exporting = useMutation({
-    mutationFn: (format: ExportFormat) =>
-      exportAdmins(token, toSearchParams(queries), format),
+    queryKey: ['admin-users', token, 'list'],
+    load: (queries) => listAdmins(token, queries),
+    exportFile: (queries, format) => exportAdmins(token, queries, format),
+    deleteRecord: (id) => deleteAdmin(token, id),
+    invalidateKey: ['admin-users', token],
+    detailKey: (id) => ['admin-users', token, 'detail', id],
   });
   return {
     rows: list.data?.data ?? [],

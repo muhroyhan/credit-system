@@ -1,11 +1,11 @@
 import { loginSchema } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
 import { authService } from '@server/features/auth/auth.service';
+import { parseJsonInput } from '@server/utils/controller';
 import type { Context } from 'hono';
 
 async function login(c: Context<AuthEnv>) {
-  const body = await c.req.json().catch(() => null);
-  const parsed = loginSchema.safeParse(body);
+  const parsed = await parseJsonInput(c, loginSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }

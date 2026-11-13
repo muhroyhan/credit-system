@@ -4,7 +4,7 @@ Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Se
 
 Pengajuan kredit, review BPR, dan registrasi memiliki folder fitur masing-masing; data dan kontrak yang sama boleh dipakai lintas fitur tanpa menyalin implementasi.
 
-Helper transport API lintas fitur memakai src/utils/api-client.ts dan download-file.ts: client RPC, header sesi, pembacaan JSON/error dan unduhan. Validasi DTO tetap di fitur; ekspor menyalin parameter filter agar tidak mengubah query pemanggil.
+Helper transport API lintas fitur memakai src/utils/api-client.ts dan download-file.ts: client RPC, header sesi, pembacaan JSON/error dan unduhan. Validasi DTO tetap di fitur; ekspor memakai toExportQuery dari search-params.ts untuk menyalin filter tanpa mengubah query pemanggil.
 
 Root router.tsx mendefinisikan /, /login dan prefix fitur. Child route di feature.routes.ts melalui createCrudRoutes. Empat halaman standar:
 
@@ -19,7 +19,7 @@ Pakai komponen bersama src/components/crud: CrudPage (layout/ACL), ListingTable 
 
 TanStack Router mengelola routing; TanStack Query mengelola data API. Query key mencakup sesi/parameter, mutation menginvalidasi query terkait, cache dibersihkan saat logout. React Hook Form memakai Zod resolver, menampilkan error per field, dan tidak meneruskan data invalid ke mutation. UI menampilkan loading/kosong/sukses/gagal sesuai hasil operasi.
 
-Setiap hook listing menyimpan satu state `[queries, setQueries]` untuk filter, urutan dan pagination serta menangani query dan mutation ekspor. Filter kosong bernilai `undefined` dan tidak disertakan dalam parameter URL; daftar dan ekspor memakai state yang sama. Perubahan filter atau urutan mengembalikan halaman ke satu.
+Hook fitur mendelegasikan kerangka listing ke src/hooks/useListing.ts dengan konfigurasi filter, key, API dan invalidasi eksplisit. Setiap instance listing menyimpan satu state `[queries, setQueries]` untuk filter, urutan dan pagination serta menangani query dan mutation ekspor. Filter kosong bernilai `undefined` dan tidak disertakan dalam parameter URL; daftar dan ekspor memakai state yang sama. Perubahan filter atau urutan mengembalikan halaman ke satu.
 
 Gate CRUDA melindungi halaman dan aksi sebelum konten/query dimount, termasuk akses URL langsung. Hak UI memakai snapshot login; otorisasi API tetap wajib. Kontrak sesi/izin hanya di api-contract.md.
 

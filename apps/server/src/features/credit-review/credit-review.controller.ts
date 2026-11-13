@@ -4,34 +4,13 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
-import {
-  CreditConflict,
-  CreditForbidden,
-  CreditInvalid,
-  CreditNotFound,
-} from '@server/features/credit/credit.error';
 import { creditReviewService } from '@server/features/credit-review/credit-review.service';
+import { controllerFailure, parseJsonInput } from '@server/utils/controller';
+import { exportHeaders } from '@server/utils/export-file';
 import type { Context } from 'hono';
 
-function failure(c: Context<AuthEnv>, error: unknown) {
-  if (error instanceof CreditInvalid) {
-    return c.json({ error: error.message }, 400);
-  }
-  if (error instanceof CreditForbidden) {
-    return c.json({ error: 'forbidden' }, 403);
-  }
-  if (error instanceof CreditNotFound) {
-    return c.json({ error: 'not found' }, 404);
-  }
-  if (error instanceof CreditConflict) {
-    return c.json({ error: error.message }, 409);
-  }
-  throw error;
-}
 async function review(c: Context<AuthEnv>) {
-  const input = creditReviewSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, creditReviewSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -40,7 +19,7 @@ async function review(c: Context<AuthEnv>) {
       await creditReviewService.review(input.data, c.get('identity')),
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function reviewList(c: Context<AuthEnv>) {
@@ -53,7 +32,7 @@ async function reviewList(c: Context<AuthEnv>) {
       await creditReviewService.reviewList(query.data, c.get('identity')),
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function reviewDetail(c: Context<AuthEnv>) {
@@ -66,7 +45,7 @@ async function reviewDetail(c: Context<AuthEnv>) {
       await creditReviewService.reviewDetail(input.data.id, c.get('identity')),
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function reviewExport(c: Context<AuthEnv>) {
@@ -81,19 +60,9 @@ async function reviewExport(c: Context<AuthEnv>) {
       c.get('identity'),
       format,
     );
-    c.header(
-      'Content-Type',
-      format === 'pdf'
-        ? 'application/pdf'
-        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    c.header(
-      'Content-Disposition',
-      `attachment; filename="credit-reviews.${format}"`,
-    );
-    return c.body(result);
+    return c.body(result, 200, exportHeaders('credit-reviews', format));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 export const creditReviewController = {

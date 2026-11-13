@@ -1,12 +1,13 @@
-import type { EmployeeProfile } from '@credit/contracts';
-import type { ExportFormat } from '@web/constant/type';
 import {
-  type EmployeeFormInput,
+  type EmployeeProfile,
   employeeDetailSchema,
   employeeListSchema,
-} from '@web/features/employees/employees.type';
+} from '@credit/contracts';
+import type { ExportFormat } from '@web/constant/type';
+import type { EmployeeFormInput } from '@web/features/employees/employees.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
+import { toExportQuery } from '@web/utils/search-params';
 
 const client = apiClient.api.debitor;
 export async function listEmployees(token: string, query: URLSearchParams) {
@@ -98,11 +99,9 @@ export async function exportEmployees(
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  const exportQuery = new URLSearchParams(query);
-  exportQuery.set('format', format);
   await downloadFile(
     await client.export.$get(
-      { query: Object.fromEntries(exportQuery) } as never,
+      { query: toExportQuery(query, format) } as never,
       apiOptions(token),
     ),
     `employees.${format}`,

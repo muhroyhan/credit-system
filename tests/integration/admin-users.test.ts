@@ -1,18 +1,10 @@
 import { closeDatabase } from '@credit/database/client';
+import { testDatabaseUrl } from '@credit/test-utils/database';
 import { AdminConflict } from '@server/features/admin-users/admin-users.error';
 import { adminUsersService } from '@server/features/admin-users/admin-users.service';
 import { afterAll, describe, expect, it } from 'vitest';
 
-const url = process.env.DATABASE_URL;
-if (url) {
-  const target = new URL(url);
-  if (
-    !['localhost', '127.0.0.1', '::1'].includes(target.hostname) ||
-    !/^\/credit_[a-z0-9_]*test$/.test(target.pathname)
-  ) {
-    throw new Error('Isolated test database required');
-  }
-}
+const url = testDatabaseUrl(process.env.DATABASE_URL);
 afterAll(async () => {
   if (url) {
     await closeDatabase();

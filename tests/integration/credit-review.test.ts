@@ -1,5 +1,6 @@
 import { closeDatabase, connectDatabase } from '@credit/database/client';
 import { creditExpense, credits } from '@credit/database/schema';
+import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { Identity } from '@server/constant/interface';
 import {
   CreditConflict,
@@ -10,14 +11,7 @@ import { creditReviewService } from '@server/features/credit-review/credit-revie
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 
-const url = process.env.DATABASE_URL;
-if (
-  url &&
-  (!['localhost', '127.0.0.1', '::1'].includes(new URL(url).hostname) ||
-    !/^\/credit_[a-z0-9_]*test$/.test(new URL(url).pathname))
-) {
-  throw new Error('Isolated test database required');
-}
+const url = testDatabaseUrl(process.env.DATABASE_URL);
 const company: Identity = {
   id: 900001,
   type: 'company',

@@ -1,14 +1,11 @@
 import {
   employeeAccountSchema,
   employeeCreateSchema,
-  employeeDetailSchema,
+  type employeeDetailSchema,
   employeeDocumentKindSchema,
-  employeeListSchema,
-  employeeProfileSchema,
 } from '@credit/contracts';
 import { z } from 'zod';
 
-export { employeeDetailSchema, employeeListSchema, employeeProfileSchema };
 export const employeeFormSchema = employeeCreateSchema
   .omit({ password: true })
   .extend({ password: z.string() });

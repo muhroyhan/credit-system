@@ -8,6 +8,7 @@ import type {
   AdminQuery,
 } from '@server/features/admin-users/admin-users.type';
 import { exportFile } from '@server/utils/export-file';
+import { hashPassword } from '@server/utils/password';
 import { withTransaction } from '@server/utils/transaction';
 
 export const adminUsersService = {
@@ -29,10 +30,7 @@ export const adminUsersService = {
   detail: (id: number) => adminUsersRepository.detail(id),
   async save(input: AdminInput, actor: string, id?: number) {
     const password = input.password
-      ? await Bun.password.hash(input.password, {
-          algorithm: 'bcrypt',
-          cost: 10,
-        })
+      ? await hashPassword(input.password)
       : undefined;
     return withTransaction(async (tx) => {
       if (await adminUsersRepository.conflict(input, id, tx)) {

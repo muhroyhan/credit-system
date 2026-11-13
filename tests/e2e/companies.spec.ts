@@ -1,16 +1,17 @@
 import { expect, test } from '@playwright/test';
+import { loginBrowser, loginHeaders } from './fixtures/login';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(!password, 'Synthetic database required');
 test('company API permissions, tenant scope and deletion guard', async ({
   request,
 }) => {
-  const login = async (username: string, type = 'admin', slug?: string) => {
-    const response = await request.post('/api/login', {
-      data: { username, type, password, slug },
-    });
-    expect(response.status()).toBe(200);
-    return { Authorization: `Bearer ${(await response.json()).authToken}` };
+  const login = async (
+    username: string,
+    type: 'admin' | 'company' | 'debitor' = 'admin',
+    slug?: string,
+  ) => {
+    return loginHeaders(request, { username, type, password, slug });
   };
   const writer = await login('admin_sintetis');
   const reader = await login('admin_baca');
@@ -110,10 +111,7 @@ test('company forms validate, reconcile arrays and display text detail', async (
   page,
 }) => {
   const name = `p04-ui-${Date.now()}`;
-  await page.goto('/login');
-  await page.getByLabel('Username atau email').fill('admin_sintetis');
-  await page.getByLabel('Password').fill(password ?? '');
-  await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+  await loginBrowser(page, { type: 'admin', username: 'admin_sintetis' });
   await page.getByRole('link', { name: 'Perusahaan', exact: true }).click();
   await page.getByRole('link', { name: 'Tambah perusahaan' }).click();
   await page.getByRole('button', { name: 'Simpan', exact: true }).click();

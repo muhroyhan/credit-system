@@ -7,6 +7,7 @@ import {
 } from '@web/features/credit-review/credit-review.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
+import { toExportQuery } from '@web/utils/search-params';
 
 const api = apiClient.api.credit;
 export async function listReviews(token: string, query: URLSearchParams) {
@@ -41,11 +42,9 @@ export async function exportReviews(
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  const params = new URLSearchParams(query);
-  params.set('format', format);
   await downloadFile(
     await api.review.export.$get(
-      { query: Object.fromEntries(params) } as never,
+      { query: toExportQuery(query, format) } as never,
       apiOptions(token),
     ),
     `credit-reviews.${format}`,

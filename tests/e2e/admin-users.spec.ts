@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { loginHeaders } from './fixtures/login';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(!password, 'Synthetic test database and seed password required');
@@ -254,11 +255,7 @@ test('protected feature URLs redirect anonymous visitors to login', async ({
 
 test('individual ACL values apply independently', async ({ request }) => {
   const login = async (username: string, pass: string) => {
-    const result = await request.post('/api/login', {
-      data: { type: 'admin', username, password: pass },
-    });
-    expect(result.status()).toBe(200);
-    return { Authorization: `Bearer ${(await result.json()).authToken}` };
+    return loginHeaders(request, { type: 'admin', username, password: pass });
   };
   const writer = await login('admin_sintetis', password ?? '');
   const input = {

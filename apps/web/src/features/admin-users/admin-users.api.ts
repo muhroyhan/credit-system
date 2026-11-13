@@ -9,6 +9,7 @@ import {
 } from '@web/features/admin-users/admin-users.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
+import { toExportQuery } from '@web/utils/search-params';
 
 const client = apiClient;
 export async function listAdmins(
@@ -61,10 +62,8 @@ export async function exportAdmins(
   filters: URLSearchParams,
   format: ExportFormat,
 ): Promise<void> {
-  const exportQuery = new URLSearchParams(filters);
-  exportQuery.set('format', format);
   const response = await client.api['admin-user'].export.$get(
-    { query: Object.fromEntries(exportQuery) } as never,
+    { query: toExportQuery(filters, format) } as never,
     apiOptions(token),
   );
   await downloadFile(

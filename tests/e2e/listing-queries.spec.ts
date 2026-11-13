@@ -1,15 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { loginBrowser } from './fixtures/login';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(!password, 'Synthetic database required');
 
 test('listing filters omit cleared values from requests', async ({ page }) => {
-  await page.goto('/login');
-  await page.getByRole('textbox', { name: 'Jenis akun' }).click();
-  await page.getByRole('option', { name: 'Admin bank' }).click();
-  await page.getByLabel('Username atau email').fill('admin_sintetis');
-  await page.getByLabel(/^Password/).fill(password ?? '');
-  await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+  await loginBrowser(page, { type: 'admin', username: 'admin_sintetis' });
   for (const [link, label, endpoint, key] of [
     ['Admin User', 'Username', '/api/admin-user/list', 'username'],
     ['Perusahaan', 'Nama perusahaan', '/api/user/list', 'companyName'],

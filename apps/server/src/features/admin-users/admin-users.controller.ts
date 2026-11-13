@@ -6,11 +6,9 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
-import {
-  AdminConflict,
-  AdminNotFound,
-} from '@server/features/admin-users/admin-users.error';
 import { adminUsersService } from '@server/features/admin-users/admin-users.service';
+import { controllerFailure, parseJsonInput } from '@server/utils/controller';
+import { exportHeaders } from '@server/utils/export-file';
 import type { Context } from 'hono';
 
 async function list(c: Context<AuthEnv>) {
@@ -32,17 +30,7 @@ async function exportFile(c: Context<AuthEnv>) {
     { ...query.data, page: 1, limit: 20 },
     format,
   );
-  c.header(
-    'Content-Type',
-    format === 'pdf'
-      ? 'application/pdf'
-      : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  );
-  c.header(
-    'Content-Disposition',
-    `attachment; filename="admin-users.${format}"`,
-  );
-  return c.body(data);
+  return c.body(data, 200, exportHeaders('admin-users', format));
 }
 async function detail(c: Context<AuthEnv>) {
   const id = idQuerySchema.safeParse(c.req.query());
@@ -56,9 +44,7 @@ async function detail(c: Context<AuthEnv>) {
   return c.json(result);
 }
 async function create(c: Context<AuthEnv>) {
-  const input = adminCreateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, adminCreateSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -69,16 +55,11 @@ async function create(c: Context<AuthEnv>) {
     );
     return c.json({ id }, 201);
   } catch (error) {
-    if (error instanceof AdminConflict) {
-      return c.json({ error: error.message }, 409);
-    }
-    throw error;
+    return controllerFailure(c, error);
   }
 }
 async function update(c: Context<AuthEnv>) {
-  const input = adminUpdateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, adminUpdateSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -87,19 +68,11 @@ async function update(c: Context<AuthEnv>) {
     await adminUsersService.save(data, String(c.get('identity').id), id);
     return c.json({ id });
   } catch (error) {
-    if (error instanceof AdminConflict) {
-      return c.json({ error: error.message }, 409);
-    }
-    if (error instanceof AdminNotFound) {
-      return c.json({ error: 'not found' }, 404);
-    }
-    throw error;
+    return controllerFailure(c, error);
   }
 }
 async function remove(c: Context<AuthEnv>) {
-  const input = adminDeleteSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, adminDeleteSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }

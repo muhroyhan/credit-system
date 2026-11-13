@@ -23,6 +23,7 @@ import type {
 } from '@server/features/employees/employees.type';
 import { createDocumentStorage } from '@server/utils/document-storage';
 import { exportFile } from '@server/utils/export-file';
+import { hashPassword } from '@server/utils/password';
 import { withTransaction } from '@server/utils/transaction';
 
 function requireAction(
@@ -138,10 +139,7 @@ export function createEmployeesService(
       );
     },
     async register(input: EmployeeAccount & { slug: string }) {
-      const password = await Bun.password.hash(input.password, {
-        algorithm: 'bcrypt',
-        cost: 10,
-      });
+      const password = await hashPassword(input.password);
       return withTransaction(async (tx) => {
         const company = await employeesRepository.company(input.slug, tx);
         if (
@@ -184,10 +182,7 @@ export function createEmployeesService(
     ) {
       requireAction(identity, id ? 'UPDATE' : 'CREATE');
       const password = input.password
-        ? await Bun.password.hash(input.password, {
-            algorithm: 'bcrypt',
-            cost: 10,
-          })
+        ? await hashPassword(input.password)
         : undefined;
       return withTransaction(async (tx) => {
         const companyId = await scope(identity, input.userId, tx);

@@ -6,11 +6,9 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
-import {
-  CompanyConflict,
-  CompanyNotFound,
-} from '@server/features/companies/companies.error';
 import { companiesService } from '@server/features/companies/companies.service';
+import { controllerFailure, parseJsonInput } from '@server/utils/controller';
+import { exportHeaders } from '@server/utils/export-file';
 import type { Context } from 'hono';
 
 async function list(c: Context<AuthEnv>) {
@@ -29,9 +27,7 @@ async function detail(c: Context<AuthEnv>) {
   return result ? c.json(result) : c.json({ error: 'not found' }, 404);
 }
 async function create(c: Context<AuthEnv>) {
-  const parsed = companyCreateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, companyCreateSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -46,16 +42,11 @@ async function create(c: Context<AuthEnv>) {
       201,
     );
   } catch (error) {
-    if (error instanceof CompanyConflict) {
-      return c.json({ error: error.message }, 409);
-    }
-    throw error;
+    return controllerFailure(c, error);
   }
 }
 async function update(c: Context<AuthEnv>) {
-  const parsed = companyUpdateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, companyUpdateSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -64,19 +55,11 @@ async function update(c: Context<AuthEnv>) {
     await companiesService.save(input, String(c.get('identity').id), id);
     return c.json({ id });
   } catch (error) {
-    if (error instanceof CompanyConflict) {
-      return c.json({ error: error.message }, 409);
-    }
-    if (error instanceof CompanyNotFound) {
-      return c.json({ error: 'not found' }, 404);
-    }
-    throw error;
+    return controllerFailure(c, error);
   }
 }
 async function remove(c: Context<AuthEnv>) {
-  const parsed = adminDeleteSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, adminDeleteSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -85,10 +68,7 @@ async function remove(c: Context<AuthEnv>) {
       ? c.json({ id: parsed.data.id })
       : c.json({ error: 'not found' }, 404);
   } catch (error) {
-    if (error instanceof CompanyConflict) {
-      return c.json({ error: error.message }, 409);
-    }
-    throw error;
+    return controllerFailure(c, error);
   }
 }
 async function interests(c: Context<AuthEnv>) {
@@ -114,14 +94,7 @@ async function exportFile(c: Context<AuthEnv>) {
     { ...parsed.data, page: 1, limit: 20 },
     format,
   );
-  c.header(
-    'Content-Type',
-    format === 'pdf'
-      ? 'application/pdf'
-      : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  );
-  c.header('Content-Disposition', `attachment; filename="companies.${format}"`);
-  return c.body(file);
+  return c.body(file, 200, exportHeaders('companies', format));
 }
 export const companiesController = {
   list,

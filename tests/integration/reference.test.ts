@@ -2,20 +2,10 @@ import { createHmac } from 'node:crypto';
 import { closeDatabase, connectDatabase } from '@credit/database/client';
 import { app } from '@credit/server/app';
 import { referenceRepository } from '@credit/server/reference-repository';
+import { testDatabaseUrl } from '@credit/test-utils/database';
 import { afterAll, describe, expect, it } from 'vitest';
 
-const databaseUrl = process.env.DATABASE_URL;
-if (databaseUrl) {
-  const target = new URL(databaseUrl);
-  if (
-    !['127.0.0.1', 'localhost', '::1'].includes(target.hostname) ||
-    !/^\/credit_[a-z0-9_]*test$/.test(target.pathname)
-  ) {
-    throw new Error(
-      'Reference integration tests require an isolated local test database',
-    );
-  }
-}
+const databaseUrl = testDatabaseUrl(process.env.DATABASE_URL);
 afterAll(async () => {
   if (databaseUrl) {
     await closeDatabase();

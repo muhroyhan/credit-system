@@ -7,6 +7,7 @@ import {
 } from '@web/features/companies/companies.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
+import { toExportQuery } from '@web/utils/search-params';
 
 const client = apiClient;
 export async function listCompanies(token: string, query: URLSearchParams) {
@@ -66,10 +67,8 @@ export async function exportCompanies(
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  const exportQuery = new URLSearchParams(query);
-  exportQuery.set('format', format);
   const response = await client.api.user.export.$get(
-    { query: Object.fromEntries(exportQuery) } as never,
+    { query: toExportQuery(query, format) } as never,
     apiOptions(token),
   );
   await downloadFile(response, `companies.${format}`, 'Ekspor gagal');

@@ -1,7 +1,9 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { credits } from '@credit/database/schema';
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { eq } from 'drizzle-orm';
+import { loginBrowser } from './fixtures/login';
+import { test } from './fixtures/test';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(
@@ -15,16 +17,7 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
 }) => {
   let id: number | undefined;
   try {
-    await page.goto('/login');
-    await page.getByRole('textbox', { name: 'Jenis akun' }).click();
-    await page.getByRole('option', { name: 'Perusahaan / HRD' }).click();
-    await page.getByRole('textbox', { name: 'Perusahaan' }).click();
-    await page
-      .getByRole('option', { name: 'Perusahaan Sintetis Satu' })
-      .click();
-    await page.getByLabel('Username atau email').fill('hrd_satu');
-    await page.getByLabel(/^Password/).fill(password ?? '');
-    await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+    await loginBrowser(page, { type: 'company', username: 'hrd_satu' });
     await page.getByRole('link', { name: 'Pengajuan Kredit' }).click();
     await page.getByRole('link', { name: 'Tambah pengajuan' }).click();
     await page.getByLabel('ID karyawan').fill('900001');
@@ -97,6 +90,5 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     if (id) {
       await connectDatabase().db.delete(credits).where(eq(credits.id, id));
     }
-    await closeDatabase();
   }
 });

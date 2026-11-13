@@ -8,6 +8,7 @@ import type {
   CompanyQuery,
 } from '@server/features/companies/companies.type';
 import { exportFile } from '@server/utils/export-file';
+import { hashPassword } from '@server/utils/password';
 import { withTransaction } from '@server/utils/transaction';
 
 export const companiesService = {
@@ -44,10 +45,7 @@ export const companiesService = {
   detail: (id: number) => companiesRepository.detail(id),
   async save(input: CompanyInput, actor: string, id?: number) {
     const password = input.password
-      ? await Bun.password.hash(input.password, {
-          algorithm: 'bcrypt',
-          cost: 10,
-        })
+      ? await hashPassword(input.password)
       : undefined;
     return withTransaction(async (tx) => {
       if (id && !(await companiesRepository.lock(id, tx))) {
