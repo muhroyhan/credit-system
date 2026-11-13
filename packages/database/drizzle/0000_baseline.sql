@@ -11,6 +11,12 @@ CREATE TABLE `admin_user` (
 	CONSTRAINT `admin_user_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `agreement_sequence` (
+	`month` varchar(7) NOT NULL,
+	`next_value` int unsigned NOT NULL,
+	CONSTRAINT `agreement_sequence_month` PRIMARY KEY(`month`)
+);
+--> statement-breakpoint
 CREATE TABLE `constant` (
 	`id` int unsigned AUTO_INCREMENT NOT NULL,
 	`name` varchar(255),
@@ -193,6 +199,7 @@ CREATE TABLE `credit` (
 	`tanggal_pengajuan` date,
 	`biaya_asuransi_jiwa` double,
 	`jangka_waktu_bulan` int,
+	`agreement_number` varchar(255),
 	`bank_account_name` varchar(255),
 	`bank_account_number` varchar(255),
 	`bank_branch` varchar(255),
@@ -210,7 +217,8 @@ CREATE TABLE `credit` (
 	`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`created_by` varchar(255),
 	`updated_by` varchar(255),
-	CONSTRAINT `credit_id` PRIMARY KEY(`id`)
+	CONSTRAINT `credit_id` PRIMARY KEY(`id`),
+	CONSTRAINT `credit_agreement_number_unique` UNIQUE(`agreement_number`)
 );
 --> statement-breakpoint
 CREATE TABLE `debitor_data` (

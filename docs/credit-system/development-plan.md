@@ -118,6 +118,7 @@ Hasil: sesudah rekening tersimpan, dokumen dibentuk, URL disimpan dan halaman te
 | Kode task | Task dan keluaran |
 | --- | --- |
 | P10-T01a | done (ef3e828): fungsi tanggal dan terbilang serta unit test; pengujian pada P10-T04. |
+| P10-T01b | done (lihat footer Task: P10-T01b): counter bulanan atomik dan nomor tetap; test pada P10-T04. |
 | P10-T01 | Tetapkan kontrak render/count, penomoran global berdasarkan bulan created_at, format nomor, tanggal acknowledgment/angsuran pertama/akhir tenor dan terbilang. Putuskan penanganan konkurensi/render ulang, label bunga/denda dan string null dalam logic-holes sebelum perubahan kompatibilitas (FLOW-10, FE-07/08). Jika keputusan membutuhkan kolom/tabel, sertakan migration Drizzle pada task ini. |
 | P10-T02a | done (lihat footer Task: P10-T02a): adapter PDF A4 berbasis teks dan unit test renderer nyata; pengujian pada P10-T04. |
 | P10-T02 | Buat template perjanjian delapan pasal/surat persetujuan A4, adapter PDF dan storage, route render/count dengan scope akses dan penyimpanan doc_url. Kelola browser/resource, sumber URL dan kegagalan upload secara eksplisit (FLOW-11, SUPPORT-12). |

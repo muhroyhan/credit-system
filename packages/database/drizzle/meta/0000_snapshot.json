@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "8d448199-67e1-4ade-860b-731e5975b14b",
+  "id": "bbfe66f7-38a0-4f18-a836-e92bc0136c8e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "admin_user": {
@@ -79,6 +79,35 @@
         "admin_user_id": {
           "name": "admin_user_id",
           "columns": ["id"]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "agreement_sequence": {
+      "name": "agreement_sequence",
+      "columns": {
+        "month": {
+          "name": "month",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "next_value": {
+          "name": "next_value",
+          "type": "int unsigned",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "agreement_sequence_month": {
+          "name": "agreement_sequence_month",
+          "columns": ["month"]
         }
       },
       "uniqueConstraints": {},
@@ -1255,6 +1284,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "agreement_number": {
+          "name": "agreement_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "bank_account_name": {
           "name": "bank_account_name",
           "type": "varchar(255)",
@@ -1385,7 +1421,12 @@
           "columns": ["id"]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "credit_agreement_number_unique": {
+          "name": "credit_agreement_number_unique",
+          "columns": ["agreement_number"]
+        }
+      },
       "checkConstraint": {}
     },
     "debitor_data": {

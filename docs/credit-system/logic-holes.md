@@ -53,6 +53,10 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 | SUPPORT-16 | Belum melarang self-delete atau hapus admin terakhir; risiko kehilangan akses tetap memerlukan keputusan bisnis. |
 | Migrasi ACL | WRITE dihapus; API dan aplikasi memakai aksi granular. Dampak data/migration dan path client hanya dirinci pada model data dan kontrak API. |
 
+## Keputusan P10 penomoran
+
+Pengguna menyetujui nomor tetap dan unik secara global per bulan pembuatan kredit. Alokasi memakai row counter bulanan serta lock kredit dalam transaksi; format nomor menyimpan snapshot nama perusahaan dan bulan. Render ulang memakai nomor tersimpan. Konversi bulan menggunakan tanggal MySQL kredit; data lama yang pernah terpengaruh migration 0005 tetap memerlukan verifikasi historis. Nomor tidak boleh diterbitkan sebelum dua approval, acknowledgment dan rekening lengkap. Template pasal/surat, identitas BPR, serta label bunga/denda masih menunggu sumber resmi.
+
 ## Isu teknis terbuka
 
 - Enam belas assertion as never (empat query baru P05 memakai pola validasi controller manual) di gateway RPC menutup pemeriksaan input end-to-end. Pasang validator Hono bertipe sebelum mengklaim request type safe.

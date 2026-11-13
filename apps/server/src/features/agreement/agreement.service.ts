@@ -1,3 +1,12 @@
+import type { Identity } from '@server/constant/interface';
+import {
+  AgreementConflict,
+  AgreementForbidden,
+  AgreementInvalid,
+  AgreementNotFound,
+} from '@server/features/agreement/agreement.error';
+import { agreementRepository } from '@server/features/agreement/agreement.repository';
+import { withTransaction } from '@server/utils/transaction';
 import { z } from 'zod';
 
 const dateSchema = z.iso.date();
@@ -82,4 +91,56 @@ export function addAgreementMonths(date: string, months: number): string {
   return `${String(targetYear).padStart(4, '0')}-${String(targetMonth).padStart(2, '0')}-${String(Math.min(day, lastDay)).padStart(2, '0')}`;
 }
 
-export const agreementService = { rupiahInWords, addAgreementMonths };
+export const agreementService = {
+  rupiahInWords,
+  addAgreementMonths,
+  async allocateNumber(id: number, identity: Identity) {
+    if (identity.type !== 'debitor') {
+      throw new AgreementForbidden();
+    }
+    return withTransaction(async (tx) => {
+      const row = await agreementRepository.lockCredit(id, tx);
+      if (!row) {
+        throw new AgreementNotFound();
+      }
+      if (row.debitorId !== identity.id || row.companySlug !== identity.slug) {
+        throw new AgreementForbidden();
+      }
+      if (
+        row.status !== 'approved' ||
+        row.statusAdminApproval !== 'approved' ||
+        !row.acknowledgment ||
+        !row.bankName ||
+        !row.bankBranch ||
+        !row.bankAccountName ||
+        !row.bankAccountNumber
+      ) {
+        throw new AgreementConflict('Konfirmasi kredit belum lengkap');
+      }
+      if (row.agreementNumber) {
+        return row.agreementNumber;
+      }
+      const company =
+        row.companyName?.toUpperCase().replace(/[^\p{L}\p{N}]/gu, '') ?? '';
+      if (!company || !/^\d{4}-\d{2}$/.test(row.createdMonth)) {
+        throw new AgreementInvalid(
+          'Data perusahaan atau tanggal kredit tidak tersedia',
+        );
+      }
+      const sequence = await agreementRepository.nextSequence(
+        row.createdMonth,
+        tx,
+      );
+      if (sequence === null) {
+        throw new Error('Gagal membuat nomor perjanjian');
+      }
+      const [year, month] = row.createdMonth.split('-');
+      const number = `${String(sequence).padStart(2, '0')}/BPR-${company}/${month}/${year}`;
+      if (number.length > 255) {
+        throw new AgreementInvalid('Nomor perjanjian terlalu panjang');
+      }
+      await agreementRepository.saveNumber(id, number, tx);
+      return number;
+    });
+  },
+};
