@@ -16,18 +16,13 @@ import { creditRepository } from '@server/features/credit/credit.repository';
 import { creditService } from '@server/features/credit/credit.service';
 import { creditReviewRepository } from '@server/features/credit-review/credit-review.repository';
 import type { CreditExpenseInput } from '@server/features/credit-review/credit-review.type';
+import { decimalFromCents } from '@server/features/credit-review/utils/decimal-from-cents';
 import { employeesRepository } from '@server/features/employees/employees.repository';
 import { createDocumentStorage } from '@server/utils/document-storage';
 import { exportFile } from '@server/utils/export-file';
 import { withTransaction } from '@server/utils/transaction';
 import { createWhatsAppSender } from '@server/utils/whatsapp';
 import { zipDocuments } from '@server/utils/zip-documents';
-
-function decimalFromCents(value: bigint) {
-  const sign = value < 0n ? '-' : '';
-  const absolute = value < 0n ? -value : value;
-  return `${sign}${absolute / 100n}.${String(absolute % 100n).padStart(2, '0')}`;
-}
 
 export const creditReviewService = {
   async exportZip(query: CreditQuery, identity: Identity) {

@@ -1,4 +1,4 @@
-import { dashboardCreditTotals } from '@server/features/dashboard/dashboard.service';
+import { dashboardCreditTotals } from '@server/features/dashboard/utils/dashboard-credit-totals';
 import { expect, it } from 'vitest';
 
 it('fills missing statuses with zero and preserves precise nominal sums', () => {

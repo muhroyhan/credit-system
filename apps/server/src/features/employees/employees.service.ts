@@ -24,6 +24,7 @@ import type {
   EmployeeDocumentInput,
   EmployeeWrite,
 } from '@server/features/employees/employees.type';
+import { validEmployeeDocumentKey } from '@server/features/employees/utils/valid-employee-document-key';
 import { createDocumentStorage } from '@server/utils/document-storage';
 import { exportFile } from '@server/utils/export-file';
 import { hashPassword } from '@server/utils/password';
@@ -124,9 +125,6 @@ export function validateEmployeeDocument(file: EmployeeDocumentInput) {
     );
   }
   return extension;
-}
-function validKey(key: string) {
-  return /^\d+\/[a-f0-9-]{36}\.(pdf|png|jpg)$/.test(key);
 }
 
 /** Coordinates SQL and private storage, compensating new files if SQL fails. */
@@ -302,7 +300,7 @@ export function createEmployeesService(
             await storage.put(key, file.bytes);
             values[kind] = key;
             const previous = old.data?.[kind];
-            if (previous && validKey(previous)) {
+            if (previous && validEmployeeDocumentKey(previous)) {
               replaced.push(previous);
             }
           }
@@ -324,7 +322,7 @@ export function createEmployeesService(
       await detail(id, identity);
       const stored = await employeesRepository.profile(id);
       const key = stored.data?.[kind];
-      if (!key || !validKey(key)) {
+      if (!key || !validEmployeeDocumentKey(key)) {
         throw new EmployeeNotFound();
       }
       const bytes = await storage.get(key);
@@ -387,7 +385,7 @@ export function createEmployeesService(
         const stored = await employeesRepository.profile(id, tx);
         for (const kind of employeeDocumentKinds) {
           const key = stored.data?.[kind];
-          if (key && validKey(key)) {
+          if (key && validEmployeeDocumentKey(key)) {
             keys.push(key);
           }
         }

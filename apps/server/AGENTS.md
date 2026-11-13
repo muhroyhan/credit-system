@@ -19,3 +19,5 @@ Rujuk [kontrak API](../../docs/credit-system/api-contract.md) dan [model data](.
 Helper controller di utils/controller.ts menangani pembacaan JSON dan pemetaan kategori service-error; error teknis diteruskan. Error fitur mewarisi kategori bersama. Hash password akun memakai utils/password.ts. Child kredit memakai saveChild bertipe di repository dengan transaksi dari service.
 
 ZIP dokumen menggunakan query listing dengan scope yang sama, membaca key privat yang dihasilkan server maksimal lima paralel dan mengembalikan arsip kosong jika tidak ada dokumen. Jangan mengambil URL klien atau URL eksternal.
+
+Fungsi utilitas khusus fitur ditempatkan di folder utils fitur; service berisi use case dan aturan bisnis yang mengakses repository, bukan definisi utilitas. Utilitas lintas fitur berada di src/utils.
