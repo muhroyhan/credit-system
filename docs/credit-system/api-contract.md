@@ -76,8 +76,6 @@ Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PU
 | `GET /debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
 | `GET /credit/export` | CSV kredit sesuai filter; format karyawan BPR memakai tipe `/kredit-karyawan`. |
 | `GET /credit/export/bulk` | Mengumpulkan dokumen PDF terfilter sebagai ZIP dan mengembalikan URL/nama. |
-| `GET /credit/export/doc` | Meminta render PDF dan menyimpan URL pada kredit. |
-| `GET /credit/doc/count` | Jumlah dokumen dalam bulan pembuatan kredit untuk penomoran. |
 
 Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK dan status HRD/BPR. Admin memperoleh daftar berstatus HRD `approved` sebagai kondisi awal. Detail dan risiko filter/otorisasi harus dikaji berdasarkan [logic-holes.md](logic-holes.md).
 
@@ -85,7 +83,7 @@ Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK da
 - Daftar debitor menyediakan `count`, data debitor dan jumlah pengajuan terbuka. Detail memuat profil, dokumen dan data finansial. Filter utama: id, nama lengkap dan alias. CSV memuat nomor induk, nama lengkap, alias, NIK dan jumlah pengajuan terbuka.
 - Daftar kredit menyediakan `count`, data kredit, total angsuran, dan untuk admin skor serta jumlah pengajuan. Filter tanggal menggunakan awal/akhir hari; nama perusahaan dan nama debitor menggunakan pencarian parsial. CSV menyediakan format pengajuan umum dan format daftar kredit karyawan, termasuk status HRD/BPR, rekening dan tanggal.
 - Ekspor ZIP mengambil kredit yang memiliki URL dokumen, membatasi pengambilan paralel hingga lima, menamai PDF dengan id debitor/kredit, identitas perusahaan dan bulan/tahun, lalu mengembalikan nama dan URL arsip. Kasus dokumen tidak ditemukan menghasilkan error.
-- Permintaan dokumen menghasilkan PDF A4 dari halaman perjanjian, menyimpan URL pada kredit dan mengembalikan URL. Penomoran menggunakan jumlah dokumen bulan pembuatan kredit, tidak dibatasi perusahaan. Validasi akses, konkurensi, response dan batas input harus diuji; lihat catatan risiko.
+
 
 GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCredits dengan agregasi sesuai business-flow.md. CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
 

@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P08 selesai; P09–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P10 selesai; P11 dan P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -112,6 +112,8 @@ Hasil: nasabah dapat melihat status, membatalkan atau menyimpan rekening/persetu
 | P09-T04 | Verifikasi akhir phase: unit nama/biaya/status, integration precondition dan waktu server, E2E pembatalan dan rekening berhasil/gagal termasuk request lintas tenant. |
 
 ## P10 — Perjanjian, PDF dan halaman terima kasih
+
+Status: done. P10-T01: 0851128; P10-T02: c10769d; P10-T03: 09c3e57; P10-T04: lihat footer commit Task: P10-T04. Bukti verifikasi pada testing.md.
 
 Hasil: sesudah rekening tersimpan, dokumen dibentuk, URL disimpan dan halaman terima kasih/unduhan tersedia.
 

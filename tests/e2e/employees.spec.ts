@@ -1,7 +1,12 @@
 import { employeeDocumentKinds } from '@credit/contracts';
-import { type APIRequestContext, expect, test } from '@playwright/test';
+import { connectDatabase } from '@credit/database/client';
+import { creditExpense, credits } from '@credit/database/schema';
+import { type APIRequestContext, expect } from '@playwright/test';
+import { createDocumentStorage } from '@server/utils/document-storage';
 import { employeeProfileFields } from '@web/features/employees/employees.constant';
+import { eq } from 'drizzle-orm';
 import { loginBrowser, loginHeaders } from './fixtures/login';
+import { test } from './fixtures/test';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(!password, 'Synthetic database required');
@@ -197,6 +202,7 @@ test('nasabah registers, logs in, validates profile and uploads five distinct do
   const username = `p05-ui-${Date.now()}`;
   const company = await login(request, 'hrd_satu');
   let id: number | undefined;
+  let creditId: number | undefined;
   await page.goto('/registration/sintetis-satu');
   await page.getByRole('button', { name: 'Daftar', exact: true }).click();
   await expect(page.getByLabel(/^Nama lengkap/)).toHaveAttribute(
@@ -266,7 +272,83 @@ test('nasabah registers, logs in, validates profile and uploads five distinct do
       page.getByText('Nomor HP: 08123456789', { exact: true }),
     ).toBeVisible();
     await expect(page.locator('input')).toHaveCount(0);
+    const self = await loginHeaders(request, {
+      type: 'debitor',
+      username,
+      slug: 'sintetis-satu',
+      password: 'Secret123',
+    });
+    const created = await request.post('/api/credit/create', {
+      headers: self,
+      data: {
+        debitorId: id,
+        jumlahPengajuan: '12000000',
+        jangkaWaktuBulan: 12,
+        tanggalPengajuan: '2026-11-13',
+      },
+    });
+    expect(created.status()).toBe(201);
+    creditId = (await created.json()).id;
+    expect(
+      (
+        await request.put('/api/credit/update', {
+          headers: company,
+          data: { id: creditId, status: 'approved' },
+        })
+      ).status(),
+    ).toBe(200);
+    const bank = await loginHeaders(request, {
+      type: 'admin',
+      username: 'admin_sintetis',
+    });
+    expect(
+      (
+        await request.put('/api/credit/review', {
+          headers: bank,
+          data: {
+            id: creditId,
+            jumlahPengajuan: '12000000',
+            jangkaWaktuBulan: 12,
+            biayaAsuransiJiwa: 100,
+            statusAdminApproval: 'approved',
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    await page.getByRole('link', { name: 'Kembali', exact: true }).click();
+    await page.getByRole('link', { name: 'Beranda', exact: true }).click();
+    await page.getByRole('link', { name: 'Pengajuan Kredit' }).click();
+    await page.locator(`a[href="/credits/${creditId}"]`).first().click();
+    await page.getByLabel('Bank', { exact: true }).fill('Bank Sintetis');
+    await page.getByLabel('Cabang').fill('Cabang Sintetis');
+    await page.getByLabel('Nama rekening').fill('Synthetic');
+    await page.getByLabel('Nomor rekening').fill('123456');
+    await page.getByLabel('Konfirmasi nama lengkap').fill('Synthetic');
+    await page.getByLabel('Saya menyatakan data benar').check();
+    await page.getByRole('button', { name: 'Simpan konfirmasi' }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Terima kasih' }),
+    ).toBeVisible();
+    const pdfDownload = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Unduh perjanjian' }).click();
+    expect((await pdfDownload).suggestedFilename()).toBe(
+      `agreement-${creditId}.pdf`,
+    );
   } finally {
+    if (creditId) {
+      const db = connectDatabase().db;
+      const [row] = await db
+        .select({ key: credits.docStorageKey })
+        .from(credits)
+        .where(eq(credits.id, creditId));
+      if (row?.key?.startsWith(`agreements/${creditId}/`)) {
+        await createDocumentStorage().remove(row.key);
+      }
+      await db
+        .delete(creditExpense)
+        .where(eq(creditExpense.creditId, creditId));
+      await db.delete(credits).where(eq(credits.id, creditId));
+    }
     if (id) {
       await request.put('/api/debitor/delete', {
         headers: company,

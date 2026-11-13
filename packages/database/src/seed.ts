@@ -156,6 +156,8 @@ try {
           username: 'debitor_satu',
           password: hash,
           namaLengkap: 'Debitor Sintetis Satu',
+          noKtp: '9000010000000001',
+          alamatKtp: 'Alamat sintetis satu',
         },
         {
           id: 900002,

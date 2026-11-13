@@ -9,5 +9,7 @@ it('renders supplied document sections as an A4 PDF', async () => {
   expect(content.startsWith('%PDF-')).toBe(true);
   expect(content).toContain('Dokumen sintetis');
   expect(content).toContain('Isi sintetis untuk pengujian');
-  expect(content).toContain('/MediaBox [0 0 595.28 841.89]');
+  const box = content.match(/MediaBox \[0 0 ([\d.]+) ([\d.]+)\]/);
+  expect(Number(box?.[1])).toBeCloseTo(595.28, 2);
+  expect(Number(box?.[2])).toBeCloseTo(841.89, 2);
 });

@@ -1,3 +1,6 @@
+import { z } from 'zod';
+export const agreementDateSchema = z.iso.date();
+
 export interface AgreementText {
   number: string;
   bank: string;

@@ -1,5 +1,6 @@
 import type { DocumentStorage, Identity } from '@server/constant/interface';
 import type { DatabaseTransaction } from '@server/constant/type';
+import { AGREEMENT_WORDS } from '@server/features/agreement/agreement.constant';
 import {
   AgreementConflict,
   AgreementForbidden,
@@ -8,31 +9,16 @@ import {
 } from '@server/features/agreement/agreement.error';
 import { agreementRepository } from '@server/features/agreement/agreement.repository';
 import { agreementSections } from '@server/features/agreement/agreement.template';
+import { agreementDateSchema } from '@server/features/agreement/agreement.type';
 import { creditService } from '@server/features/credit/credit.service';
+import { creditReviewService } from '@server/features/credit-review/credit-review.service';
 import { createDocumentStorage } from '@server/utils/document-storage';
 import { renderTextPdf } from '@server/utils/pdf-document';
 import { withTransaction } from '@server/utils/transaction';
-import { z } from 'zod';
-
-const dateSchema = z.iso.date();
-const words = [
-  '',
-  'satu',
-  'dua',
-  'tiga',
-  'empat',
-  'lima',
-  'enam',
-  'tujuh',
-  'delapan',
-  'sembilan',
-  'sepuluh',
-  'sebelas',
-] as const;
 
 function triplet(value: number): string {
   if (value < 12) {
-    return words[value] ?? '';
+    return AGREEMENT_WORDS[value] ?? '';
   }
   if (value < 20) {
     return `${triplet(value - 10)} belas`;
@@ -76,7 +62,7 @@ export function rupiahInWords(amount: bigint): string {
 /** Adds calendar months and clamps dates beyond the target month's last day. */
 export function addAgreementMonths(date: string, months: number): string {
   if (
-    !dateSchema.safeParse(date).success ||
+    !agreementDateSchema.safeParse(date).success ||
     !Number.isSafeInteger(months) ||
     months < 0 ||
     months > 1200
@@ -191,6 +177,19 @@ export function createAgreementService(
             throw new AgreementInvalid('Denda tidak valid');
           }
           const expenses = await agreementRepository.expenses(id, tx);
+          if (
+            expenses.some((item) => item.name === null || item.amount === null)
+          ) {
+            throw new AgreementInvalid('Snapshot biaya tidak lengkap');
+          }
+          const totals = creditReviewService.expenseTotals(
+            Number(row.principal),
+            row.insurance ?? 0,
+            expenses.map((item) => ({
+              expenseName: item.name ?? '',
+              amount: item.amount ?? '',
+            })),
+          );
           const sections = agreementSections({
             number,
             bank,
@@ -217,6 +216,8 @@ export function createAgreementService(
               `Asuransi jiwa: Rp${row.insurance ?? 0}`,
               'Materai: Rp10000',
               'Tabungan tetap: Rp100000',
+              `Jumlah biaya: Rp${totals.total}`,
+              `Total diterima: Rp${totals.received}`,
             ],
           });
           const bytes = await render('Perjanjian Kredit', sections);

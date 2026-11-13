@@ -236,6 +236,35 @@ export const creditReviewService = {
       return { id, notification: 'failed' as const };
     }
   },
+  expenseTotals(
+    principal: number,
+    insurance: number,
+    expenses: Array<{ expenseName: string; amount: string }>,
+  ) {
+    if (
+      !Number.isSafeInteger(principal) ||
+      principal <= 0 ||
+      !/^\d+(?:\.\d{1,2})?$/.test(String(insurance)) ||
+      expenses.some((item) => !/^\d+\.\d{2}$/.test(item.amount))
+    ) {
+      throw new CreditInvalid('Nominal biaya tidak valid');
+    }
+    const [whole, fraction = ''] = String(insurance).split('.');
+    const insuranceCents =
+      BigInt(whole ?? '0') * 100n + BigInt(fraction.padEnd(2, '0') || '0');
+    const totalCents =
+      expenses
+        .filter((item) => !item.expenseName.toLowerCase().includes('tabungan'))
+        .reduce((sum, item) => sum + BigInt(item.amount.replace('.', '')), 0n) +
+      insuranceCents +
+      1000000n;
+    return {
+      total: decimalFromCents(totalCents),
+      received: decimalFromCents(
+        BigInt(principal) * 100n - totalCents - 10000000n,
+      ),
+    };
+  },
   calculateExpenses(
     principal: number,
     installment: number,
@@ -283,21 +312,9 @@ export const creditReviewService = {
         amount: decimalFromCents(amountCents),
       };
     });
-    const [whole, fraction = ''] = String(insurance).split('.');
-    const insuranceCents =
-      BigInt(whole ?? '0') * 100n + BigInt(fraction.padEnd(2, '0') || '0');
-    const totalCents =
-      expenses
-        .filter((item) => !item.expenseName.toLowerCase().includes('tabungan'))
-        .reduce((sum, item) => sum + BigInt(item.amount.replace('.', '')), 0n) +
-      insuranceCents +
-      1000000n;
     return {
       expenses,
-      total: decimalFromCents(totalCents),
-      received: decimalFromCents(
-        BigInt(principal) * 100n - totalCents - 10000000n,
-      ),
+      ...creditReviewService.expenseTotals(principal, insurance, expenses),
     };
   },
 };
