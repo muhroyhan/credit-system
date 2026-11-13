@@ -175,7 +175,6 @@ export const companiesRepository = {
           ...parent,
           ...(password ? { password } : {}),
           updatedBy: actor,
-          updatedAt: new Date(),
         })
         .where(eq(users.id, id));
     } else {
@@ -220,7 +219,7 @@ export const companiesRepository = {
       if (childId) {
         await tx
           .update(userBungaKredit)
-          .set({ ...value, updatedBy: actor, updatedAt: new Date() })
+          .set({ ...value, updatedBy: actor })
           .where(
             and(
               eq(userBungaKredit.id, childId),
@@ -240,7 +239,7 @@ export const companiesRepository = {
       if (childId) {
         await tx
           .update(userBiaya)
-          .set({ ...value, updatedBy: actor, updatedAt: new Date() })
+          .set({ ...value, updatedBy: actor })
           .where(
             and(eq(userBiaya.id, childId), eq(userBiaya.userId, companyId)),
           );

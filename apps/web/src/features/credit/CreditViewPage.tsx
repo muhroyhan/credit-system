@@ -4,6 +4,7 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useSession } from '@web/features/auth/hooks/useSession';
+import { CustomerCreditStatus } from '@web/features/credit/components/CustomerCreditStatus';
 import { useCreditApproval } from '@web/features/credit/hooks/useCreditApproval';
 import { useCreditDetail } from '@web/features/credit/hooks/useCreditDetail';
 import { crudaAccess } from '@web/utils/cruda';
@@ -81,6 +82,12 @@ function Content() {
                 </Button>
               </Group>
             )}
+          {session?.type === 'debitor' && (
+            <CustomerCreditStatus
+              token={session.authToken}
+              id={row.credit.id}
+            />
+          )}
           <Link to="/credits">Kembali</Link>
         </>
       )}

@@ -101,6 +101,16 @@ export const creditUpdateRequestSchema = z.union([
   creditUpdateSchema,
 ]);
 export type CreditApproval = z.infer<typeof creditApprovalSchema>;
+export const creditConfirmationSchema = z.strictObject({
+  id: z.number().int().positive(),
+  bankName: z.string().trim().min(1).max(255),
+  bankBranch: z.string().trim().min(1).max(255),
+  bankAccountName: z.string().trim().min(1).max(255),
+  bankAccountNumber: z.string().trim().min(1).max(255),
+  confirmationName: z.string().min(1).max(255),
+  confirmed: z.literal(true),
+});
+export type CreditConfirmation = z.infer<typeof creditConfirmationSchema>;
 
 export const creditQuerySchema = z.object({
   userId: z.coerce.number().int().positive().optional(),

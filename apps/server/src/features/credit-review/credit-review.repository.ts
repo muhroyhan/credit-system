@@ -56,7 +56,6 @@ export const creditReviewRepository = {
         pokokAngsuran: String(principal / months),
         biayaAsuransiJiwa: insurance,
         updatedBy: actor,
-        updatedAt: new Date(),
       })
       .where(eq(credits.id, id));
   },

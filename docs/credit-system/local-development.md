@@ -14,7 +14,7 @@ Bun memuat .env dari working directory. Untuk perintah Node seperti Vitest/Playw
 
 ## Database dan seed
 
-- pnpm db:generate menghasilkan SQL dari schema; review sebelum pnpm db:migrate. DDL dan perubahan data tercatat pada data-model.md.
+- pnpm db:generate memperbarui satu baseline SQL dan snapshot dari schema; review sebelum pnpm db:migrate. Baseline hanya berlaku untuk database kosong. Jika histori database lama berbeda atau baseline berubah, gunakan database lokal baru yang kosong, lalu jalankan migration dan seed. Runner menolak histori tidak cocok; ia tidak menghapus atau mengubah database lama. DDL tercatat pada data-model.md.
 - pnpm db:seed memerlukan DATABASE_URL lokal bernama credit_*development atau credit_*test, SEED_SYNTHETIC=true, SEED_PASSWORD minimal delapan karakter. Runner memakai Bun/Drizzle dan hash bcrypt.
 - Dataset berisi dua tenant, admin_sintetis/admin_baca, hrd_satu/hrd_dua dan debitor_satu/debitor_dua. Akun tenant memakai slug sintetis-satu/sintetis-dua. Periksa seed.ts untuk data persisnya; bukan akun produksi.
 - ID sintetis eksplisit mulai 900001 untuk entitas referensi/akun; role dicegah duplikat berdasarkan admin/program/aksi. Seed ulang tidak mengganti password/data yang sudah ada. Gunakan database khusus seed.
