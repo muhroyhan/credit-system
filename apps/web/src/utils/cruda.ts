@@ -11,7 +11,7 @@ export function crudaAccess(
       read: true,
       update: true,
       delete: session.type === 'company',
-      approve: false,
+      approve: session.type === 'company',
     };
   }
   const roles: unknown = session?.userData.roles;

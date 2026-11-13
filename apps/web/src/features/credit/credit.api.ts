@@ -1,4 +1,4 @@
-import type { CreditApplication } from '@credit/contracts';
+import type { CreditApplication, CreditApproval } from '@credit/contracts';
 import type { AppType } from '@credit/server/app';
 import type { ApiResponse } from '@web/constant/interface';
 import { apiErrorSchema } from '@web/constant/schema';
@@ -67,6 +67,9 @@ export async function saveCredit(
         )
       : await api.create.$post({ json: input } as never, options(token)),
   );
+}
+export async function approveCredit(token: string, input: CreditApproval) {
+  return read(await api.update.$put({ json: input } as never, options(token)));
 }
 export async function simulateCredit(token: string, input: CreditApplication) {
   return creditSimulationSchema.parse(

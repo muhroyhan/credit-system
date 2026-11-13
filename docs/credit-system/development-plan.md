@@ -78,7 +78,7 @@ Status: done. P06-T01: b27e9e3; P06-T02: e4b11ca; P06-T03: b8cd2d8; P06-T04: lih
 
 Hasil: HRD meninjau dan menyetujui/menolak pengajuan perusahaan sendiri; keputusan tersimpan tanpa bergantung layar BPR.
 
-Status: doing. P07-T01 selesai; P07-T02 dan P07-T03 belum selesai.
+Status: doing. P07-T01 dan P07-T02 selesai; P07-T03 belum selesai.
 
 | Kode task | Task dan keluaran |
 | --- | --- |
