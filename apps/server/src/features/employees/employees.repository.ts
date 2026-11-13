@@ -26,6 +26,7 @@ import {
   getTableColumns,
   like,
   ne,
+  sql,
 } from 'drizzle-orm';
 
 const columns = {
@@ -88,7 +89,10 @@ export const employeesRepository = {
       .from(debitors)
       .where(where);
     const selection = db
-      .select(columns)
+      .select({
+        ...columns,
+        sumPengajuan: sql<string>`(SELECT COALESCE(SUM(CAST(${credits.jumlahPengajuan} AS DECIMAL(20, 0))), 0) FROM ${credits} WHERE ${credits.debitorId} = ${debitors.id} AND ${credits.status} IN ('pending', 'approved'))`,
+      })
       .from(debitors)
       .leftJoin(users, eq(users.id, debitors.userId))
       .where(where)

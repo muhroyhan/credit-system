@@ -340,13 +340,21 @@ export function createEmployeesService(
       );
       return exportFile({
         title: 'Master Karyawan',
-        columns: ['Nomor induk', 'Nama', 'Alias', 'NIK', 'Perusahaan'],
+        columns: [
+          'Nomor induk',
+          'Nama',
+          'Alias',
+          'NIK',
+          'Perusahaan',
+          'Pengajuan terbuka',
+        ],
         values: result.data.map((row) => [
           row.employeeId ?? '',
           row.namaLengkap ?? '',
           row.namaAlias ?? '',
           row.noKtp ?? '',
           row.companyName ?? '',
+          String(row.sumPengajuan),
         ]),
         format,
       });
