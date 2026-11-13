@@ -1,53 +1,78 @@
-# credit-system — instruksi agent
+# Agent instructions
 
-Instruksi utama proyek; instruksi direktori melengkapi file ini. Dokumen menyimpan kebutuhan, kontrak, rencana dan bukti, bukan menggantikan instruksi kerja.
+The MVP phases P00–P13 are complete. Improve the existing application without
+changing business rules unless the user instructs it. Inspect the implementation,
+contracts, schema and tests before changing behavior; distinguish requirements,
+implementation and verification. Record unresolved risks, compatibility impacts
+and decisions in [logic-holes.md](docs/credit-system/logic-holes.md).
 
-## Tujuan dan batasan
+## Architecture
 
-- Jangan mengubah aturan bisnis tanpa instruksi pengguna. Catat risiko dan dampak kompatibilitas di [logic-holes.md](docs/credit-system/logic-holes.md); bedakan kebutuhan, implementasi dan hasil verifikasi.
-- Rahasia dan data produksi tidak digunakan untuk pengembangan/test. Docker hanya untuk MySQL lokal; aplikasi, tooling dan test berjalan native.
+One Bun/Hono deployment serves the API and React/Vite assets. MySQL uses Drizzle;
+the UI uses Mantine, TanStack Router and Query, React Hook Form and Zod. The
+workspace uses pnpm, Turbo, Biome and strict TypeScript. Setup and commands are
+in [README.md](README.md).
 
-## Stack dan struktur
+- Server features use `feature.routes.ts`, `feature.controller.ts`,
+  `feature.service.ts`, `feature.repository.ts`, `feature.type.ts`, and an
+  optional error file. Middleware has one function per file.
+- Web features use feature pages, routes, API and type files, with feature
+  hooks, components and utilities in their own directories. Shared components
+  and utilities live under `src/components` and `src/utils`.
+- `packages/contracts` owns shared Zod schemas and DTOs; `packages/database`
+  owns physical schema, connections, migration and seed; `packages/test-utils`
+  owns synthetic fixtures and adapters. Shared definitions within an app use
+  the appropriate files under `src/constant`.
+- Import packages through `@credit/...` public exports and app code through
+  `@server/*` or `@web/*`; keep TypeScript, runtime and test resolution aligned.
+  Use `import type` and `export type` for type dependencies. Backend principal
+  symbols use featureCamelCaseLayer. Feature types and schemas belong in
+  `feature.type.ts`, feature constants in `feature.constant.ts`.
+- Repeated domain choices use one `as const` enum object and same-named union
+  per `kebab-case.enum.ts`. Place feature-only enums in that feature, app-wide
+  enums in the app's `src/enums`, and cross-app or shared DTO enums in contracts.
+  Zod, comparisons and UI share that definition. Column names, paths and free
+  text are not enums.
 
-Satu deployment Bun/Hono melayani API serta aset React/Vite. Database MySQL melalui Drizzle; UI Mantine; validasi Zod; pnpm workspace, Turbo, Biome dan TypeScript strict. Tooling dan lingkungan ada di [local-development.md](docs/credit-system/local-development.md).
+## TypeScript and style
 
-| Lokasi                             | Isi                                                                                                                                                                                |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| apps/server/src/features/feature   | feature.routes.ts, feature.controller.ts, feature.service.ts, feature.repository.ts, feature.type.ts; feature.error.ts bila diperlukan                                             |
-| apps/server/src/middleware         | Satu fungsi middleware per file nama.middleware.ts                                                                                                                                 |
-| apps/web/src/features/feature      | FeaturePage.tsx, FeatureAddPage.tsx, FeatureEditPage.tsx, FeatureViewPage.tsx, feature.routes.ts, feature.api.ts, feature.type.ts; hooks/ dan components/ atau utils/ khusus fitur |
-| apps/web/src/components, src/utils | Komponen dan utilitas frontend lintas fitur                                                                                                                                        |
-| apps/*/src/constant                | constant.ts, type.ts, interface.ts, schema.ts untuk definisi lintas fitur sesuai jenisnya                                                                                          |
-| packages/contracts                 | Schema Zod dan DTO lintas package                                                                                                                                                  |
-| packages/database                  | Schema fisik, koneksi, migration dan seed                                                                                                                                          |
-| packages/test-utils                | Adapter dan fixture sintetis                                                                                                                                                       |
+Biome is the formatting source: two spaces, single quotes, explicit semicolons,
+target width 80 and braces for control blocks. Prefer interfaces for object
+shapes, type aliases for unions, conditional types and Zod inference; use `T[]`
+for simple arrays and `Array<T>` for complex elements. Imports go first; prefer
+named exports and function declarations for named factories and handlers.
+Default exports are reserved for `*.config.ts` and Bun `index.ts` entries;
+external default imports are allowed when required by the dependency.
 
-Import lintas package melalui @credit/... dan ekspor publik; dalam aplikasi melalui @server/* atau @web/*. Selaraskan tsconfig, runtime dan test resolver. Simbol utama backend memakai featureCamelCaseLayer. Tipe dan schema khusus fitur berada di feature.type.ts; konstanta khusus fitur berada di feature.constant.ts. Schema runtime memakai .ts, deklarasi tanpa implementasi dapat memakai .d.ts. Gunakan import/export type untuk dependency tipe.
+Keep strict compiler checks, including isolated modules, verbatim module syntax,
+unchecked indexed access, unused, casing, override and fallthrough checks. Do
+not introduce blanket suppressions, fake ambient declarations, `any`, non-null
+assertions or disabled strictness to bypass errors. Return types may be inferred,
+especially for Hono/TanStack composition. Document public exports and utilities
+with JSDoc describing their boundaries. Packages remain private and export
+TypeScript source; public distribution needs a separate artifact design.
 
-## TypeScript, Biome dan gaya
+## Work and verification
 
-Profil proyek mengadaptasi [TypeScript Declaration Files](https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html) dan [Google TS/JS Style Guide](https://google.github.io/styleguide/tsguide.html), bukan sertifikasi kepatuhan Google penuh.
+- Use synthetic data and credentials for development and tests. Docker is for
+  local MySQL only; run the app, tooling and tests on the host.
+- Work in a custom branch. Check the branch before starting and before each
+  commit; do not commit on `main` or a detached HEAD. Use focused commits with
+  `<type>(optional scope): <imperative lowercase subject>`, at most 50
+  characters, no final period; wrap body at 72 characters. For tracked phase
+  tasks, retain their `Pxx-Tyy` identifier in a `Task: Pxx-Tyy` footer. Record
+  task status, decisions and commit identifiers where the work is tracked.
+- For improvements, run checks and tests appropriate to the change; report
+  actual results and limitations. For a phase's final verification run lint,
+  typecheck, build and relevant full suites. Keep permanent tests and fixtures;
+  remove temporary test scripts. Schema changes require migration review and
+  seed updates where needed. Unresolved business decisions block only dependent
+  work.
+- The P13 record from 13 November 2026 reports lint, typecheck and build passing,
+  plus 317 unit, 203 Vitest integration, 7 HTTP integration and 23 browser E2E
+  cases on disposable MySQL. Live WhatsApp delivery was not tested. This is
+  historical evidence for that revision, not a claim about later changes.
 
-- Biome menjadi sumber format: dua spasi, single quote TS/JS, semicolon eksplisit, lebar target 80; semua blok kontrol memakai braces. Object alias yang dapat dimodelkan sebagai interface menggunakan interface; union/conditional/infer Zod tetap type. Array sederhana T[], elemen kompleks Array<T> (review manual).
-- Import berada di awal modul, named export menjadi default. Pengecualian default export hanya *.config.ts dan entry Bun index.ts; default import dependency eksternal boleh sesuai API-nya. Factory/handler bernama mengutamakan function declaration; callback boleh arrow.
-- Biome menolak var, CommonJS, namespace, explicit any, wrapper type terlarang, non-null assertion dan unsafe declaration merging. Jangan menambah blanket suppression, ambient stub palsu atau menonaktifkan strict untuk melewati error.
-- tsconfig mempertahankan strict, isolatedModules, verbatimModuleSyntax, noUncheckedIndexedAccess, unused/casing/override/fallthrough checks. pnpm typecheck mencakup lima workspace, tooling dan test. lib/types ditentukan per lingkungan; konfigurasi adalah sumber nilai flag persisnya.
-- Return type boleh diinferensikan, khususnya komposisi Hono/TanStack. Dokumentasikan ekspor/utilitas publik dengan JSDoc yang menjelaskan batas penggunaan, bukan mengulang nama.
-- Package masih private dan mengekspor source .ts untuk Bun/Vite. Distribusi publik memerlukan desain artefak JS/declaration yang cocok. Alias/import serta nama file mengikuti standar proyek, bukan menyalin seluruh konvensi lingkungan internal Google.
-
-## Pelaksanaan phase
-
-1. Kerjakan fitur setelah dependensinya selesai; jangan menjadikan fitur phase mendatang prasyarat tersembunyi. Seed boleh memenuhi prasyarat data.
-2. Pertahankan kode Pxx-Tyy. Setiap task menghasilkan satu commit terfokus; daftarkan subtask berkode bila perlu dipecah. Catat status todo/doing/blocked/done, commit dan keputusan.
-3. Commit hanya di custom branch. Periksa branch sebelum mulai dan sebelum commit. Jika main/detached atau belum ada branch custom, ingatkan pengguna dan tunda commit.
-4. Format commit mengikuti [Git Commit Best Practices](https://gist.github.com/Aditi3/a7a1ddd1ecef73dab548f7955210cfff): `<type>(scope opsional): <subject>` imperative huruf kecil, tanpa titik, subject maksimum 50 karakter; body dibungkus 72 karakter. Footer `Task: Pxx-Tyy` menjaga trace.
-5. Jalankan test pada task terakhir setiap phase, bukan tiap task. Task sebelumnya boleh menyiapkan test permanen. Pada verifikasi akhir jalankan lint/typecheck/build serta suite relevan sesuai [testing.md](docs/credit-system/testing.md); laporan harus menyebut hasil aktual.
-6. Phase selesai setelah semua task, kontrak/model/keputusan terkait dan verifikasi terakhir selesai. Jika schema berubah sertakan migration; bila data diperlukan perbarui seed. Runner/perintah hanya di runbook lokal.
-7. Hapus script test sementara sebelum commit verifikasi; test permanen, fixture, seed.ts dan migrate.ts tetap disimpan. Keputusan bisnis yang belum tersedia hanya memblokir pekerjaan yang bergantung padanya.
-
-## Referensi dan instruksi direktori
-
-- [Server](apps/server/AGENTS.md), [web](apps/web/AGENTS.md), [database](packages/database/AGENTS.md), [E2E](tests/e2e/AGENTS.md).
-- [Alur bisnis](docs/credit-system/business-flow.md), [kontrak API](docs/credit-system/api-contract.md), [model data](docs/credit-system/data-model.md), [rencana](docs/credit-system/development-plan.md), [acceptance dan hasil](docs/credit-system/testing.md), [pengembangan lokal](docs/credit-system/local-development.md).
-
-Nilai pilihan domain yang dipakai berulang ditetapkan sebagai objek enum `as const` beserta tipe union bernama sama, satu definisi per file `kebab-case.enum.ts` (contoh `ExportTypeEnum` di `export-type.enum.ts`). Enum yang hanya dipakai satu fitur berada di folder enums fitur tersebut; enum lintas fitur dalam satu aplikasi berada di src/enums aplikasi itu. Enum lintas aplikasi atau yang diperlukan schema/DTO bersama berada di packages/contracts dan diimpor melalui ekspor publik; schema Zod, perbandingan nilai dan UI memakai sumber yang sama. Nama kolom/path serta teks bebas bukan enum.
+Read the directory instructions for [server](apps/server/AGENTS.md),
+[web](apps/web/AGENTS.md), [database](packages/database/AGENTS.md), and
+[E2E](tests/e2e/AGENTS.md). Historic MVP documents are available in Git history.

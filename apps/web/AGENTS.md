@@ -1,26 +1,31 @@
 # Frontend
 
-Komponen memakai hook/use case; RPC dan mapping DTO berada di feature.api.ts. Setiap hook dalam feature/hooks memiliki file sendiri dengan nama persis nama hook, misalnya useEmployeeDetail.ts untuk useEmployeeDetail. Tipe yang sudah diekspor package diimpor langsung dari ekspor publik package oleh file pemakai; jangan meneruskannya melalui feature.type.ts. Dashboard terpisah dari auth.
+Components use hooks/use cases; RPC and DTO mapping live in `feature.api.ts`.
+Each feature hook has its own file named after the hook. Import package types
+directly from public exports. Dashboard, auth, credit applications, BPR review
+and registration are separate features; share contracts without duplicating
+implementation.
 
-Pengajuan kredit, review BPR, dan registrasi memiliki folder fitur masing-masing; data dan kontrak yang sama boleh dipakai lintas fitur tanpa menyalin implementasi.
+Use `src/utils/api-client.ts` and `download-file.ts` for shared transport and
+downloads. DTO validation stays in the feature. Use `toExportQuery` from
+`search-params.ts` to copy filters without mutating the caller's query.
 
-Helper transport API lintas fitur memakai src/utils/api-client.ts dan download-file.ts: client RPC, header sesi, pembacaan JSON/error dan unduhan. Validasi DTO tetap di fitur; ekspor memakai toExportQuery dari search-params.ts untuk menyalin filter tanpa mengubah query pemanggil.
+The root router defines `/`, `/login` and feature prefixes; feature routes use
+`createCrudRoutes`. Standard list, add, edit and view pages provide filtering,
+sorting, pagination and export; view pages display text rather than disabled
+inputs. Reuse `CrudPage`, `ListingTable`, `ListingSort`, `RecordState`,
+`DetailFields`, `DeleteAction` and `FormActions` from `src/components/crud`.
 
-Root router.tsx mendefinisikan /, /login dan prefix fitur. Child route di feature.routes.ts melalui createCrudRoutes. Empat halaman standar:
+TanStack Router handles routing and Query handles API state. Include session and
+parameters in query keys, invalidate related queries after mutations, and clear
+cache on logout. React Hook Form uses the Zod resolver and displays field errors;
+show loading, empty, success and failure states as appropriate.
 
-| Page            | Tugas                                                                |
-| --------------- | -------------------------------------------------------------------- |
-| FeaturePage     | Listing dengan filter/sort/pagination, aksi baris, tambah dan ekspor |
-| FeatureAddPage  | Form tambah                                                          |
-| FeatureEditPage | Form edit, boleh berbagi komponen form dengan tambah                 |
-| FeatureViewPage | Detail berupa teks; bukan input disabled                             |
+Use `src/hooks/useListing.ts` with explicit filters, keys, API and invalidation.
+Each listing has one `[queries, setQueries]` state for filters, sort and
+pagination; empty filters are `undefined` and omitted from URLs. List and export
+share state; filter or sort changes reset the page to one.
 
-Pakai komponen bersama src/components/crud: CrudPage (layout/ACL), ListingTable (navigasi, filter, tabel, pagination dan ekspor), ListingSort (pengurutan), RecordState (ID/loading/error), DetailFields, DeleteAction dan FormActions. Fitur menyediakan kolom, filter, mapping, field dan hook; jangan menyalin layout/kontrol yang sama.
-
-TanStack Router mengelola routing; TanStack Query mengelola data API. Query key mencakup sesi/parameter, mutation menginvalidasi query terkait, cache dibersihkan saat logout. React Hook Form memakai Zod resolver, menampilkan error per field, dan tidak meneruskan data invalid ke mutation. UI menampilkan loading/kosong/sukses/gagal sesuai hasil operasi.
-
-Hook fitur mendelegasikan kerangka listing ke src/hooks/useListing.ts dengan konfigurasi filter, key, API dan invalidasi eksplisit. Setiap instance listing menyimpan satu state `[queries, setQueries]` untuk filter, urutan dan pagination serta menangani query dan mutation ekspor. Filter kosong bernilai `undefined` dan tidak disertakan dalam parameter URL; daftar dan ekspor memakai state yang sama. Perubahan filter atau urutan mengembalikan halaman ke satu.
-
-Gate CRUDA melindungi halaman dan aksi sebelum konten/query dimount, termasuk akses URL langsung. Hak UI memakai snapshot login; otorisasi API tetap wajib. Kontrak sesi/izin hanya di api-contract.md.
-
-Rujuk [kontrak API](../../docs/credit-system/api-contract.md) dan aturan bisnis pada dokumen proyek.
+CRUDA gates protect pages and actions before content or queries mount, including
+direct URLs. UI permissions are a login snapshot; API authorization remains
+mandatory. Inspect the existing contracts and routes for session and permissions.

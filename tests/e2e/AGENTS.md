@@ -1,5 +1,12 @@
 # E2E
 
-Playwright memakai aplikasi, database dan API nyata; jangan mock API aplikasi pada skenario fullstack. Clock/timezone dan fixture dibuat deterministik; cleanup data/resource agar dapat diulang, simpan trace kegagalan. Runner native dan isolasi DB mengikuti runbook lokal. Ikuti [cakupan acceptance](../../docs/credit-system/testing.md#cakupan-acceptance) dan jadwal phase di AGENTS.md root. Baca instruksi server/web/database jika fixture mengubah area tersebut.
+Playwright full-stack scenarios use the real application, API and database; do
+not mock the application API. Use deterministic clock/timezone and fixtures,
+clean up data and resources for repeatability, and retain failure traces. Follow
+the isolated native test setup in the [README](../../README.md). Read server,
+web and database instructions when fixtures affect those areas.
 
-Setup login fitur memakai fixtures/login.ts; skenario acceptance login tetap menguji kontrol/request langsung. Test yang mengakses SQL memakai fixtures/test.ts agar pool ditutup sekali pada akhir worker. Guard database integrasi memakai @credit/test-utils/database sebelum koneksi dibuat.
+Feature login setup uses `fixtures/login.ts`; login acceptance scenarios still
+exercise the actual controls and requests. Tests accessing SQL use
+`fixtures/test.ts` so the pool closes once per worker. Use the
+`@credit/test-utils/database` integration database guard before connecting.
