@@ -133,7 +133,10 @@ async function rates(c: Context<AuthEnv>) {
 async function exporting(c: Context<AuthEnv>) {
   const input = creditQuerySchema.safeParse(c.req.query());
   const format = c.req.query('format');
-  if (!input.success || (format !== 'pdf' && format !== 'xlsx')) {
+  if (
+    !input.success ||
+    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+  ) {
     return c.json({ error: 'invalid query' }, 400);
   }
   try {

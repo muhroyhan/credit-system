@@ -87,7 +87,10 @@ async function exportFile(c: Context<AuthEnv>) {
     .omit({ page: true, limit: true })
     .safeParse(c.req.query());
   const format = c.req.query('format');
-  if (!parsed.success || (format !== 'pdf' && format !== 'xlsx')) {
+  if (
+    !parsed.success ||
+    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+  ) {
     return c.json({ error: 'invalid query' }, 400);
   }
   const file = await companiesService.exportFile(

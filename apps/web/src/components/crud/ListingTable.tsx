@@ -25,7 +25,7 @@ export function ListingTable<T extends { id: number }>({
   total: number;
   onPageChange: (page: number) => void;
   exporting: boolean;
-  onExport: (format: 'pdf' | 'xlsx') => void;
+  onExport: (format: 'pdf' | 'xlsx' | 'csv') => void;
   addAction?: ReactNode;
   filters: ReactNode;
 }) {
@@ -49,6 +49,13 @@ export function ListingTable<T extends { id: number }>({
           onClick={() => onExport('xlsx')}
         >
           Export XLSX
+        </Button>
+        <Button
+          loading={exporting}
+          disabled={loading}
+          onClick={() => onExport('csv')}
+        >
+          Export CSV
         </Button>
       </Group>
       {loading && <Text>Memuat...</Text>}

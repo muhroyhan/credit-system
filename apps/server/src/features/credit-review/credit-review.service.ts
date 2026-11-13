@@ -38,7 +38,7 @@ export const creditReviewService = {
   async exportReviews(
     query: CreditQuery,
     identity: Identity,
-    format: 'pdf' | 'xlsx',
+    format: 'pdf' | 'xlsx' | 'csv',
   ) {
     if (
       identity.type !== 'admin' ||
@@ -62,6 +62,12 @@ export const creditReviewService = {
         'Tenor',
         'Status HRD',
         'Status BPR',
+        'Bank',
+        'Cabang',
+        'Nama rekening',
+        'Nomor rekening',
+        'Tanggal pengajuan',
+        'Tanggal konfirmasi',
       ],
       values: result.data.map(({ credit, nama, companyName }) => [
         String(credit.id),
@@ -71,6 +77,12 @@ export const creditReviewService = {
         String(credit.jangkaWaktuBulan ?? ''),
         credit.status ?? '',
         credit.statusAdminApproval ?? '',
+        credit.bankName ?? '',
+        credit.bankBranch ?? '',
+        credit.bankAccountName ?? '',
+        credit.bankAccountNumber ?? '',
+        credit.tanggalPengajuan ?? '',
+        credit.debitorAcknowledgmentTimestamp ?? '',
       ]),
       format,
     });

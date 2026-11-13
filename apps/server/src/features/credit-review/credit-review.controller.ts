@@ -51,7 +51,10 @@ async function reviewDetail(c: Context<AuthEnv>) {
 async function reviewExport(c: Context<AuthEnv>) {
   const query = creditQuerySchema.safeParse(c.req.query());
   const format = c.req.query('format');
-  if (!query.success || (format !== 'pdf' && format !== 'xlsx')) {
+  if (
+    !query.success ||
+    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+  ) {
     return c.json({ error: 'invalid query' }, 400);
   }
   try {

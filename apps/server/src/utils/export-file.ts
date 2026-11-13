@@ -1,10 +1,15 @@
 /** Supplies attachment headers for controller responses with trusted filenames. */
-export function exportHeaders(filename: string, format: 'pdf' | 'xlsx') {
+export function exportHeaders(
+  filename: string,
+  format: 'pdf' | 'xlsx' | 'csv',
+) {
   return {
     'Content-Type':
       format === 'pdf'
         ? 'application/pdf'
-        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        : format === 'csv'
+          ? 'text/csv; charset=utf-8'
+          : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'Content-Disposition': `attachment; filename="${filename}.${format}"`,
   };
 }
@@ -19,8 +24,17 @@ export async function exportFile({
   title: string;
   columns: string[];
   values: string[][];
-  format: 'pdf' | 'xlsx';
+  format: 'pdf' | 'xlsx' | 'csv';
 }) {
+  if (format === 'csv') {
+    const encode = (value: string) => {
+      const safe = /^[\s]*[=+@-]/.test(value) ? `'${value}` : value;
+      return `"${safe.replaceAll('"', '""')}"`;
+    };
+    return new TextEncoder().encode(
+      `\uFEFF${[columns, ...values].map((row) => row.map(encode).join(',')).join('\r\n')}\r\n`,
+    );
+  }
   if (format === 'xlsx') {
     const ExcelJS = (await import('exceljs')).default;
     const workbook = new ExcelJS.Workbook();

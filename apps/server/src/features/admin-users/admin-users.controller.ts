@@ -23,7 +23,10 @@ async function exportFile(c: Context<AuthEnv>) {
     .omit({ page: true, limit: true })
     .safeParse(c.req.query());
   const format = c.req.query('format');
-  if (!query.success || (format !== 'pdf' && format !== 'xlsx')) {
+  if (
+    !query.success ||
+    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+  ) {
     return c.json({ error: 'invalid query' }, 400);
   }
   const data = await adminUsersService.exportFile(

@@ -12,7 +12,7 @@ import { hashPassword } from '@server/utils/password';
 import { withTransaction } from '@server/utils/transaction';
 
 export const adminUsersService = {
-  async exportFile(query: AdminQuery, format: 'pdf' | 'xlsx') {
+  async exportFile(query: AdminQuery, format: 'pdf' | 'xlsx' | 'csv') {
     const { data: rows } = await adminUsersRepository.list(query, false);
     const values = rows.map((row) => [
       row.username ?? '',

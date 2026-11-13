@@ -18,7 +18,7 @@ export const companiesService = {
       ? ((await companiesRepository.detail(id))?.bungaKredits ?? [])
       : [];
   },
-  async exportFile(query: CompanyQuery, format: 'pdf' | 'xlsx') {
+  async exportFile(query: CompanyQuery, format: 'pdf' | 'xlsx' | 'csv') {
     const result = await companiesRepository.list(query, false);
     return exportFile({
       title: 'Perusahaan',

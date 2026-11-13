@@ -168,7 +168,7 @@ export const creditService = {
   async exportFile(
     query: CreditQuery,
     identity: Identity,
-    format: 'pdf' | 'xlsx',
+    format: 'pdf' | 'xlsx' | 'csv',
   ) {
     authorize(identity, 'READ');
     const result = await creditRepository.list(
@@ -179,7 +179,21 @@ export const creditService = {
     );
     return exportFile({
       title: 'Pengajuan Kredit',
-      columns: ['ID', 'Nama', 'Perusahaan', 'Nominal', 'Tenor', 'Status'],
+      columns: [
+        'ID',
+        'Nama',
+        'Perusahaan',
+        'Nominal',
+        'Tenor',
+        'Status HRD',
+        'Status BPR',
+        'Bank',
+        'Cabang',
+        'Nama rekening',
+        'Nomor rekening',
+        'Tanggal pengajuan',
+        'Tanggal konfirmasi',
+      ],
       values: result.data.map(({ credit, nama, companyName }) => [
         String(credit.id),
         nama ?? '',
@@ -187,6 +201,13 @@ export const creditService = {
         credit.jumlahPengajuan ?? '',
         String(credit.jangkaWaktuBulan ?? ''),
         credit.status ?? '',
+        credit.statusAdminApproval ?? '',
+        credit.bankName ?? '',
+        credit.bankBranch ?? '',
+        credit.bankAccountName ?? '',
+        credit.bankAccountNumber ?? '',
+        credit.tanggalPengajuan ?? '',
+        credit.debitorAcknowledgmentTimestamp ?? '',
       ]),
       format,
     });

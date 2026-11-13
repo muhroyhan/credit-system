@@ -188,7 +188,10 @@ async function document(c: Context<AuthEnv>) {
 async function exportFile(c: Context<AuthEnv>) {
   const parsed = employeeQuerySchema.safeParse(c.req.query());
   const format = c.req.query('format');
-  if (!parsed.success || (format !== 'pdf' && format !== 'xlsx')) {
+  if (
+    !parsed.success ||
+    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+  ) {
     return c.json({ error: 'invalid query' }, 400);
   }
   try {

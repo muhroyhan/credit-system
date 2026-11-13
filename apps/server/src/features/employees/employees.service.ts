@@ -329,7 +329,7 @@ export function createEmployeesService(
     async exportFile(
       query: EmployeeQuery,
       identity: Identity,
-      format: 'pdf' | 'xlsx',
+      format: 'pdf' | 'xlsx' | 'csv',
     ) {
       requireAction(identity, 'READ');
       const result = await employeesRepository.list(
