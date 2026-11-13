@@ -4,26 +4,11 @@ import {
   type EmployeeFormInput,
   employeeDetailSchema,
   employeeListSchema,
-  type RegistrationInput,
 } from '@web/features/employees/employees.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
 
 const client = apiClient.api.debitor;
-export async function registerEmployee(slug: string, input: RegistrationInput) {
-  const { confirmPassword: _confirmation, ...account } = input;
-  return readApiResponse(
-    await client.register.$post(
-      {},
-      {
-        init: {
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...account, slug }),
-        },
-      },
-    ),
-  );
-}
 export async function listEmployees(token: string, query: URLSearchParams) {
   return employeeListSchema.parse(
     await readApiResponse(

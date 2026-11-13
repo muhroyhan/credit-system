@@ -35,15 +35,8 @@ export function accountFormSchema(edit: boolean, admin = false) {
     }
   });
 }
-export const registrationSchema = employeeAccountSchema
-  .extend({ confirmPassword: z.string() })
-  .refine((value) => value.password === value.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Konfirmasi password tidak sama',
-  });
 export type EmployeeFormInput = z.infer<typeof employeeFormSchema>;
 export type EmployeeDetail = z.infer<typeof employeeDetailSchema>;
-export type RegistrationInput = z.infer<typeof registrationSchema>;
 export interface EmployeePageProps {
   token: string;
   id?: number;

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { listReviews } from '@web/features/credit/credit.api';
+import { listReviews } from '@web/features/credit-review/credit-review.api';
 import { toSearchParams } from '@web/utils/search-params';
 export function useCreditReviews(
   token: string,

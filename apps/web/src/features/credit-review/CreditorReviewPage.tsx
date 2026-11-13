@@ -5,8 +5,8 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import { exportReviews } from '@web/features/credit/credit.api';
-import { useCreditReviews } from '@web/features/credit/hooks/useCreditReviews';
+import { exportReviews } from '@web/features/credit-review/credit-review.api';
+import { useCreditReviews } from '@web/features/credit-review/hooks/useCreditReviews';
 import { toSearchParams } from '@web/utils/search-params';
 import { useState } from 'react';
 export function CreditorReviewPage() {

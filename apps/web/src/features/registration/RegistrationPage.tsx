@@ -9,7 +9,7 @@ import {
   Title,
 } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
-import { useRegistration } from '@web/features/employees/hooks/useRegistration';
+import { useRegistration } from '@web/features/registration/hooks/useRegistration';
 export function RegistrationPage() {
   const { slug } = useParams({ from: '/registration/$slug' });
   const { form, save, loginError } = useRegistration(slug);

@@ -1,8 +1,10 @@
 import type { AuthEnv } from '@server/constant/interface';
 import type { SchemaOf } from '@server/constant/type';
 import { creditController } from '@server/features/credit/credit.controller';
+import { creditReviewRoutes } from '@server/features/credit-review/credit-review.routes';
 import { identityContext } from '@server/middleware/identity-context.middleware';
 import { Hono } from 'hono';
+import type { MergeSchemaPath } from 'hono/types';
 
 export function creditRoutes() {
   const app = new Hono<AuthEnv>();
@@ -11,22 +13,8 @@ export function creditRoutes() {
   const rates = app.get('/rates', identityContext, creditController.rates);
   const create = app.post('/create', identityContext, creditController.create);
   const update = app.put('/update', identityContext, creditController.update);
-  const review = app.put('/review', identityContext, creditController.review);
-  const reviewList = app.get(
-    '/review/list',
-    identityContext,
-    creditController.reviewList,
-  );
-  const reviewDetail = app.get(
-    '/review/detail',
-    identityContext,
-    creditController.reviewDetail,
-  );
-  const reviewExport = app.get(
-    '/review/export',
-    identityContext,
-    creditController.reviewExport,
-  );
+  const review = creditReviewRoutes();
+  app.route('/review', review);
   const simulation = app.post(
     '/simulation',
     identityContext,
@@ -44,10 +32,7 @@ export function creditRoutes() {
       SchemaOf<typeof detail> &
       SchemaOf<typeof create> &
       SchemaOf<typeof update> &
-      SchemaOf<typeof review> &
-      SchemaOf<typeof reviewList> &
-      SchemaOf<typeof reviewDetail> &
-      SchemaOf<typeof reviewExport> &
+      MergeSchemaPath<SchemaOf<typeof review>, '/review'> &
       SchemaOf<typeof simulation> &
       SchemaOf<typeof exporting>
   >;

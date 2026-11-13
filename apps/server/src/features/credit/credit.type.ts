@@ -12,13 +12,6 @@ export interface CreditRate {
   bungaPercentage: string;
 }
 
-export interface CreditExpenseInput {
-  expenseName: string;
-  unit: string;
-  value: number;
-  amount: string;
-}
-
 export type CreditCollectionInput = Omit<
   typeof creditCollection.$inferInsert,
   'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'

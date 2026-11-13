@@ -159,5 +159,6 @@ export const companyQuerySchema = z.object({
 });
 
 export * from './credit.type';
+export * from './credit-review.type';
 export * from './employees.constant';
 export * from './employees.type';

@@ -6,6 +6,7 @@ import {
   CreditForbidden,
 } from '@server/features/credit/credit.error';
 import { creditService } from '@server/features/credit/credit.service';
+import { creditReviewService } from '@server/features/credit-review/credit-review.service';
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 
@@ -59,9 +60,9 @@ describe.skipIf(!url)('BPR review', () => {
           biayaAsuransiJiwa: 100,
         };
         await expect(
-          creditService.review(input, company),
+          creditReviewService.review(input, company),
         ).rejects.toBeInstanceOf(CreditForbidden);
-        const result = await creditService.review(input, admin);
+        const result = await creditReviewService.review(input, admin);
         expect(result.id).toBe(id);
         const [row] = await db.select().from(credits).where(eq(credits.id, id));
         expect(row?.statusAdminApproval).toBe(status);
@@ -78,9 +79,9 @@ describe.skipIf(!url)('BPR review', () => {
             ).length,
           ).toBeGreaterThan(0);
         }
-        await expect(creditService.review(input, admin)).rejects.toBeInstanceOf(
-          CreditConflict,
-        );
+        await expect(
+          creditReviewService.review(input, admin),
+        ).rejects.toBeInstanceOf(CreditConflict);
       } finally {
         await db.delete(creditExpense).where(eq(creditExpense.creditId, id));
         await db.delete(credits).where(eq(credits.id, id));

@@ -10,9 +10,9 @@ import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import type { CreditRow } from '@web/features/credit/credit.type';
-import { useCreditReview } from '@web/features/credit/hooks/useCreditReview';
-import { useCreditReviewForm } from '@web/features/credit/hooks/useCreditReviewForm';
+import type { CreditReviewDetail } from '@web/features/credit-review/credit-review.type';
+import { useCreditReview } from '@web/features/credit-review/hooks/useCreditReview';
+import { useCreditReviewForm } from '@web/features/credit-review/hooks/useCreditReviewForm';
 import { crudaAccess } from '@web/utils/cruda';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
@@ -71,7 +71,7 @@ function Form({
   canUpdate,
 }: {
   token: string;
-  row: CreditRow;
+  row: CreditReviewDetail;
   onResult: (notification: string) => void;
   canUpdate: boolean;
 }) {

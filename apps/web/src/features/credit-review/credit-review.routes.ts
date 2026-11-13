@@ -1,7 +1,7 @@
 import { type AnyRoute, createRoute } from '@tanstack/react-router';
-import { CreditorReviewEditPage } from '@web/features/credit/CreditorReviewEditPage';
-import { CreditorReviewPage } from '@web/features/credit/CreditorReviewPage';
-import { CreditorReviewViewPage } from '@web/features/credit/CreditorReviewViewPage';
+import { CreditorReviewEditPage } from '@web/features/credit-review/CreditorReviewEditPage';
+import { CreditorReviewPage } from '@web/features/credit-review/CreditorReviewPage';
+import { CreditorReviewViewPage } from '@web/features/credit-review/CreditorReviewViewPage';
 
 export function creditReviewRoutes<T extends AnyRoute>(parent: T) {
   const list = createRoute({

@@ -1,12 +1,12 @@
 import { type CreditReview, creditReviewSchema } from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { saveReview } from '@web/features/credit/credit.api';
-import type { CreditRow } from '@web/features/credit/credit.type';
+import { saveReview } from '@web/features/credit-review/credit-review.api';
+import type { CreditReviewDetail } from '@web/features/credit-review/credit-review.type';
 import { useForm } from 'react-hook-form';
 export function useCreditReviewForm(
   token: string,
-  row: CreditRow,
+  row: CreditReviewDetail,
   onResult: (notification: string) => void,
 ) {
   const client = useQueryClient();

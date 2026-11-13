@@ -21,19 +21,6 @@ export const creditListSchema = z.object({
   count: z.number(),
   data: z.array(creditRowSchema),
 });
-export const creditReviewDetailSchema = creditRowSchema.extend({
-  noKtp: z.string().nullable(),
-  summary: z.object({ open: z.number(), score: z.number() }).nullable(),
-  expenses: z.array(
-    z.object({
-      id: z.number(),
-      expenseName: z.string().nullable(),
-      unit: z.string().nullable(),
-      value: z.number().nullable(),
-      amount: z.string().nullable(),
-    }),
-  ),
-});
 export const creditSimulationSchema = z.object({
   principal: z.number(),
   months: z.number(),
@@ -42,10 +29,6 @@ export const creditSimulationSchema = z.object({
   total: z.number(),
   open: z.number(),
   score: z.number(),
-});
-export const creditReviewResultSchema = z.object({
-  id: z.number(),
-  notification: z.enum(['sent', 'failed', 'not-required', 'not-configured']),
 });
 export const creditRatesSchema = z.array(
   z.object({

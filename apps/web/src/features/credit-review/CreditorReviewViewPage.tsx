@@ -3,7 +3,7 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import { useCreditReview } from '@web/features/credit/hooks/useCreditReview';
+import { useCreditReview } from '@web/features/credit-review/hooks/useCreditReview';
 import { crudaAccess } from '@web/utils/cruda';
 export function CreditorReviewViewPage() {
   return (

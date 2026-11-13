@@ -102,15 +102,6 @@ export const creditUpdateRequestSchema = z.union([
 ]);
 export type CreditApproval = z.infer<typeof creditApprovalSchema>;
 
-export const creditReviewSchema = z.strictObject({
-  id: z.number().int().positive(),
-  statusAdminApproval: z.enum(['approved', 'rejected', 'completed']),
-  jumlahPengajuan: amount,
-  jangkaWaktuBulan: z.number().int().positive(),
-  biayaAsuransiJiwa: z.number().finite().nonnegative(),
-});
-export type CreditReview = z.infer<typeof creditReviewSchema>;
-
 export const creditQuerySchema = z.object({
   userId: z.coerce.number().int().positive().optional(),
   debitorId: z.coerce.number().int().positive().optional(),

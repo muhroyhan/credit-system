@@ -10,12 +10,10 @@ import { adminUsersRoutes } from '@web/features/admin-users/admin-users.routes';
 import { LoginPage } from '@web/features/auth/LoginPage';
 import { companiesRoutes } from '@web/features/companies/companies.routes';
 import { creditRoutes } from '@web/features/credit/credit.routes';
-import { creditReviewRoutes } from '@web/features/credit/credit-review.routes';
+import { creditReviewRoutes } from '@web/features/credit-review/credit-review.routes';
 import { DashboardPage } from '@web/features/dashboard/DashboardPage';
-import {
-  employeesRoutes,
-  registrationRoutes,
-} from '@web/features/employees/employees.routes';
+import { employeesRoutes } from '@web/features/employees/employees.routes';
+import { registrationRoutes } from '@web/features/registration/registration.routes';
 
 const rootRoute = createRootRoute({
   component: Outlet,
