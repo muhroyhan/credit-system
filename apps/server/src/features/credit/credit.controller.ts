@@ -1,7 +1,7 @@
 import {
   creditApplicationSchema,
   creditQuerySchema,
-  creditUpdateSchema,
+  creditUpdateRequestSchema,
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
@@ -68,14 +68,19 @@ async function create(c: Context<AuthEnv>) {
   }
 }
 async function update(c: Context<AuthEnv>) {
-  const input = creditUpdateSchema.safeParse(
+  const input = creditUpdateRequestSchema.safeParse(
     await c.req.json().catch(() => null),
   );
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
-  const { id, ...application } = input.data;
   try {
+    if ('status' in input.data) {
+      return c.json({
+        id: await creditService.approve(input.data, c.get('identity')),
+      });
+    }
+    const { id, ...application } = input.data;
     return c.json({
       id: await creditService.save(application, c.get('identity'), id),
     });

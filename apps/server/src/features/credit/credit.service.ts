@@ -1,4 +1,8 @@
-import type { CreditApplication, CreditQuery } from '@credit/contracts';
+import type {
+  CreditApplication,
+  CreditApproval,
+  CreditQuery,
+} from '@credit/contracts';
 import type { Identity } from '@server/constant/interface';
 import type { DatabaseTransaction } from '@server/constant/type';
 import { authService } from '@server/features/auth/auth.service';
@@ -65,6 +69,32 @@ function parseAmount(value: string) {
 }
 
 export const creditService = {
+  async approve(input: CreditApproval, identity: Identity) {
+    if (identity.type !== 'company') {
+      throw new CreditForbidden();
+    }
+    return withTransaction(async (tx) => {
+      const debitorId = await creditRepository.debitorId(input.id, tx);
+      if (debitorId === null) {
+        throw new CreditNotFound();
+      }
+      await requireDebitor(identity, debitorId, tx);
+      const row = await creditRepository.detail(input.id, tx);
+      if (!row || row.credit.debitorId !== debitorId) {
+        throw new CreditNotFound();
+      }
+      if (row.credit.status !== 'pending') {
+        throw new CreditConflict('Pengajuan tidak dalam status pending');
+      }
+      await creditRepository.approve(
+        input.id,
+        input.status,
+        `${identity.type}:${identity.id}`,
+        tx,
+      );
+      return input.id;
+    });
+  },
   async rates(debitorId: number, identity: Identity) {
     authorize(identity, 'READ');
     await requireDebitor(identity, debitorId);

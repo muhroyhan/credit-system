@@ -36,6 +36,25 @@ import {
 } from 'drizzle-orm';
 
 export const creditRepository = {
+  async debitorId(id: number, tx: DatabaseTransaction) {
+    const [row] = await tx
+      .select({ debitorId: credits.debitorId })
+      .from(credits)
+      .where(eq(credits.id, id))
+      .limit(1);
+    return row?.debitorId ?? null;
+  },
+  async approve(
+    id: number,
+    status: 'approved' | 'rejected',
+    actor: string,
+    tx: DatabaseTransaction,
+  ) {
+    await tx
+      .update(credits)
+      .set({ status, updatedBy: actor, updatedAt: new Date() })
+      .where(eq(credits.id, id));
+  },
   async simulationData(debitorId: number, tx?: DatabaseTransaction) {
     const db = tx ?? connectDatabase().db;
     const [debitor] = await db
