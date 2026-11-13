@@ -52,11 +52,11 @@ Ini menjelaskan jalur UI dan kondisi yang perlu dijaga, bukan jaminan semua tran
 
 Nominal di bawah Rp8.000.000 membatasi pilihan tenor hingga 12 bulan; nominal tepat Rp8.000.000 dapat menggunakan tenor lebih panjang jika tersedia. Contoh: Rp12.000.000 selama 12 bulan dengan bunga 1% per bulan menghasilkan angsuran Rp1.120.000 dan total Rp13.440.000.
 
-Persyaratan tertulis pada dokumen menyebut annuitas dan bunga tahunan, sementara perhitungan tersebut bersifat flat bulanan. Pertahankan rumus sampai ada keputusan untuk mengubahnya. Surat persetujuan dan perjanjian dapat berbeda dalam penyajian bunga dan denda; lihat catatan risiko.
+Dokumen P10 memakai label bunga flat bulanan mengikuti rumus berjalan. Redaksi baru terinspirasi template klien yang diberikan pengguna; identitas bank berasal konfigurasi dan ketentuan denda digunakan konsisten pada dokumen.
 
 ## Perjanjian dan rekening
 
-Nomor perjanjian ditampilkan sebagai `<nomor urut>/BPR-<nama perusahaan uppercase tanpa pemisah>/<MM/YYYY>`. Nomor urut berasal dari hitungan dokumen pada bulan pembuatan kredit, ditambah satu, dengan setidaknya dua digit. Tanggal perjanjian mengikuti acknowledgment; cicilan pertama adalah satu bulan sesudahnya dan tanggal akhir adalah acknowledgment ditambah tenor.
+Nomor perjanjian ditampilkan sebagai `<nomor urut>/BPR-<nama perusahaan uppercase tanpa pemisah>/<MM/YYYY>`. Nomor urut dialokasikan secara atomik dari counter global bulan pembuatan kredit, dengan setidaknya dua digit, dan disimpan tetap untuk render ulang. Tanggal perjanjian mengikuti acknowledgment; cicilan pertama adalah satu bulan sesudahnya dan tanggal akhir adalah acknowledgment ditambah tenor.
 
 PDF memuat identitas bank, perusahaan dan debitor, nominal dan terbilang, tenor, bunga, biaya, denda, delapan pasal perjanjian dan surat persetujuan. Teks mengenai pembayaran, pelunasan, atau pencairan tidak dengan sendirinya mendefinisikan fitur transaksi otomatis.
 

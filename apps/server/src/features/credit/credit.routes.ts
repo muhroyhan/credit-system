@@ -1,5 +1,6 @@
 import type { AuthEnv } from '@server/constant/interface';
 import type { SchemaOf } from '@server/constant/type';
+import { agreementRoutes } from '@server/features/agreement/agreement.routes';
 import { creditController } from '@server/features/credit/credit.controller';
 import { creditReviewRoutes } from '@server/features/credit-review/credit-review.routes';
 import { identityContext } from '@server/middleware/identity-context.middleware';
@@ -20,6 +21,8 @@ export function creditRoutes() {
     identityContext,
     creditController.confirm,
   );
+  const document = agreementRoutes();
+  app.route('/doc', document);
   const review = creditReviewRoutes();
   app.route('/review', review);
   const simulation = app.post(
@@ -43,6 +46,7 @@ export function creditRoutes() {
       SchemaOf<typeof status> &
       SchemaOf<typeof confirm> &
       MergeSchemaPath<SchemaOf<typeof review>, '/review'> &
+      MergeSchemaPath<SchemaOf<typeof document>, '/doc'> &
       SchemaOf<typeof simulation> &
       SchemaOf<typeof exporting>
   >;

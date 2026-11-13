@@ -53,6 +53,10 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 | SUPPORT-16 | Belum melarang self-delete atau hapus admin terakhir; risiko kehilangan akses tetap memerlukan keputusan bisnis. |
 | Migrasi ACL | WRITE dihapus; API dan aplikasi memakai aksi granular. Dampak data/migration dan path client hanya dirinci pada model data dan kontrak API. |
 
+## Keputusan P10 penomoran
+
+Pengguna menyetujui nomor tetap dan unik secara global per bulan pembuatan kredit. Alokasi memakai row counter bulanan serta lock kredit dalam transaksi; format nomor menyimpan snapshot nama perusahaan dan bulan. Render ulang memakai nomor tersimpan. Konversi bulan menggunakan tanggal MySQL kredit; data lama yang pernah terpengaruh migration 0005 tetap memerlukan verifikasi historis. Nomor tidak boleh diterbitkan sebelum dua approval, acknowledgment dan rekening lengkap. Template pasal/surat, identitas BPR, serta label bunga/denda masih menunggu sumber resmi.
+
 ## Isu teknis terbuka
 
 - Enam belas assertion as never (empat query baru P05 memakai pola validasi controller manual) di gateway RPC menutup pemeriksaan input end-to-end. Pasang validator Hono bertipe sebelum mengklaim request type safe.
@@ -93,3 +97,5 @@ FLOW-12/SUPPORT-13: child profil ditulis di transaksi dengan lock debitor, slipG
 FE-02/09/10/16: form memakai RHF/Zod per field, tidak mengirim URL/base64 lama sebagai file, password regex tanpa flag global, tanggal kalender tanpa tambah tujuh jam. Profil memerlukan isian menurut kebutuhan bisnis; tidak menambah aturan NIK 16 digit/email TLD lama secara diam-diam. Field model keluarga/GPS/SLIK tetap opsional dan belum menjadi form wajib.
 
 Registrasi/HRD create mengikuti slug/scope tenant dan username unik per tenant. Lock perusahaan dan pembacaan FOR UPDATE menyerialisasi create/update akun lewat service; child profil juga memakai current read saat transaksi agar snapshot lama tidak menggandakan child; writer eksternal yang melewati service tetap membutuhkan constraint setelah audit data. Status tenant mengikuti kompatibilitas SUPPORT-03/11 yang masih terbuka. Guard delete memeriksa tabel credit bila sudah ada; test dengan kredit nyata dilakukan P06.
+
+P10: pengguna memberikan template DOCX lama sebagai inspirasi dan mengizinkan redaksi baru. Dokumen proyek memakai delapan pasal baru tanpa menyalin identitas atau angka contoh. Bunga dilabeli flat per bulan sesuai rumus berjalan; denda dikonfigurasi dengan nilai awal 0.2%/hari dari referensi. Identitas BPR wajib dari konfigurasi. Field wajib yang kosong menolak render, tidak dicetak sebagai null. Generasi memakai POST, unduhan GET tanpa render; nomor tetap, dokumen tersimpan dipakai ulang.

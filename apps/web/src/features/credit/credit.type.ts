@@ -3,6 +3,8 @@ import { z } from 'zod';
 export const creditRowSchema = z.object({
   credit: z.object({
     id: z.number(),
+    docUrl: z.string().nullable(),
+    agreementNumber: z.string().nullable(),
     debitorId: z.number().nullable(),
     jumlahPengajuan: z.string().nullable(),
     jumlahAngsuran: z.string().nullable(),
@@ -67,3 +69,8 @@ export const creditConfirmationFormSchema = z.object({
 export type CreditConfirmationForm = z.infer<
   typeof creditConfirmationFormSchema
 >;
+
+export const agreementResultSchema = z.object({
+  url: z.string(),
+  number: z.string(),
+});

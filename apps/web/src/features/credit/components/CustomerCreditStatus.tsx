@@ -9,7 +9,10 @@ export function CustomerCreditStatus({
   token: string;
   id: number;
 }) {
-  const { query, form, cancel, confirm } = useCustomerCredit(token, id);
+  const { query, form, cancel, confirm, generate } = useCustomerCredit(
+    token,
+    id,
+  );
   return (
     <RecordState id={id} query={query}>
       {(row) => (
@@ -31,6 +34,18 @@ export function CustomerCreditStatus({
                 : 'Konfirmasi'}{' '}
               tersimpan pada {row.credit.debitorAcknowledgmentTimestamp}.
             </Alert>
+          )}
+          {row.credit.debitorAcknowledgmentTimestamp &&
+            row.credit.statusAdminApproval === 'approved' && (
+              <Button
+                loading={generate.isPending}
+                onClick={() => generate.mutate()}
+              >
+                {row.credit.docUrl ? 'Lihat dokumen' : 'Buat dokumen'}
+              </Button>
+            )}
+          {generate.error && (
+            <Alert color="red">{generate.error.message}</Alert>
           )}
           {(cancel.error || confirm.error) && (
             <Alert color="red">

@@ -36,12 +36,14 @@ export const credits = mysqlTable('credit', {
   tanggalPengajuan: date('tanggal_pengajuan', { mode: 'string' }),
   biayaAsuransiJiwa: double('biaya_asuransi_jiwa'),
   jangkaWaktuBulan: int('jangka_waktu_bulan'),
+  agreementNumber: varchar('agreement_number', { length: 255 }).unique(),
   bankAccountName: str('bank_account_name'),
   bankAccountNumber: str('bank_account_number'),
   bankBranch: str('bank_branch'),
   bankName: str('bank_name'),
   bungaAngsuranBulanan: str('bunga_angsuran_bulanan'),
   docUrl: str('doc_url'),
+  docStorageKey: str('doc_storage_key'),
   jumlahAngsuran: str('jumlah_angsuran'),
   jumlahPengajuan: str('jumlah_pengajuan'),
   nilaiAngsuran: str('nilai_angsuran'),
@@ -50,6 +52,11 @@ export const credits = mysqlTable('credit', {
   statusAdminApproval: str('status_admin_approval'),
   remarks: text('remarks'),
   ...audit(),
+});
+
+export const agreementSequences = mysqlTable('agreement_sequence', {
+  month: varchar('month', { length: 7 }).primaryKey(),
+  nextValue: int('next_value', { unsigned: true }).notNull(),
 });
 
 export const creditExpense = mysqlTable('credit_expense', {

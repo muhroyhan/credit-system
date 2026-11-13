@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P08 selesai; P09–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P10 selesai; P11 dan P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -113,11 +113,16 @@ Hasil: nasabah dapat melihat status, membatalkan atau menyimpan rekening/persetu
 
 ## P10 — Perjanjian, PDF dan halaman terima kasih
 
+Status: done. P10-T01: 0851128; P10-T02: c10769d; P10-T03: 09c3e57; P10-T04: lihat footer commit Task: P10-T04. Bukti verifikasi pada testing.md.
+
 Hasil: sesudah rekening tersimpan, dokumen dibentuk, URL disimpan dan halaman terima kasih/unduhan tersedia.
 
 | Kode task | Task dan keluaran |
 | --- | --- |
+| P10-T01a | done (ef3e828): fungsi tanggal dan terbilang serta unit test; pengujian pada P10-T04. |
+| P10-T01b | done (lihat footer Task: P10-T01b): counter bulanan atomik dan nomor tetap; test pada P10-T04. |
 | P10-T01 | Tetapkan kontrak render/count, penomoran global berdasarkan bulan created_at, format nomor, tanggal acknowledgment/angsuran pertama/akhir tenor dan terbilang. Putuskan penanganan konkurensi/render ulang, label bunga/denda dan string null dalam logic-holes sebelum perubahan kompatibilitas (FLOW-10, FE-07/08). Jika keputusan membutuhkan kolom/tabel, sertakan migration Drizzle pada task ini. |
+| P10-T02a | done (lihat footer Task: P10-T02a): adapter PDF A4 berbasis teks dan unit test renderer nyata; pengujian pada P10-T04. |
 | P10-T02 | Buat template perjanjian delapan pasal/surat persetujuan A4, adapter PDF dan storage, route render/count dengan scope akses dan penyimpanan doc_url. Kelola browser/resource, sumber URL dan kegagalan upload secara eksplisit (FLOW-11, SUPPORT-12). |
 | P10-T03 | Hubungkan simpan rekening sukses ke pembuatan PDF, halaman dokumen, unduh individual dan terima kasih; gunakan kondisi acknowledgment+BPR approved+doc_url, tunggu fetch selesai sebelum redirect. Tangani kegagalan render tanpa keberhasilan palsu (FE-04/15). |
 | P10-T04 | Verifikasi akhir phase: unit nomor/tanggal/biaya, integration renderer PDF nyata terpisah dari adapter deterministik, E2E perjalanan registrasi hingga unduh dokumen. |

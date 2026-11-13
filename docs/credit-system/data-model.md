@@ -251,3 +251,7 @@ Schema dan migration 0003 menyiapkan credit dan enam tabel child. Kolom mengikut
 Migration 0005: semua kolom `created_at` dan `updated_at` pada 24 tabel aplikasi tetap DATETIME dan menggunakan default serta ON UPDATE CURRENT_TIMESTAMP di MySQL. Kedua nilai berubah saat data baris berubah; update tanpa perubahan nilai tidak memicu pembaruan otomatis MySQL. Tabel internal histori migration Drizzle tidak diubah. Nilai lama dipertahankan saat migration. `created_at` tidak lagi menjadi waktu pembuatan yang dapat diandalkan; P10 perlu keputusan baru sebelum memakai bulan kolom tersebut untuk nomor dokumen.
 
 Migration 0006 mengembalikan `created_at` menjadi default CURRENT_TIMESTAMP saat insert tanpa ON UPDATE; `updated_at` tetap diperbarui otomatis saat nilai baris berubah. Migration tidak memulihkan nilai created_at yang sudah tertimpa saat 0005 berlaku; data tersebut memerlukan sumber historis lain.
+
+P10: baseline menambahkan `credit.agreement_number` nullable dan unik serta `agreement_sequence` dengan primary key bulan dan angka berikutnya. Alokasi nomor dilakukan dalam transaksi; belum merupakan bukti migrasi data historis atau dokumen sudah tersedia.
+
+P10 menyimpan doc_storage_key privat terpisah dari doc_url endpoint berotorisasi. Render gagal me-rollback nomor/URL dalam transaksi dan mencoba menghapus file baru. Kegagalan proses/cleanup masih dapat meninggalkan file orphan untuk rekonsiliasi.

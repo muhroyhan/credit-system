@@ -2,7 +2,10 @@ import type { RouteComponent } from '@tanstack/react-router';
 import { type AnyRoute, createRoute } from '@tanstack/react-router';
 
 /** Attaches the four standard CRUD pages while preserving the parent route type. */
-export function createCrudRoutes<TParent extends AnyRoute>(
+export function createCrudRoutes<
+  TParent extends AnyRoute,
+  TExtra extends AnyRoute[],
+>(
   parent: TParent,
   pages: {
     list: RouteComponent;
@@ -10,6 +13,7 @@ export function createCrudRoutes<TParent extends AnyRoute>(
     edit: RouteComponent;
     view: RouteComponent;
   },
+  ...extra: TExtra
 ) {
   const list = createRoute({
     getParentRoute: () => parent,
@@ -31,5 +35,5 @@ export function createCrudRoutes<TParent extends AnyRoute>(
     path: '$id',
     component: pages.view,
   });
-  return parent.addChildren([list, add, edit, view]);
+  return parent.addChildren([list, add, edit, view, ...extra]);
 }
