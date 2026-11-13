@@ -1,18 +1,10 @@
-import { createHmac } from 'node:crypto';
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { app } from '@credit/server/app';
 import { referenceRepository } from '@credit/server/reference-repository';
-import { testDatabaseUrl } from '@credit/test-utils/database';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { fixtureToken } from '../setup/token';
 
-const databaseUrl = testDatabaseUrl(process.env.DATABASE_URL);
-afterAll(async () => {
-  if (databaseUrl) {
-    await closeDatabase();
-  }
-});
-
-describe.skipIf(!databaseUrl)('reference data on isolated mysql', () => {
+describe('reference data on isolated mysql', () => {
   it('blocks all private routes even with untrusted authorization header', async () => {
     for (const path of ['programs', 'entity-types', 'countries', 'constants']) {
       const response = await app.request(`/api/${path}`, {
@@ -37,21 +29,17 @@ describe.skipIf(!databaseUrl)('reference data on isolated mysql', () => {
     if (!secret) {
       throw new Error('JWT_SECRET is required for integration tests');
     }
-    const header = Buffer.from(
-      JSON.stringify({ alg: 'HS256', typ: 'JWT' }),
-    ).toString('base64url');
-    const payload = Buffer.from(
-      JSON.stringify({
-        id: 900001,
-        slug: 'admin',
-        type: 'admin',
-        exp: Math.floor(Date.now() / 1000) + 60,
-      }),
-    ).toString('base64url');
-    const signature = createHmac('sha256', secret)
-      .update(`${header}.${payload}`)
-      .digest('base64url');
-    const session = { authToken: `${header}.${payload}.${signature}` };
+    const session = {
+      authToken: fixtureToken(
+        {
+          id: 900001,
+          slug: 'admin',
+          type: 'admin',
+          exp: Math.floor(Date.now() / 1000) + 60,
+        },
+        secret,
+      ),
+    };
     const response = await app.request('/api/programs', {
       headers: { authorization: `Bearer ${session.authToken}` },
     });
