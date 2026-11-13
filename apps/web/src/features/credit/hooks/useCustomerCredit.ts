@@ -1,10 +1,12 @@
 import { creditConfirmationSchema } from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import {
   cancelCredit,
   confirmCredit,
   creditStatus,
+  generateAgreement,
 } from '@web/features/credit/credit.api';
 import {
   type CreditConfirmationForm,
@@ -14,6 +16,14 @@ import { useForm } from 'react-hook-form';
 
 export function useCustomerCredit(token: string, id: number) {
   const client = useQueryClient();
+  const navigate = useNavigate();
+  const generate = useMutation({
+    mutationFn: () => generateAgreement(token, id),
+    onSuccess: async () => {
+      await refresh();
+      await navigate({ to: '/credits/$id/thanks', params: { id: String(id) } });
+    },
+  });
   const query = useQuery({
     queryKey: ['credits', token, 'status', id],
     queryFn: () => creditStatus(token, id),
@@ -40,7 +50,10 @@ export function useCustomerCredit(token: string, id: number) {
   const confirm = useMutation({
     mutationFn: (values: CreditConfirmationForm) =>
       confirmCredit(token, creditConfirmationSchema.parse({ ...values, id })),
-    onSuccess: refresh,
+    onSuccess: async () => {
+      await refresh();
+      await generate.mutateAsync();
+    },
   });
-  return { query, form, cancel, confirm };
+  return { query, form, cancel, confirm, generate };
 }

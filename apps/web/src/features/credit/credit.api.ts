@@ -5,6 +5,7 @@ import type {
 } from '@credit/contracts';
 import type { ExportFormat } from '@web/constant/type';
 import {
+  agreementResultSchema,
   creditListSchema,
   creditRatesSchema,
   creditRowSchema,
@@ -102,5 +103,22 @@ export async function cancelCredit(token: string, id: number) {
 export async function confirmCredit(token: string, input: CreditConfirmation) {
   return readApiResponse(
     await api.confirm.$put({ json: input } as never, apiOptions(token)),
+  );
+}
+
+export async function generateAgreement(token: string, id: number) {
+  return agreementResultSchema.parse(
+    await readApiResponse(
+      await api.doc.render.$post({ json: { id } } as never, apiOptions(token)),
+    ),
+  );
+}
+export async function downloadAgreement(token: string, id: number) {
+  await downloadFile(
+    await api.doc.$get(
+      { query: { id: String(id) } } as never,
+      apiOptions(token),
+    ),
+    `agreement-${id}.pdf`,
   );
 }
