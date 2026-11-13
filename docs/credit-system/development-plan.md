@@ -90,7 +90,7 @@ Status: done. P07-T01: 0d88281; P07-T02: c83654d; P07-T03: lihat footer commit T
 
 Hasil: BPR meninjau kredit yang disetujui HRD, menetapkan status, menghasilkan snapshot biaya dan notifikasi melalui adapter.
 
-Status: done. Commit task ditelusuri melalui footer Task: P08-T01 sampai P08-T04. Pengiriman WhatsApp nyata belum diuji sesuai instruksi pengguna; bukti lainnya pada testing.md.
+Status: done. Commit task ditelusuri melalui footer Task: P08-T01 sampai P08-T05. Pengiriman WhatsApp nyata belum diuji sesuai instruksi pengguna; bukti lainnya pada testing.md.
 
 | Kode task | Task dan keluaran |
 | --- | --- |
@@ -98,6 +98,7 @@ Status: done. Commit task ditelusuri melalui footer Task: P08-T01 sampai P08-T04
 | P08-T02 | Implementasikan approved/rejected/completed BPR, perubahan HRD ke rejected saat penolakan BPR, lock form serta snapshot approval; jangan mensyaratkan approved sebelumnya untuk completed tanpa keputusan bisnis. Tetapkan perilaku request berulang dan kegagalan notifikasi secara tercatat. |
 | P08-T03 | Buat adapter WhatsApp untuk tautan status nasabah dan implementasi produksi berdasarkan konfigurasi/provider terverifikasi; gunakan adapter deterministik untuk test. Buat Daftar Kredit Karyawan, default HRD approved, filter perusahaan/debitor/status, detail identitas/score, form nominal/tenor/asuransi/status dengan DKN_CREATE/READ/UPDATE/DELETE/APPROVAL. |
 | P08-T04 | Verifikasi akhir phase: unit biaya/score/status, integration transaksi snapshot, pengulangan request dan gagal notifikasi, E2E approved/rejected/completed dan lock form. Uji kebocoran tenant dan field approval melalui API. |
+| P08-T05 | Pisahkan halaman detail dan form keputusan BPR sesuai standar page; verifikasi ulang lint, typecheck, build dan alur browser review. |
 
 ## P09 — Status nasabah, pembatalan dan rekening
 

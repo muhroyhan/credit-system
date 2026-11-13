@@ -65,15 +65,18 @@ test('BPR can approve, reject and complete HRD-approved applications', async ({
         .filter({ hasText: amount })
         .getByRole('link', { name: 'Lihat' })
         .click();
+      await page.getByRole('link', { name: 'Ubah keputusan' }).click();
       await page.getByRole('textbox', { name: 'Keputusan BPR' }).click();
       await page.getByRole('option', { name: status, exact: true }).click();
       await page.getByRole('button', { name: 'Simpan keputusan' }).click();
-      await expect(page.getByText(`Status BPR: ${status}`)).toBeVisible();
+      await expect(page.getByText(/Keputusan tersimpan/).first()).toBeVisible();
       if (status !== 'approved') {
         await expect(
           page.getByRole('button', { name: 'Simpan keputusan' }),
         ).toHaveCount(0);
       }
+      await page.getByRole('link', { name: 'Kembali' }).click();
+      await expect(page.getByText(`Status BPR: ${status}`)).toBeVisible();
       await page.getByRole('link', { name: 'Kembali' }).click();
     }
   } finally {
