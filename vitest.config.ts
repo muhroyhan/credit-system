@@ -13,6 +13,7 @@ export default defineConfig({
       {
         test: {
           name: 'integration',
+          fileParallelism: false,
           include: ['tests/integration/**/*.test.ts'],
         },
       },

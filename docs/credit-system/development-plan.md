@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P06 selesai; P07–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00–P07 selesai; P08–P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -78,7 +78,7 @@ Status: done. P06-T01: b27e9e3; P06-T02: e4b11ca; P06-T03: b8cd2d8; P06-T04: lih
 
 Hasil: HRD meninjau dan menyetujui/menolak pengajuan perusahaan sendiri; keputusan tersimpan tanpa bergantung layar BPR.
 
-Status: doing. P07-T01 dan P07-T02 selesai; P07-T03 belum selesai.
+Status: done. P07-T01: 0d88281; P07-T02: c83654d; P07-T03: lihat footer commit Task: P07-T03. Bukti verifikasi pada testing.md.
 
 | Kode task | Task dan keluaran |
 | --- | --- |
