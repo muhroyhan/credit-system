@@ -1,7 +1,7 @@
 import {
   addAgreementMonths,
   rupiahInWords,
-} from '@server/features/agreement/agreement.service';
+} from '@server/features/agreement/utils/agreement-format';
 import { describe, expect, it } from 'vitest';
 
 describe('agreement date and amount formatting', () => {

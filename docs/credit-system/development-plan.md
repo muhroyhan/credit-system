@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P11 selesai; P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P12 selesai. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -140,6 +140,8 @@ Hasil: ekspor perusahaan, debitor, kredit dan dokumen mengikuti filter, sort dan
 | P11-T03 | Verifikasi akhir phase: unit format/filter, integration isi CSV/ZIP dan scope aktor, E2E unduhan sesuai filter termasuk kosong/gagal dan tanpa bocor tenant. |
 
 ## P12 — Dashboard aktor
+
+Status: done. P12-T01: 6206d72; P12-T02: a2968ed; P12-T03: lihat footer commit Task: P12-T03. Bukti verifikasi pada testing.md.
 
 Hasil: admin, HRD dan debitor melihat ringkasan sesuai kontrak, dengan navigasi yang sudah tersedia pada phase dependensinya.
 

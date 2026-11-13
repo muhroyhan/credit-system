@@ -67,7 +67,7 @@ PDF memuat identitas bank, perusahaan dan debitor, nominal dan terbilang, tenor,
 | Administrasi | CRUD administrator/role dan perusahaan; pengaman hapus perusahaan yang memiliki debitor. |
 | Master Karyawan | Registrasi publik melalui slug, pendaftaran oleh HRD, profil, penghasilan, dokumen, daftar/detail/edit dan pengaman hapus bila memiliki kredit. |
 | Review dan pelaporan | Daftar Kredit Karyawan lintas perusahaan untuk BPR, ekspor sesuai filter, PDF tunggal dan ZIP dokumen. |
-| Dashboard | Total perusahaan active/inactive (blocked tidak dihitung), jumlah debitor sesuai aktor (nol bagi debitor), nominal pengajuan per status HRD. Total perusahaan global tetap perlu keputusan untuk aktor debitor (SUPPORT-04). |
+| Dashboard | Total perusahaan active/inactive (blocked tidak dihitung), jumlah debitor sesuai aktor (nol bagi debitor), nominal pengajuan per status HRD. Total perusahaan global juga ditampilkan kepada debitor sesuai ketentuan P12 (SUPPORT-04). |
 | Referensi dan navigasi | Kamus program, badan usaha, negara, constant; menu sesuai aktor, breadcrumb, kondisi kosong/gagal dan tampilan mobile. |
 
 Registrasi memerlukan nama lengkap, username, password dan konfirmasi. Password registrasi minimal delapan karakter, mengandung huruf besar/kecil dan angka; username menerima huruf, angka, titik, underscore dan tanda hubung. Ini kebutuhan registrasi nasabah, bukan klaim validasi seluruh form sudah tersedia.

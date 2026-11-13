@@ -69,7 +69,7 @@ P07: PUT /credit/update juga menerima body strict `{id, status}` dengan status `
 
 Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx|csv. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, insurance, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected.
 
-## Rancangan API P12 (belum tersedia)
+## Ringkasan dashboard
 
 | Method dan path | Fungsi |
 | --- | --- |
@@ -81,9 +81,9 @@ Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK da
 - Daftar kredit menyediakan `count`, data kredit, total angsuran, dan untuk admin skor serta jumlah pengajuan. Filter tanggal menggunakan awal/akhir hari; nama perusahaan dan nama debitor menggunakan pencarian parsial. CSV menyediakan format pengajuan umum dan format daftar kredit karyawan, termasuk status HRD/BPR, rekening dan tanggal.
 
 
-GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCredits dengan agregasi sesuai business-flow.md. CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
+GET /dashboard/data memerlukan sesi dan mengembalikan totalUsers (jumlah global active/inactive), totalDebitor (jumlah sesuai aktor), totalCredits {pending, approved, completed} (nominal string desimal sesuai scope aktor dan status HRD). CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
 
-Path di bagian rancangan belum final. Normalisasi list/detail mengikuti pola fitur saat diimplementasikan; operasi GET yang mengubah dokumen harus ditinjau pada FLOW-11, bukan dianggap endpoint berjalan.
+Dashboard merupakan pembacaan terotorisasi dan tidak mengubah data.
 
 P09-T01: `PUT /credit/cancel` menerima `{ "id": number }` dari debitor pemilik. Dua status approval harus approved dan acknowledgment belum ada; transaksi menetapkan status BPR rejected serta tanggal acknowledgment server, tanpa mengubah HRD. Pengulangan menghasilkan 409. Kolom acknowledgment bertipe DATE sehingga hanya tanggal disimpan.
 
