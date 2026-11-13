@@ -164,8 +164,8 @@ dilengkapi pada task dokumentasi terakhir. Tidak ada task diblokir keputusan bis
 | P13-T01 | Harness, isolasi lingkungan, fixture bersama dan cleanup adapter | done | b925bdf |
 | P13-T02 | Auth, referensi dan ACL | done | 080f94f |
 | P13-T03 | Administrator dan role | done | 98786ff |
-| P13-T04 | Perusahaan dan konfigurasi child | done | footer Task: P13-T04 |
-| P13-T05 | Registrasi, profil dan dokumen karyawan | doing | footer Task: P13-T05 |
+| P13-T04 | Perusahaan dan konfigurasi child | done | aa7bc9e |
+| P13-T05 | Registrasi, profil dan dokumen karyawan | done | footer Task: P13-T05 |
 | P13-T06 | Simulasi, scope dan child kredit | doing | footer Task: P13-T06 |
 | P13-T07 | Approval HRD dan konkurensi | doing | footer Task: P13-T07 |
 | P13-T08 | Review BPR, snapshot dan kegagalan notifikasi | doing | footer Task: P13-T08 |

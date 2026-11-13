@@ -4,8 +4,10 @@ import {
 } from '@credit/contracts';
 import { EmployeeInvalid } from '@server/features/employees/employees.error';
 import { validateEmployeeDocument } from '@server/features/employees/employees.service';
+import { validEmployeeDocumentKey } from '@server/features/employees/utils/valid-employee-document-key';
 import { crudaAccess } from '@web/utils/cruda';
 import { describe, expect, it } from 'vitest';
+import { profile } from '../setup/fixtures';
 
 describe('P05 account, profile and document boundaries', () => {
   it('rejects internal registration fields and validates passwords repeatedly without regex state', () => {
@@ -86,5 +88,97 @@ describe('P05 account, profile and document boundaries', () => {
       true,
     );
     expect(crudaAccess(session, 'USA').read).toBe(false);
+  });
+});
+
+describe('EMPLOYEE-U profile and file partitions', () => {
+  it('accepts a complete profile and unsigned income boundaries', () => {
+    expect(employeeProfileSchema.parse(profile)).toEqual(profile);
+    for (const takehomePay of ['0', '4294967295']) {
+      expect(
+        employeeProfileSchema.safeParse({ ...profile, takehomePay }).success,
+      ).toBe(true);
+    }
+  });
+  it.each([
+    'employeeId',
+    'noKtp',
+    'namaLengkap',
+    'jenisKelamin',
+    'agama',
+    'tempatLahir',
+    'tanggalLahir',
+    'statusMarital',
+    'namaIbuKandung',
+    'alamatKtp',
+    'provinsi',
+    'kota',
+    'kecamatan',
+    'kelurahanDesa',
+    'kodePos',
+    'alamatDomisili',
+    'takehomePay',
+  ])('rejects missing required profile %s', (field) => {
+    expect(
+      employeeProfileSchema.safeParse({ ...profile, [field]: '' }).success,
+    ).toBe(false);
+  });
+  it.each(['-1', '0.5', '1.000', '4294967296', 'NaN'])(
+    'rejects income %s',
+    (takehomePay) => {
+      expect(
+        employeeProfileSchema.safeParse({ ...profile, takehomePay }).success,
+      ).toBe(false);
+    },
+  );
+  it.each([
+    ['document.PDF', 'application/pdf', [37, 80, 68, 70, 45], 'pdf'],
+    ['document.png', 'image/png', [137, 80, 78, 71, 13, 10, 26, 10], 'png'],
+    ['document.jpeg', 'image/jpeg', [255, 216, 255], 'jpg'],
+    ['document.JPG', 'image/jpeg', [255, 216, 255], 'jpg'],
+  ] as const)(
+    'accepts matching signature for %s',
+    (name, type, signature, extension) => {
+      expect(
+        validateEmployeeDocument({
+          name,
+          type,
+          bytes: new Uint8Array(signature),
+        }),
+      ).toBe(extension);
+    },
+  );
+  it('accepts exactly 10 MB and rejects mismatched MIME and extension', () => {
+    const bytes = new Uint8Array(10 * 1024 * 1024);
+    bytes.set([37, 80, 68, 70, 45]);
+    expect(
+      validateEmployeeDocument({
+        name: 'doc.pdf',
+        type: 'application/pdf',
+        bytes,
+      }),
+    ).toBe('pdf');
+    for (const metadata of [
+      { name: 'doc.png', type: 'application/pdf' },
+      { name: 'doc.pdf', type: 'image/png' },
+    ]) {
+      expect(() => validateEmployeeDocument({ ...metadata, bytes })).toThrow(
+        EmployeeInvalid,
+      );
+    }
+  });
+  it.each([
+    '../secret.pdf',
+    '/1/file.pdf',
+    'https://example.invalid/doc.pdf',
+    '1/not-a-uuid.pdf',
+    '1/00000000-0000-4000-8000-000000000000.exe',
+  ])('rejects untrusted stored document key %s', (key) => {
+    expect(validEmployeeDocumentKey(key)).toBe(false);
+  });
+  it('accepts service-generated private document keys', () => {
+    expect(
+      validEmployeeDocumentKey('1/00000000-0000-4000-8000-000000000000.pdf'),
+    ).toBe(true);
   });
 });
