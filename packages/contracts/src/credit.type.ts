@@ -92,6 +92,15 @@ export const creditApplicationSchema = z.strictObject({
 export const creditUpdateSchema = creditApplicationSchema.extend({
   id: z.number().int().positive(),
 });
+export const creditApprovalSchema = z.strictObject({
+  id: z.number().int().positive(),
+  status: z.enum(['approved', 'rejected']),
+});
+export const creditUpdateRequestSchema = z.union([
+  creditApprovalSchema,
+  creditUpdateSchema,
+]);
+export type CreditApproval = z.infer<typeof creditApprovalSchema>;
 
 export const creditQuerySchema = z.object({
   userId: z.coerce.number().int().positive().optional(),

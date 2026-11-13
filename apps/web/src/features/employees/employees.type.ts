@@ -55,4 +55,3 @@ export const employeeDocumentsSchema = z.record(
   z.instanceof(File).nullable(),
 );
 export type EmployeeDocuments = z.infer<typeof employeeDocumentsSchema>;
-export type EmployeeDownloadResponse = Pick<Response, 'ok' | 'blob'>;

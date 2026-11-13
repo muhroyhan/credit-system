@@ -1,33 +1,18 @@
 import type { EmployeeProfile } from '@credit/contracts';
-import type { AppType } from '@credit/server/app';
-import type { ApiResponse } from '@web/constant/interface';
-import { apiErrorSchema } from '@web/constant/schema';
 import type { ExportFormat } from '@web/constant/type';
 import {
-  type EmployeeDownloadResponse,
   type EmployeeFormInput,
   employeeDetailSchema,
   employeeListSchema,
   type RegistrationInput,
 } from '@web/features/employees/employees.type';
-import { hc } from 'hono/client';
+import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
+import { downloadFile } from '@web/utils/download-file';
 
-const client = hc<AppType>(window.location.origin).api.debitor;
-function options(token: string) {
-  return { headers: { Authorization: `Bearer ${token}` } };
-}
-async function read(response: ApiResponse) {
-  const body = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      apiErrorSchema.safeParse(body).data?.error ?? 'Operasi gagal',
-    );
-  }
-  return body;
-}
+const client = apiClient.api.debitor;
 export async function registerEmployee(slug: string, input: RegistrationInput) {
   const { confirmPassword: _confirmation, ...account } = input;
-  return read(
+  return readApiResponse(
     await client.register.$post(
       {},
       {
@@ -41,20 +26,20 @@ export async function registerEmployee(slug: string, input: RegistrationInput) {
 }
 export async function listEmployees(token: string, query: URLSearchParams) {
   return employeeListSchema.parse(
-    await read(
+    await readApiResponse(
       await client.list.$get(
         { query: Object.fromEntries(query) } as never,
-        options(token),
+        apiOptions(token),
       ),
     ),
   );
 }
 export async function employeeDetail(token: string, id: number) {
   return employeeDetailSchema.parse(
-    await read(
+    await readApiResponse(
       await client.detail.$get(
         { query: { id: String(id) } } as never,
-        options(token),
+        apiOptions(token),
       ),
     ),
   );
@@ -69,12 +54,12 @@ export async function saveEmployee(
   const init = {
     method: id ? 'PUT' : 'POST',
     headers: {
-      Authorization: `Bearer ${token}`,
+      ...apiOptions(token).headers,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(id ? { ...value, id } : { ...value, userId }),
   };
-  return read(
+  return readApiResponse(
     id
       ? await client.update.$put({}, { init })
       : await client.create.$post({}, { init }),
@@ -85,14 +70,14 @@ export async function saveProfile(
   id: number,
   profile: EmployeeProfile,
 ) {
-  return read(
+  return readApiResponse(
     await client.profile.$put(
       {},
       {
         init: {
           method: 'PUT',
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...apiOptions(token).headers,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ id, profile }),
@@ -102,19 +87,19 @@ export async function saveProfile(
   );
 }
 export async function uploadDocuments(token: string, body: FormData) {
-  return read(
-    await client.documents.$post({}, { ...options(token), init: { body } }),
+  return readApiResponse(
+    await client.documents.$post({}, { ...apiOptions(token), init: { body } }),
   );
 }
 export async function deleteEmployee(token: string, id: number) {
-  return read(
+  return readApiResponse(
     await client.delete.$put(
       {},
       {
         init: {
           method: 'PUT',
           headers: {
-            Authorization: `Bearer ${token}`,
+            ...apiOptions(token).headers,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ id }),
@@ -123,27 +108,17 @@ export async function deleteEmployee(token: string, id: number) {
     ),
   );
 }
-async function download(response: EmployeeDownloadResponse, filename: string) {
-  if (!response.ok) {
-    throw new Error('Unduhan gagal');
-  }
-  const url = URL.createObjectURL(await response.blob());
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 export async function exportEmployees(
   token: string,
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  query.set('format', format);
-  await download(
+  const exportQuery = new URLSearchParams(query);
+  exportQuery.set('format', format);
+  await downloadFile(
     await client.export.$get(
-      { query: Object.fromEntries(query) } as never,
-      options(token),
+      { query: Object.fromEntries(exportQuery) } as never,
+      apiOptions(token),
     ),
     `employees.${format}`,
   );
@@ -155,11 +130,11 @@ export async function downloadDocument(
 ) {
   const response = await client.document.$get(
     { query: { id: String(id), kind } } as never,
-    options(token),
+    apiOptions(token),
   );
   const filename =
     response.headers
       .get('Content-Disposition')
       ?.match(/filename="([^"]+)"/)?.[1] ?? 'document';
-  await download(response, filename);
+  await downloadFile(response, filename);
 }

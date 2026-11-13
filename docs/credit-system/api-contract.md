@@ -63,6 +63,8 @@ Detail menambahkan profile dan documents (URL unduhan privat atau null). GET /do
 
 ### Pengajuan kredit (P06)
 
+P07: PUT /credit/update juga menerima body strict `{id, status}` dengan status `approved` atau `rejected`, hanya untuk HRD perusahaan pemilik. Keputusan hanya tersedia dari `pending`; status lain dan pengulangan menghasilkan 409. Debitor/admin atau HRD tenant lain mendapat 403. Audit ditentukan server. Payload keputusan tidak dapat dicampur dengan field pengajuan atau biaya.
+
 Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, insurance, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected.
 
 ## Rancangan API P07–P12 (belum tersedia)
