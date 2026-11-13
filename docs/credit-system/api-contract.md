@@ -81,7 +81,7 @@ Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK da
 - Daftar kredit menyediakan `count`, data kredit, total angsuran, dan untuk admin skor serta jumlah pengajuan. Filter tanggal menggunakan awal/akhir hari; nama perusahaan dan nama debitor menggunakan pencarian parsial. CSV menyediakan format pengajuan umum dan format daftar kredit karyawan, termasuk status HRD/BPR, rekening dan tanggal.
 
 
-GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCredits dengan agregasi sesuai business-flow.md. CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
+GET /dashboard/data memerlukan sesi dan mengembalikan totalUsers (jumlah global active/inactive), totalDebitor (jumlah sesuai aktor), totalCredits {pending, approved, completed} (nominal string desimal sesuai scope aktor dan status HRD). CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
 
 Path di bagian rancangan belum final. Normalisasi list/detail mengikuti pola fitur saat diimplementasikan; operasi GET yang mengubah dokumen harus ditinjau pada FLOW-11, bukan dianggap endpoint berjalan.
 
