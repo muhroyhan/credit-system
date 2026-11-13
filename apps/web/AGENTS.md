@@ -19,7 +19,7 @@ Pakai komponen bersama src/components/crud: CrudPage (layout/ACL), ListingTable 
 
 TanStack Router mengelola routing; TanStack Query mengelola data API. Query key mencakup sesi/parameter, mutation menginvalidasi query terkait, cache dibersihkan saat logout. React Hook Form memakai Zod resolver, menampilkan error per field, dan tidak meneruskan data invalid ke mutation. UI menampilkan loading/kosong/sukses/gagal sesuai hasil operasi.
 
-Setiap listing menggunakan satu state `[queries, setQueries]` untuk filter, urutan dan pagination. Filter kosong bernilai `undefined` dan tidak disertakan dalam parameter URL; daftar dan ekspor memakai state yang sama. Perubahan filter atau urutan mengembalikan halaman ke satu.
+Setiap hook listing menyimpan satu state `[queries, setQueries]` untuk filter, urutan dan pagination serta menangani query dan mutation ekspor. Filter kosong bernilai `undefined` dan tidak disertakan dalam parameter URL; daftar dan ekspor memakai state yang sama. Perubahan filter atau urutan mengembalikan halaman ke satu.
 
 Gate CRUDA melindungi halaman dan aksi sebelum konten/query dimount, termasuk akses URL langsung. Hak UI memakai snapshot login; otorisasi API tetap wajib. Kontrak sesi/izin hanya di api-contract.md.
 

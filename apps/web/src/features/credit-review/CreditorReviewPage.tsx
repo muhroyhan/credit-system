@@ -1,14 +1,10 @@
 import { Select, TextInput } from '@mantine/core';
-import { useMutation } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import { exportReviews } from '@web/features/credit-review/credit-review.api';
 import { useCreditReviews } from '@web/features/credit-review/hooks/useCreditReviews';
-import { toSearchParams } from '@web/utils/search-params';
-import { useState } from 'react';
 export function CreditorReviewPage() {
   return (
     <CrudPage program="DKN" action="read" title="Daftar Kredit Karyawan">
@@ -18,23 +14,9 @@ export function CreditorReviewPage() {
 }
 function Content() {
   const { session } = useSession();
-  const token = session?.authToken ?? '';
-  const [queries, setQueries] = useState({
-    page: 1,
-    limit: 20,
-    nama: undefined as string | undefined,
-    status: 'approved',
-    sortBy: 'createdAt',
-    sortDirection: 'desc',
-    userId: undefined as string | undefined,
-    debitorId: undefined as string | undefined,
-    statusAdminApproval: undefined as string | undefined,
-  });
-  const list = useCreditReviews(token, queries);
-  const exporting = useMutation({
-    mutationFn: (format: 'pdf' | 'xlsx') =>
-      exportReviews(token, toSearchParams(queries), format),
-  });
+  const { queries, setQueries, list, exporting } = useCreditReviews(
+    session?.authToken ?? '',
+  );
   return (
     <ListingTable
       rows={(list.data?.data ?? []).map((row) => ({
