@@ -15,6 +15,8 @@ import {
 } from '@credit/database/schema';
 import type { DatabaseTransaction } from '@server/constant/type';
 import type {
+  CreditChildInput,
+  CreditChildTable,
   CreditCollectionInput,
   CreditGuarantorInput,
   CreditInsuranceInput,
@@ -34,6 +36,32 @@ import {
   lte,
   sql,
 } from 'drizzle-orm';
+
+/** Keeps child persistence in the caller's transaction; table and input remain paired. */
+async function saveChild<T extends CreditChildTable>(
+  table: T,
+  creditId: number,
+  values: CreditChildInput<NoInfer<T>>,
+  actor: string,
+  tx: DatabaseTransaction,
+) {
+  const childTable: CreditChildTable = table;
+  const [row] = await tx
+    .select({ id: childTable.id })
+    .from(childTable)
+    .where(eq(childTable.creditId, creditId))
+    .limit(1);
+  if (row) {
+    await tx
+      .update(childTable)
+      .set({ ...values, updatedBy: actor, updatedAt: new Date() })
+      .where(eq(childTable.id, row.id));
+  } else {
+    await tx
+      .insert(childTable)
+      .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
+  }
+}
 
 export const creditRepository = {
   async debitorId(id: number, tx: DatabaseTransaction) {
@@ -92,6 +120,7 @@ export const creditRepository = {
         credit: credits,
         userId: debitors.userId,
         nama: debitors.namaLengkap,
+        noKtp: debitors.noKtp,
         companyName: users.companyName,
       })
       .from(credits)
@@ -248,21 +277,7 @@ export const creditRepository = {
     actor: string,
     tx: DatabaseTransaction,
   ) {
-    const [row] = await tx
-      .select({ id: creditCollection.id })
-      .from(creditCollection)
-      .where(eq(creditCollection.creditId, creditId))
-      .limit(1);
-    if (row) {
-      await tx
-        .update(creditCollection)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
-        .where(eq(creditCollection.id, row.id));
-    } else {
-      await tx
-        .insert(creditCollection)
-        .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
-    }
+    await saveChild(creditCollection, creditId, values, actor, tx);
   },
   async guarantor(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx
@@ -278,21 +293,7 @@ export const creditRepository = {
     actor: string,
     tx: DatabaseTransaction,
   ) {
-    const [row] = await tx
-      .select({ id: creditGuarantor.id })
-      .from(creditGuarantor)
-      .where(eq(creditGuarantor.creditId, creditId))
-      .limit(1);
-    if (row) {
-      await tx
-        .update(creditGuarantor)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
-        .where(eq(creditGuarantor.id, row.id));
-    } else {
-      await tx
-        .insert(creditGuarantor)
-        .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
-    }
+    await saveChild(creditGuarantor, creditId, values, actor, tx);
   },
   async insurance(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx
@@ -308,21 +309,7 @@ export const creditRepository = {
     actor: string,
     tx: DatabaseTransaction,
   ) {
-    const [row] = await tx
-      .select({ id: creditInsurance.id })
-      .from(creditInsurance)
-      .where(eq(creditInsurance.creditId, creditId))
-      .limit(1);
-    if (row) {
-      await tx
-        .update(creditInsurance)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
-        .where(eq(creditInsurance.id, row.id));
-    } else {
-      await tx
-        .insert(creditInsurance)
-        .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
-    }
+    await saveChild(creditInsurance, creditId, values, actor, tx);
   },
   async potongan(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx
@@ -338,21 +325,7 @@ export const creditRepository = {
     actor: string,
     tx: DatabaseTransaction,
   ) {
-    const [row] = await tx
-      .select({ id: creditPotongan.id })
-      .from(creditPotongan)
-      .where(eq(creditPotongan.creditId, creditId))
-      .limit(1);
-    if (row) {
-      await tx
-        .update(creditPotongan)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
-        .where(eq(creditPotongan.id, row.id));
-    } else {
-      await tx
-        .insert(creditPotongan)
-        .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
-    }
+    await saveChild(creditPotongan, creditId, values, actor, tx);
   },
   async slikBmpk(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx
@@ -368,21 +341,7 @@ export const creditRepository = {
     actor: string,
     tx: DatabaseTransaction,
   ) {
-    const [row] = await tx
-      .select({ id: creditSlikBmpk.id })
-      .from(creditSlikBmpk)
-      .where(eq(creditSlikBmpk.creditId, creditId))
-      .limit(1);
-    if (row) {
-      await tx
-        .update(creditSlikBmpk)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
-        .where(eq(creditSlikBmpk.id, row.id));
-    } else {
-      await tx
-        .insert(creditSlikBmpk)
-        .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
-    }
+    await saveChild(creditSlikBmpk, creditId, values, actor, tx);
   },
   async spouse(creditId: number, tx: DatabaseTransaction) {
     const [row] = await tx
@@ -398,20 +357,6 @@ export const creditRepository = {
     actor: string,
     tx: DatabaseTransaction,
   ) {
-    const [row] = await tx
-      .select({ id: creditSpouse.id })
-      .from(creditSpouse)
-      .where(eq(creditSpouse.creditId, creditId))
-      .limit(1);
-    if (row) {
-      await tx
-        .update(creditSpouse)
-        .set({ ...values, updatedBy: actor, updatedAt: new Date() })
-        .where(eq(creditSpouse.id, row.id));
-    } else {
-      await tx
-        .insert(creditSpouse)
-        .values({ ...values, creditId, createdBy: actor, updatedBy: actor });
-    }
+    await saveChild(creditSpouse, creditId, values, actor, tx);
   },
 };

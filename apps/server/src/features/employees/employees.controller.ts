@@ -11,48 +11,25 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
-import {
-  EmployeeConflict,
-  EmployeeForbidden,
-  EmployeeInvalid,
-  EmployeeNotFound,
-} from '@server/features/employees/employees.error';
 import { employeesService } from '@server/features/employees/employees.service';
 import type { EmployeeDocumentInput } from '@server/features/employees/employees.type';
+import { controllerFailure, parseJsonInput } from '@server/utils/controller';
+import { exportHeaders } from '@server/utils/export-file';
 import type { Context } from 'hono';
 
-function failure(c: Context<AuthEnv>, error: unknown) {
-  if (error instanceof EmployeeInvalid) {
-    return c.json({ error: error.message }, 400);
-  }
-  if (error instanceof EmployeeForbidden) {
-    return c.json({ error: 'forbidden' }, 403);
-  }
-  if (error instanceof EmployeeNotFound) {
-    return c.json({ error: 'not found' }, 404);
-  }
-  if (error instanceof EmployeeConflict) {
-    return c.json({ error: error.message }, 409);
-  }
-  throw error;
-}
 async function register(c: Context<AuthEnv>) {
-  const parsed = employeeRegisterSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, employeeRegisterSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
   try {
     return c.json({ id: await employeesService.register(parsed.data) }, 201);
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function create(c: Context<AuthEnv>) {
-  const parsed = employeeCreateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, employeeCreateSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -62,13 +39,11 @@ async function create(c: Context<AuthEnv>) {
       201,
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function update(c: Context<AuthEnv>) {
-  const parsed = employeeUpdateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, employeeUpdateSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -78,7 +53,7 @@ async function update(c: Context<AuthEnv>) {
       id: await employeesService.save(input, c.get('identity'), id),
     });
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function list(c: Context<AuthEnv>) {
@@ -89,7 +64,7 @@ async function list(c: Context<AuthEnv>) {
   try {
     return c.json(await employeesService.list(parsed.data, c.get('identity')));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function detail(c: Context<AuthEnv>) {
@@ -102,13 +77,11 @@ async function detail(c: Context<AuthEnv>) {
       await employeesService.detail(parsed.data.id, c.get('identity')),
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function remove(c: Context<AuthEnv>) {
-  const parsed = adminDeleteSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, adminDeleteSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -117,13 +90,11 @@ async function remove(c: Context<AuthEnv>) {
       id: await employeesService.remove(parsed.data.id, c.get('identity')),
     });
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function profile(c: Context<AuthEnv>) {
-  const parsed = employeeProfileUpdateSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const parsed = await parseJsonInput(c, employeeProfileUpdateSchema);
   if (!parsed.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -136,7 +107,7 @@ async function profile(c: Context<AuthEnv>) {
       ),
     });
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function upload(c: Context<AuthEnv>) {
@@ -180,7 +151,7 @@ async function upload(c: Context<AuthEnv>) {
       ),
     });
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function document(c: Context<AuthEnv>) {
@@ -211,7 +182,7 @@ async function document(c: Context<AuthEnv>) {
     c.header('X-Content-Type-Options', 'nosniff');
     return c.body(new Uint8Array(result.bytes).buffer);
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function exportFile(c: Context<AuthEnv>) {
@@ -226,19 +197,9 @@ async function exportFile(c: Context<AuthEnv>) {
       c.get('identity'),
       format,
     );
-    c.header(
-      'Content-Type',
-      format === 'pdf'
-        ? 'application/pdf'
-        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    c.header(
-      'Content-Disposition',
-      `attachment; filename="employees.${format}"`,
-    );
-    return c.body(file);
+    return c.body(file, 200, exportHeaders('employees', format));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 export const employeesController = {

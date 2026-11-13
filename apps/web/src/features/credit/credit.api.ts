@@ -8,6 +8,7 @@ import {
 } from '@web/features/credit/credit.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
+import { toExportQuery } from '@web/utils/search-params';
 
 const api = apiClient.api.credit;
 export async function listCredits(token: string, query: URLSearchParams) {
@@ -71,10 +72,8 @@ export async function exportCredits(
   query: URLSearchParams,
   format: ExportFormat,
 ) {
-  const params = new URLSearchParams(query);
-  params.set('format', format);
   const response = await api.export.$get(
-    { query: Object.fromEntries(params) } as never,
+    { query: toExportQuery(query, format) } as never,
     apiOptions(token),
   );
   await downloadFile(response, `credits.${format}`, 'Unduhan gagal');

@@ -1,7 +1,9 @@
-import { closeDatabase, connectDatabase } from '@credit/database/client';
+import { connectDatabase } from '@credit/database/client';
 import { credits } from '@credit/database/schema';
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { inArray } from 'drizzle-orm';
+import { loginBrowser, loginHeaders } from './fixtures/login';
+import { test } from './fixtures/test';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(
@@ -14,27 +16,18 @@ test('HRD approves and rejects while other actors cannot decide', async ({
 }) => {
   const ids: number[] = [];
   try {
-    const signIn = async (type: string, username: string, slug: string) => {
-      const response = await request.post('/api/login', {
-        data: { type, username, slug, password },
-      });
-      expect(response.status()).toBe(200);
-      return { Authorization: `Bearer ${(await response.json()).authToken}` };
+    const signIn = async (
+      type: 'admin' | 'company' | 'debitor',
+      username: string,
+      slug: string,
+    ) => {
+      return loginHeaders(request, { type, username, slug, password });
     };
     const hrd = await signIn('company', 'hrd_satu', 'sintetis-satu');
     const other = await signIn('company', 'hrd_dua', 'sintetis-dua');
     const debitor = await signIn('debitor', 'debitor_satu', 'sintetis-satu');
     const admin = await signIn('admin', 'admin_sintetis', 'admin');
-    await page.goto('/login');
-    await page.getByRole('textbox', { name: 'Jenis akun' }).click();
-    await page.getByRole('option', { name: 'Perusahaan / HRD' }).click();
-    await page.getByRole('textbox', { name: 'Perusahaan' }).click();
-    await page
-      .getByRole('option', { name: 'Perusahaan Sintetis Satu' })
-      .click();
-    await page.getByLabel('Username atau email').fill('hrd_satu');
-    await page.getByLabel(/^Password/).fill(password ?? '');
-    await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+    await loginBrowser(page, { type: 'company', username: 'hrd_satu' });
     await page.getByRole('link', { name: 'Pengajuan Kredit' }).click();
     for (const [status, amount, button] of [
       ['approved', '15000000', 'Setujui'],
@@ -96,6 +89,5 @@ test('HRD approves and rejects while other actors cannot decide', async ({
         .db.delete(credits)
         .where(inArray(credits.id, ids));
     }
-    await closeDatabase();
   }
 });

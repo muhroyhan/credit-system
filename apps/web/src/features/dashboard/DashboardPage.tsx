@@ -26,6 +26,9 @@ export function DashboardPage() {
         {crudaAccess(session, 'CGP').read && (
           <Link to="/credits">Pengajuan Kredit</Link>
         )}
+        {crudaAccess(session, 'DKN').read && (
+          <Link to="/credit-reviews">Daftar Kredit Karyawan</Link>
+        )}
         <Button onClick={logout}>Keluar</Button>
       </Stack>
     </Container>

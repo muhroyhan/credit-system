@@ -12,32 +12,27 @@ export interface CreditRate {
   bungaPercentage: string;
 }
 
-export type CreditCollectionInput = Omit<
-  typeof creditCollection.$inferInsert,
-  'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
->;
+export type CreditCollectionInput = CreditChildInput<typeof creditCollection>;
 
-export type CreditGuarantorInput = Omit<
-  typeof creditGuarantor.$inferInsert,
-  'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
->;
+export type CreditGuarantorInput = CreditChildInput<typeof creditGuarantor>;
 
-export type CreditInsuranceInput = Omit<
-  typeof creditInsurance.$inferInsert,
-  'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
->;
+export type CreditInsuranceInput = CreditChildInput<typeof creditInsurance>;
 
-export type CreditPotonganInput = Omit<
-  typeof creditPotongan.$inferInsert,
-  'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
->;
+export type CreditPotonganInput = CreditChildInput<typeof creditPotongan>;
 
-export type CreditSlikBmpkInput = Omit<
-  typeof creditSlikBmpk.$inferInsert,
-  'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
->;
+export type CreditSlikBmpkInput = CreditChildInput<typeof creditSlikBmpk>;
 
-export type CreditSpouseInput = Omit<
-  typeof creditSpouse.$inferInsert,
+export type CreditSpouseInput = CreditChildInput<typeof creditSpouse>;
+
+export type CreditChildTable =
+  | typeof creditCollection
+  | typeof creditGuarantor
+  | typeof creditInsurance
+  | typeof creditPotongan
+  | typeof creditSlikBmpk
+  | typeof creditSpouse;
+
+export type CreditChildInput<T extends CreditChildTable> = Omit<
+  T['$inferInsert'],
   'id' | 'creditId' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
 >;

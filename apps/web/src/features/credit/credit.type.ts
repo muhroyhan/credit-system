@@ -10,6 +10,7 @@ export const creditRowSchema = z.object({
     tanggalPengajuan: z.string().nullable(),
     status: z.string().nullable(),
     statusAdminApproval: z.string().nullable(),
+    biayaAsuransiJiwa: z.number().nullable().optional(),
     debitorAcknowledgmentTimestamp: z.string().nullable(),
   }),
   userId: z.number().nullable(),

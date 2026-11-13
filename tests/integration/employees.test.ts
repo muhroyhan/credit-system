@@ -11,6 +11,7 @@ import {
   debitorOthers,
   debitorSlik,
 } from '@credit/database/schema';
+import { testDatabaseUrl } from '@credit/test-utils/database';
 import type { DocumentStorage, Identity } from '@server/constant/interface';
 import {
   EmployeeConflict,
@@ -20,14 +21,7 @@ import { createEmployeesService } from '@server/features/employees/employees.ser
 import { eq } from 'drizzle-orm';
 import { afterAll, describe, expect, it } from 'vitest';
 
-const url = process.env.DATABASE_URL;
-if (
-  url &&
-  (!['localhost', '127.0.0.1', '::1'].includes(new URL(url).hostname) ||
-    !/^\/credit_[a-z0-9_]*test$/.test(new URL(url).pathname))
-) {
-  throw new Error('Isolated test database required');
-}
+const url = testDatabaseUrl(process.env.DATABASE_URL);
 afterAll(async () => {
   if (url) {
     await closeDatabase();

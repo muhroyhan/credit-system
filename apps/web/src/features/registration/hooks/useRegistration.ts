@@ -2,11 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useSession } from '@web/features/auth/hooks/useSession';
-import { registerEmployee } from '@web/features/employees/employees.api';
+import { registerEmployee } from '@web/features/registration/registration.api';
 import {
   type RegistrationInput,
   registrationSchema,
-} from '@web/features/employees/employees.type';
+} from '@web/features/registration/registration.type';
 import { useForm } from 'react-hook-form';
 export function useRegistration(slug: string) {
   const form = useForm<RegistrationInput>({

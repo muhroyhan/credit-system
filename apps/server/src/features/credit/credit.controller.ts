@@ -5,30 +5,11 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
-import {
-  CreditConflict,
-  CreditForbidden,
-  CreditInvalid,
-  CreditNotFound,
-} from '@server/features/credit/credit.error';
 import { creditService } from '@server/features/credit/credit.service';
+import { controllerFailure, parseJsonInput } from '@server/utils/controller';
+import { exportHeaders } from '@server/utils/export-file';
 import type { Context } from 'hono';
 
-function failure(c: Context<AuthEnv>, error: unknown) {
-  if (error instanceof CreditInvalid) {
-    return c.json({ error: error.message }, 400);
-  }
-  if (error instanceof CreditForbidden) {
-    return c.json({ error: 'forbidden' }, 403);
-  }
-  if (error instanceof CreditNotFound) {
-    return c.json({ error: 'not found' }, 404);
-  }
-  if (error instanceof CreditConflict) {
-    return c.json({ error: error.message }, 409);
-  }
-  throw error;
-}
 async function list(c: Context<AuthEnv>) {
   const input = creditQuerySchema.safeParse(c.req.query());
   if (!input.success) {
@@ -37,7 +18,7 @@ async function list(c: Context<AuthEnv>) {
   try {
     return c.json(await creditService.list(input.data, c.get('identity')));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function detail(c: Context<AuthEnv>) {
@@ -48,13 +29,11 @@ async function detail(c: Context<AuthEnv>) {
   try {
     return c.json(await creditService.detail(input.data.id, c.get('identity')));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function create(c: Context<AuthEnv>) {
-  const input = creditApplicationSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, creditApplicationSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -64,13 +43,11 @@ async function create(c: Context<AuthEnv>) {
       201,
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function update(c: Context<AuthEnv>) {
-  const input = creditUpdateRequestSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, creditUpdateRequestSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -85,13 +62,11 @@ async function update(c: Context<AuthEnv>) {
       id: await creditService.save(application, c.get('identity'), id),
     });
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function simulation(c: Context<AuthEnv>) {
-  const input = creditApplicationSchema.safeParse(
-    await c.req.json().catch(() => null),
-  );
+  const input = await parseJsonInput(c, creditApplicationSchema);
   if (!input.success) {
     return c.json({ error: 'invalid request' }, 400);
   }
@@ -100,7 +75,7 @@ async function simulation(c: Context<AuthEnv>) {
       await creditService.simulation(input.data, c.get('identity')),
     );
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function rates(c: Context<AuthEnv>) {
@@ -111,7 +86,7 @@ async function rates(c: Context<AuthEnv>) {
   try {
     return c.json(await creditService.rates(input.data.id, c.get('identity')));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 async function exporting(c: Context<AuthEnv>) {
@@ -126,16 +101,9 @@ async function exporting(c: Context<AuthEnv>) {
       c.get('identity'),
       format,
     );
-    c.header(
-      'Content-Type',
-      format === 'pdf'
-        ? 'application/pdf'
-        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
-    c.header('Content-Disposition', `attachment; filename="credits.${format}"`);
-    return c.body(file);
+    return c.body(file, 200, exportHeaders('credits', format));
   } catch (error) {
-    return failure(c, error);
+    return controllerFailure(c, error);
   }
 }
 export const creditController = {

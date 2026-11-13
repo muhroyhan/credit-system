@@ -69,6 +69,7 @@ function parseAmount(value: string) {
 }
 
 export const creditService = {
+  parseAmount,
   async approve(input: CreditApproval, identity: Identity) {
     if (identity.type !== 'company') {
       throw new CreditForbidden();

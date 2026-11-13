@@ -1,5 +1,12 @@
-export class EmployeeConflict extends Error {}
-export class EmployeeNotFound extends Error {}
-export class EmployeeForbidden extends Error {}
+import {
+  Conflict,
+  Forbidden,
+  InvalidInput,
+  NotFound,
+} from '@server/utils/service-error';
 
-export class EmployeeInvalid extends Error {}
+export class EmployeeConflict extends Conflict {}
+export class EmployeeNotFound extends NotFound {}
+export class EmployeeForbidden extends Forbidden {}
+
+export class EmployeeInvalid extends InvalidInput {}

@@ -50,6 +50,16 @@ export const credits = mysqlTable('credit', {
   ...audit(),
 });
 
+export const creditExpense = mysqlTable('credit_expense', {
+  id: id(),
+  creditId: ref('credit_id'),
+  expenseName: str('expense_name'),
+  unit: str('unit'),
+  value: int('value'),
+  amount: decimal('amount', { precision: 30, scale: 2 }),
+  ...audit(),
+});
+
 export const creditCollection = mysqlTable('credit_collection', {
   id: id(),
   creditId: ref('credit_id'),

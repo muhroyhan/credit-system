@@ -53,6 +53,8 @@ Metadata kolektor, marketing, pembayaran dan klasifikasi BI.
 
 Snapshot komponen biaya setiap kredit.
 
+P08: migration 0004 menambahkan tabel baru, nullable dan audit mengikuti schema sebelumnya. `amount` memakai DECIMAL(30,2) berdasarkan keputusan pengguna agar pecahan rupiah tersimpan; kamus lama memakai integer. Tidak ada bukti kompatibilitas dengan DDL/data lama atau constraint tambahan.
+
 - `INTEGER`: `amount`, `value`.
 - `INTEGER.UNSIGNED`: `credit_id`.
 - `STRING`: `expense_name`, `unit`.

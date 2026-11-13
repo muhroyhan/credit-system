@@ -47,6 +47,7 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 | SUPPORT-06, SUPPORT-07, FE-14 | P04: pengguna menyetujui array kosong menghapus seluruh konfigurasi. Child harus milik perusahaan, update memakai user_id; nama bungaPercentage konsisten. |
 | SUPPORT-05 | Transaksi parent/child sudah diterapkan. Pemeriksaan konflik sebelum write masih dapat mengalami race antartransaksi karena belum ada constraint unik fisik. |
 | FLOW-08/14, SUPPORT-10, FE-01/11 | P06 menerapkan perhitungan flat bulanan dan score informatif tanpa mengubah rumus. Nominal menerima digit atau pemisah ribuan titik; tenor harus positif, tersedia dalam konfigurasi dan maksimal 12 bulan untuk nominal di bawah Rp8 juta. Agregasi memilih kredit HRD pending/approved. Cakupan verifikasi dan hasil aktual tercatat pada testing.md. |
+| FLOW-04/05/09, FE-06 | Pengguna memilih menyimpan pecahan biaya dengan decimal; P08 memakai `credit_expense.amount` DECIMAL(30,2) dan perhitungan tepat dalam satuan sen. Ini perubahan dari kamus awal integer yang memerlukan pemeriksaan kompatibilitas data lama. Materai Rp10.000 dan tabungan tetap Rp100.000 mengikuti rumus terdokumentasi. Snapshot dan status disimpan dalam satu transaksi; permintaan berulang menghasilkan konflik. Notifikasi dilakukan setelah commit: kegagalan atau konfigurasi kosong dilaporkan dalam respons, tidak membatalkan keputusan dan tidak memiliki retry otomatis atau antrean persisten. Jika proses berhenti sesudah commit sebelum mengirim, notifikasi bisa hilang. Pengiriman WhatsApp nyata belum diuji. |
 | FLOW-01/02/03 | P07: hanya HRD tenant pemilik dapat memutuskan pending menjadi approved/rejected; input keputusan dibatasi id/status, scope dan audit ditentukan server. Approved/rejected terkunci termasuk permintaan berulang. Status lama lain termasuk completed/null tidak memiliki transisi HRD yang ditetapkan, sehingga ditolak; penanganan data lama memerlukan keputusan bisnis. Admin BPR dan debitor tidak mendapat kewenangan HRD. |
 | SUPPORT-03, SUPPORT-11 | Tetap terbuka: status perusahaan tidak diperiksa untuk akun debitor; slug publik mencakup inactive/blocked. Memerlukan keputusan produk sebelum diperketat. |
 | SUPPORT-16 | Belum melarang self-delete atau hapus admin terakhir; risiko kehilangan akses tetap memerlukan keputusan bisnis. |
@@ -60,6 +61,22 @@ Sumber tunggal isu terbuka dan perubahan perilaku. Tabel ID berasal dari analisi
 - JSDoc seluruh ekspor fitur dan preferensi function declaration untuk beberapa factory lokal belum lengkap. Cast komposisi schema Hono dan output jsPDF belum menjadi pembuktian tipe runtime.
 - Validasi response runtime belum seragam; schema input runtime tidak dengan sendirinya membuktikan seluruh DTO keluaran valid.
 - Hak UI memakai snapshot login yang dapat tertinggal; server memeriksa ulang. Ekspor tanpa batas menyimpan data/dokumen dalam memori server selama pembuatan.
+
+## Audit duplikasi — 13 November 2026
+
+Pemindaian blok identik/serupa pada 190 file TS/TSX terlacak (aplikasi, package, konfigurasi dan test), disertai review kandidat. Artefak generated/build/dependency bukan target refactor; kemiripan deklarasi field atau wiring fitur bukan otomatis duplikasi perilaku.
+
+| Area | Hasil / keputusan |
+| --- | --- |
+| Ekspor | Header lima controller dan parameter lima API frontend dipusatkan pada utilitas ekspor/query yang ada; format file, filter, nama unduhan dan status respons dipertahankan. |
+| Schema frontend | Referensi entity dan enum ACL memakai schema kontrak; proxy ekspor schema employee dihapus agar pemakai mengimpor langsung. Schema admin DTO tidak disatukan begitu saja: nullability dan optional roles berbeda. |
+| Controller | Pemetaan error credit/review identik; pola validasi request berulang lintas fitur. Pengguna menyetujui helper bersama; implementasi di utils/controller.ts. Error tidak dikenal harus tetap menjadi kegagalan internal, bukan 400. |
+| Hooks | Query/list/export dan penanganan delete berulang. Pengguna menyetujui dan implementasi memakai useListing; invalidasi cache dan default filter tiap fitur berbeda. |
+| Test | Guard database disposable, identitas sintetis dan login browser berulang. Pengguna menyetujui helper fixture; guard DB dan login fitur dipusatkan. |
+| Service/repository | Hash bcrypt di tiga fitur dan enam pola simpan child kredit berulang. Pengguna menyetujui sentralisasi; hashPassword dan saveChild telah diterapkan; transaksi service dan tipe tiap tabel harus dipertahankan. Guard ownership employee serta query permission auth juga kandidat ekstraksi lokal. |
+| Kontrak/query/form | Pagination, validasi password admin/perusahaan dan bentuk list DTO serupa; belum ada factory bersama. Ekstraksi lebih luas perlu keputusan standar baru, tanpa menyamakan aturan password employee atau scope tenant yang berbeda. |
+
+Audit ini belum menyatakan proyek bebas duplikasi: kandidat kontrak/query/form dan ekstraksi lokal yang belum disepakati tetap dicatat untuk keputusan berikutnya. Hasil pemeriksaan perubahan dicatat di testing.md.
 
 ## Risiko pemetaan data
 

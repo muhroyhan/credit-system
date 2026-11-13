@@ -97,6 +97,11 @@ try {
         { adminUserId: 900001, programId: 900004, value },
         { adminUserId: 900001, programId: 900003, value },
       ]),
+      ...['CREATE', 'READ', 'UPDATE', 'DELETE', 'APPROVAL'].map((value) => ({
+        adminUserId: 900001,
+        programId: 900002,
+        value,
+      })),
       { adminUserId: 900002, programId: 900001, value: 'READ' },
       { adminUserId: 900002, programId: 900004, value: 'READ' },
       { adminUserId: 900002, programId: 900003, value: 'READ' },

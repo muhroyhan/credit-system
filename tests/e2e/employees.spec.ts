@@ -1,20 +1,17 @@
 import { employeeDocumentKinds } from '@credit/contracts';
 import { type APIRequestContext, expect, test } from '@playwright/test';
 import { employeeProfileFields } from '@web/features/employees/employees.constant';
+import { loginBrowser, loginHeaders } from './fixtures/login';
 
 const password = process.env.SEED_PASSWORD;
 test.skip(!password, 'Synthetic database required');
 async function login(
   request: APIRequestContext,
   username: string,
-  type = 'company',
+  type: 'admin' | 'company' | 'debitor' = 'company',
   slug = 'sintetis-satu',
 ) {
-  const response = await request.post('/api/login', {
-    data: { username, type, slug, password },
-  });
-  expect(response.status()).toBe(200);
-  return { Authorization: `Bearer ${(await response.json()).authToken}` };
+  return loginHeaders(request, { username, type, slug, password });
 }
 test('registration API rejects internal fields and isolates employee CRUD and document download', async ({
   request,
@@ -282,14 +279,7 @@ test('HRD creates and deletes a scoped employee through standard pages', async (
   page,
 }) => {
   const username = `p05-hrd-${Date.now()}`;
-  await page.goto('/login');
-  await page.getByRole('textbox', { name: 'Jenis akun' }).click();
-  await page.getByRole('option', { name: 'Perusahaan / HRD' }).click();
-  await page.getByRole('textbox', { name: 'Perusahaan' }).click();
-  await page.getByRole('option', { name: 'Perusahaan Sintetis Satu' }).click();
-  await page.getByLabel('Username atau email').fill('hrd_satu');
-  await page.getByLabel(/^Password/).fill(password ?? '');
-  await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+  await loginBrowser(page, { type: 'company', username: 'hrd_satu' });
   await page.getByRole('link', { name: 'Master Karyawan' }).click();
   await page.getByRole('link', { name: 'Tambah karyawan' }).click();
   await page.getByLabel(/^Nama lengkap/).fill(username);

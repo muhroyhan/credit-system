@@ -1,61 +1,27 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { ExportFormat } from '@web/constant/type';
 import {
   deleteCompany,
   exportCompanies,
   listCompanies,
 } from '@web/features/companies/companies.api';
-import { useState } from 'react';
+import { useListing } from '@web/hooks/useListing';
 
 export function useCompanies(token: string) {
-  const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({
-    companyName: '',
-    username: '',
-    email: '',
-    status: '',
-    entityTypeId: '',
-    sortBy: 'createdAt',
-    sortDirection: 'desc',
-  });
-  const query = new URLSearchParams(
-    Object.entries(filters).filter(([, v]) => !!v),
-  );
-  const list = useQuery({
-    queryKey: ['companies', token, 'list', query.toString(), page],
-    queryFn: () =>
-      listCompanies(
-        token,
-        new URLSearchParams({
-          ...Object.fromEntries(query),
-          page: String(page),
-          limit: '20',
-        }),
-      ),
-  });
-  const client = useQueryClient();
-  const remove = useMutation({
-    mutationFn: (id: number) => deleteCompany(token, id),
-    onSuccess: async () => {
-      if (list.data?.data.length === 1 && page > 1) {
-        setPage(page - 1);
-      }
-      await client.invalidateQueries({ queryKey: ['companies'] });
+  return useListing({
+    initialQueries: {
+      page: 1,
+      limit: 20,
+      companyName: undefined as string | undefined,
+      username: undefined as string | undefined,
+      email: undefined as string | undefined,
+      status: undefined as string | undefined,
+      entityTypeId: undefined as string | undefined,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
     },
+    queryKey: ['companies', token, 'list'],
+    load: (queries) => listCompanies(token, queries),
+    exportFile: (queries, format) => exportCompanies(token, queries, format),
+    deleteRecord: (id) => deleteCompany(token, id),
+    invalidateKey: ['companies'],
   });
-  const exporting = useMutation({
-    mutationFn: (format: ExportFormat) => exportCompanies(token, query, format),
-  });
-  return {
-    list,
-    page,
-    setPage,
-    filters,
-    filter: (key: keyof typeof filters, value: string) => {
-      setFilters((v) => ({ ...v, [key]: value }));
-      setPage(1);
-    },
-    remove,
-    exporting,
-  };
 }

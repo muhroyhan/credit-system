@@ -3,6 +3,7 @@ import {
   companyInputSchema,
   companyInterestSchema,
   type companyQuerySchema,
+  referenceItemSchema,
 } from '@credit/contracts';
 import { z } from 'zod';
 
@@ -38,9 +39,7 @@ export const companyFormSchema = (editing: boolean) =>
         });
       }
     });
-export const entityListSchema = z.array(
-  z.object({ id: z.number(), value: z.string().nullable() }),
-);
+export const entityListSchema = referenceItemSchema.array();
 export type CompanyInput = z.infer<typeof companyInputSchema>;
 export type CompanyDetail = z.infer<typeof companyDetailSchema>;
 export type CompanyQuery = z.input<typeof companyQuerySchema>;

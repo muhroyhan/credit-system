@@ -1,2 +1,4 @@
-export class CompanyConflict extends Error {}
-export class CompanyNotFound extends Error {}
+import { Conflict, NotFound } from '@server/utils/service-error';
+
+export class CompanyConflict extends Conflict {}
+export class CompanyNotFound extends NotFound {}

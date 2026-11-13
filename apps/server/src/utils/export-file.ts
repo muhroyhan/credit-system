@@ -1,3 +1,14 @@
+/** Supplies attachment headers for controller responses with trusted filenames. */
+export function exportHeaders(filename: string, format: 'pdf' | 'xlsx') {
+  return {
+    'Content-Type':
+      format === 'pdf'
+        ? 'application/pdf'
+        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'Content-Disposition': `attachment; filename="${filename}.${format}"`,
+  };
+}
+
 /** Builds a tabular PDF or XLSX in memory from rows selected by a feature service. */
 export async function exportFile({
   title,

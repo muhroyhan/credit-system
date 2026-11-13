@@ -1,4 +1,4 @@
-import { adminInputSchema } from '@credit/contracts';
+import { adminInputSchema, adminRoleSchema } from '@credit/contracts';
 import { z } from 'zod';
 
 export const adminSchema = z.object({
@@ -10,7 +10,7 @@ export const adminSchema = z.object({
     .array(
       z.object({
         programId: z.number(),
-        value: z.enum(['READ', 'CREATE', 'UPDATE', 'DELETE', 'APPROVAL']),
+        value: adminRoleSchema.shape.value,
       }),
     )
     .optional(),
