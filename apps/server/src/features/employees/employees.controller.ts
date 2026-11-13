@@ -1,7 +1,6 @@
 import {
   adminDeleteSchema,
   type EmployeeDocumentKind,
-  ExportTypeEnum,
   employeeCreateSchema,
   employeeDocumentKindSchema,
   employeeDocumentKinds,
@@ -12,6 +11,7 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { employeesService } from '@server/features/employees/employees.service';
 import type { EmployeeDocumentInput } from '@server/features/employees/employees.type';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
@@ -187,19 +187,16 @@ async function document(c: Context<AuthEnv>) {
   }
 }
 async function exportFile(c: Context<AuthEnv>) {
-  const parsed = employeeQuerySchema.safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (
-    !parsed.success ||
-    (format !== ExportTypeEnum.PDF &&
-      format !== ExportTypeEnum.XLSX &&
-      format !== ExportTypeEnum.CSV)
-  ) {
+  const parsed = employeeQuerySchema
+    .extend({ format: exportFormatSchema })
+    .safeParse(c.req.query());
+  if (!parsed.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = parsed.data;
   try {
     const file = await employeesService.exportFile(
-      parsed.data,
+      filters,
       c.get('identity'),
       format,
     );

@@ -1,10 +1,10 @@
 import {
   creditQuerySchema,
   creditReviewSchema,
-  ExportTypeEnum,
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { creditReviewService } from '@server/features/credit-review/credit-review.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
@@ -50,19 +50,16 @@ async function reviewDetail(c: Context<AuthEnv>) {
   }
 }
 async function reviewExport(c: Context<AuthEnv>) {
-  const query = creditQuerySchema.safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (
-    !query.success ||
-    (format !== ExportTypeEnum.PDF &&
-      format !== ExportTypeEnum.XLSX &&
-      format !== ExportTypeEnum.CSV)
-  ) {
+  const query = creditQuerySchema
+    .extend({ format: exportFormatSchema })
+    .safeParse(c.req.query());
+  if (!query.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = query.data;
   try {
     const result = await creditReviewService.exportReviews(
-      query.data,
+      filters,
       c.get('identity'),
       format,
     );

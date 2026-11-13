@@ -3,10 +3,10 @@ import {
   adminDeleteSchema,
   adminListQuerySchema,
   adminUpdateSchema,
-  ExportTypeEnum,
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { adminUsersService } from '@server/features/admin-users/admin-users.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
@@ -22,18 +22,14 @@ async function list(c: Context<AuthEnv>) {
 async function exportFile(c: Context<AuthEnv>) {
   const query = adminListQuerySchema
     .omit({ page: true, limit: true })
+    .extend({ format: exportFormatSchema })
     .safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (
-    !query.success ||
-    (format !== ExportTypeEnum.PDF &&
-      format !== ExportTypeEnum.XLSX &&
-      format !== ExportTypeEnum.CSV)
-  ) {
+  if (!query.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = query.data;
   const data = await adminUsersService.exportFile(
-    { ...query.data, page: 1, limit: 20 },
+    { ...filters, page: 1, limit: 20 },
     format,
   );
   return c.body(data, 200, exportHeaders('admin-users', format));

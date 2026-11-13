@@ -4,10 +4,10 @@ import {
   creditConfirmationSchema,
   creditQuerySchema,
   creditUpdateRequestSchema,
-  ExportTypeEnum,
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { creditService } from '@server/features/credit/credit.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
@@ -132,19 +132,16 @@ async function rates(c: Context<AuthEnv>) {
   }
 }
 async function exporting(c: Context<AuthEnv>) {
-  const input = creditQuerySchema.safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (
-    !input.success ||
-    (format !== ExportTypeEnum.PDF &&
-      format !== ExportTypeEnum.XLSX &&
-      format !== ExportTypeEnum.CSV)
-  ) {
+  const input = creditQuerySchema
+    .extend({ format: exportFormatSchema })
+    .safeParse(c.req.query());
+  if (!input.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = input.data;
   try {
     const file = await creditService.exportFile(
-      input.data,
+      filters,
       c.get('identity'),
       format,
     );
