@@ -43,6 +43,7 @@ export const credits = mysqlTable('credit', {
   bankName: str('bank_name'),
   bungaAngsuranBulanan: str('bunga_angsuran_bulanan'),
   docUrl: str('doc_url'),
+  docStorageKey: str('doc_storage_key'),
   jumlahAngsuran: str('jumlah_angsuran'),
   jumlahPengajuan: str('jumlah_pengajuan'),
   nilaiAngsuran: str('nilai_angsuran'),

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "bbfe66f7-38a0-4f18-a836-e92bc0136c8e",
+  "id": "6e692fb4-44aa-456f-8685-08a6e45809e9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "admin_user": {
@@ -1328,6 +1328,13 @@
         },
         "doc_url": {
           "name": "doc_url",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "doc_storage_key": {
+          "name": "doc_storage_key",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,

@@ -206,6 +206,7 @@ CREATE TABLE `credit` (
 	`bank_name` varchar(255),
 	`bunga_angsuran_bulanan` varchar(255),
 	`doc_url` varchar(255),
+	`doc_storage_key` varchar(255),
 	`jumlah_angsuran` varchar(255),
 	`jumlah_pengajuan` varchar(255),
 	`nilai_angsuran` varchar(255),
