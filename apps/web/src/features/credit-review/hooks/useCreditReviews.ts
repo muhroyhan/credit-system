@@ -1,11 +1,14 @@
+import { useMutation } from '@tanstack/react-query';
 import {
   exportReviews,
+  exportReviewZip,
   listReviews,
 } from '@web/features/credit-review/credit-review.api';
 import { useListing } from '@web/hooks/useListing';
+import { toSearchParams } from '@web/utils/search-params';
 
 export function useCreditReviews(token: string) {
-  return useListing({
+  const listing = useListing({
     initialQueries: {
       page: 1,
       limit: 20,
@@ -21,4 +24,8 @@ export function useCreditReviews(token: string) {
     load: (queries) => listReviews(token, queries),
     exportFile: (queries, format) => exportReviews(token, queries, format),
   });
+  const zip = useMutation({
+    mutationFn: () => exportReviewZip(token, toSearchParams(listing.queries)),
+  });
+  return { ...listing, zip };
 }

@@ -1,4 +1,5 @@
 import {
+  CompanyStatusEnum,
   companyExpenseSchema,
   companyInputSchema,
   companyInterestSchema,
@@ -14,7 +15,7 @@ export const companySchema = z.object({
   email: z.string().nullable(),
   username: z.string().nullable(),
   slug: z.string().nullable(),
-  status: z.enum(['active', 'inactive', 'blocked']).nullable(),
+  status: z.enum(CompanyStatusEnum).nullable(),
   entityType: z.string().nullable().optional(),
 });
 export const companyDetailSchema = companySchema.extend({

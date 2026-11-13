@@ -1,4 +1,8 @@
-import { type CreditReview, creditReviewSchema } from '@credit/contracts';
+import {
+  type CreditReview,
+  CreditStatusEnum,
+  creditReviewSchema,
+} from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { saveReview } from '@web/features/credit-review/credit-review.api';
@@ -18,7 +22,7 @@ export function useCreditReviewForm(
       jangkaWaktuBulan: row.credit.jangkaWaktuBulan ?? 0,
       biayaAsuransiJiwa: row.credit.biayaAsuransiJiwa ?? 0,
       statusAdminApproval:
-        row.credit.statusAdminApproval === 'approved'
+        row.credit.statusAdminApproval === CreditStatusEnum.Approved
           ? 'completed'
           : 'approved',
     },

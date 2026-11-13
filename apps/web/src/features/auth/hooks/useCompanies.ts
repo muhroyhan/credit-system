@@ -1,3 +1,4 @@
+import { AccountTypeEnum } from '@credit/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { getSlugs } from '@web/features/auth/auth.api';
 import type { AccountType } from '@web/features/auth/auth.type';
@@ -6,7 +7,7 @@ export function useCompanies(type: AccountType) {
   const query = useQuery({
     queryKey: ['companies'],
     queryFn: getSlugs,
-    enabled: type !== 'admin',
+    enabled: type !== AccountTypeEnum.Admin,
   });
   return {
     companies: (query.data ?? []).flatMap((company) =>

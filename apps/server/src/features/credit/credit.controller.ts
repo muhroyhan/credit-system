@@ -7,6 +7,7 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { creditService } from '@server/features/credit/credit.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
@@ -131,14 +132,16 @@ async function rates(c: Context<AuthEnv>) {
   }
 }
 async function exporting(c: Context<AuthEnv>) {
-  const input = creditQuerySchema.safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (!input.success || (format !== 'pdf' && format !== 'xlsx')) {
+  const input = creditQuerySchema
+    .extend({ format: exportFormatSchema })
+    .safeParse(c.req.query());
+  if (!input.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = input.data;
   try {
     const file = await creditService.exportFile(
-      input.data,
+      filters,
       c.get('identity'),
       format,
     );
@@ -147,7 +150,24 @@ async function exporting(c: Context<AuthEnv>) {
     return controllerFailure(c, error);
   }
 }
+async function exportZip(c: Context<AuthEnv>) {
+  const query = creditQuerySchema.safeParse(c.req.query());
+  if (!query.success) {
+    return c.json({ error: 'invalid query' }, 400);
+  }
+  try {
+    const result = await creditService.exportZip(query.data, c.get('identity'));
+    return c.body(new Uint8Array(result), 200, {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': 'attachment; filename="credit-documents.zip"',
+      'Cache-Control': 'private, no-store',
+    });
+  } catch (error) {
+    return controllerFailure(c, error);
+  }
+}
 export const creditController = {
+  exportZip,
   status,
   confirm,
   cancel,

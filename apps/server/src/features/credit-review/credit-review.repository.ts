@@ -1,3 +1,4 @@
+import { CreditStatusEnum } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   creditExpense,
@@ -47,7 +48,7 @@ export const creditReviewRepository = {
       .update(credits)
       .set({
         statusAdminApproval: status,
-        ...(status === 'rejected' ? { status: 'rejected' } : {}),
+        ...(status === CreditStatusEnum.Rejected ? { status: 'rejected' } : {}),
         jumlahPengajuan: String(principal),
         jangkaWaktuBulan: months,
         bungaAngsuranBulanan: String(percentage),

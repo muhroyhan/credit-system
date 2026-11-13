@@ -2,8 +2,8 @@ import type {
   CreditApplication,
   CreditApproval,
   CreditConfirmation,
+  ExportTypeEnum,
 } from '@credit/contracts';
-import type { ExportFormat } from '@web/constant/type';
 import {
   agreementResultSchema,
   creditListSchema,
@@ -76,7 +76,7 @@ export async function simulateCredit(token: string, input: CreditApplication) {
 export async function exportCredits(
   token: string,
   query: URLSearchParams,
-  format: ExportFormat,
+  format: ExportTypeEnum,
 ) {
   const response = await api.export.$get(
     { query: toExportQuery(query, format) } as never,
@@ -120,5 +120,15 @@ export async function downloadAgreement(token: string, id: number) {
       apiOptions(token),
     ),
     `agreement-${id}.pdf`,
+  );
+}
+
+export async function exportCreditZip(token: string, query: URLSearchParams) {
+  await downloadFile(
+    await api['export-zip'].$get(
+      { query: Object.fromEntries(query) } as never,
+      apiOptions(token),
+    ),
+    'credit-documents.zip',
   );
 }

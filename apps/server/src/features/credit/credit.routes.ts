@@ -35,6 +35,11 @@ export function creditRoutes() {
     identityContext,
     creditController.exporting,
   );
+  const zip = app.get(
+    '/export-zip',
+    identityContext,
+    creditController.exportZip,
+  );
   return app as Hono<
     AuthEnv,
     SchemaOf<typeof list> &
@@ -48,6 +53,7 @@ export function creditRoutes() {
       MergeSchemaPath<SchemaOf<typeof review>, '/review'> &
       MergeSchemaPath<SchemaOf<typeof document>, '/doc'> &
       SchemaOf<typeof simulation> &
-      SchemaOf<typeof exporting>
+      SchemaOf<typeof exporting> &
+      SchemaOf<typeof zip>
   >;
 }

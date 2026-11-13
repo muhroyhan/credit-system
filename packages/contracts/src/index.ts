@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import { AccountTypeEnum } from './account-type.enum';
+import { CompanyStatusEnum } from './company-status.enum';
+import { PermissionActionEnum } from './permission-action.enum';
+import { SortDirectionEnum } from './sort-direction.enum';
 
 export const referenceItemSchema = z.object({
   id: z.number(),
@@ -25,13 +29,13 @@ export const constantsQuerySchema = z.object({ name: z.string().optional() });
 
 export const loginSchema = z
   .object({
-    type: z.enum(['admin', 'company', 'debitor']),
+    type: z.enum(AccountTypeEnum),
     username: z.string().min(1),
     password: z.string().min(1),
     slug: z.string().optional(),
   })
   .superRefine((v, ctx) => {
-    if (v.type !== 'admin' && !v.slug) {
+    if (v.type !== AccountTypeEnum.Admin && !v.slug) {
       ctx.addIssue({
         code: 'custom',
         path: ['slug'],
@@ -42,7 +46,7 @@ export const loginSchema = z
 
 export const adminRoleSchema = z.object({
   programId: z.number().int().positive(),
-  value: z.enum(['READ', 'CREATE', 'UPDATE', 'DELETE', 'APPROVAL']),
+  value: z.enum(PermissionActionEnum),
 });
 export const adminInputSchema = z.object({
   username: z.string().min(1).max(255),
@@ -70,7 +74,7 @@ export const adminListQuerySchema = z.object({
   sortBy: z
     .enum(['createdAt', 'username', 'email', 'isActive'])
     .default('createdAt'),
-  sortDirection: z.enum(['asc', 'desc']).default('desc'),
+  sortDirection: z.enum(SortDirectionEnum).default('desc'),
   email: z.string().optional(),
   username: z.string().optional(),
   active: z.enum(['true', 'false']).optional(),
@@ -132,7 +136,7 @@ export const companyInputSchema = z.object({
     .min(1)
     .max(255)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-  status: z.enum(['active', 'inactive', 'blocked']),
+  status: z.enum(CompanyStatusEnum),
   password: z.string().min(8).max(72).optional(),
   bungaKredits: z.array(companyInterestSchema),
   biaya: z.array(companyExpenseSchema),
@@ -149,16 +153,22 @@ export const companyQuerySchema = z.object({
   username: z.string().optional(),
   companyName: z.string().optional(),
   entityTypeId: z.coerce.number().int().positive().optional(),
-  status: z.enum(['active', 'inactive', 'blocked']).optional(),
+  status: z.enum(CompanyStatusEnum).optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   sortBy: z
     .enum(['companyName', 'username', 'email', 'status', 'createdAt'])
     .default('createdAt'),
-  sortDirection: z.enum(['asc', 'desc']).default('desc'),
+  sortDirection: z.enum(SortDirectionEnum).default('desc'),
 });
 
+export * from './account-type.enum';
+export * from './company-status.enum';
 export * from './credit.type';
 export * from './credit-review.type';
+export * from './credit-status.enum';
 export * from './employees.constant';
 export * from './employees.type';
+export * from './export-type.enum';
+export * from './permission-action.enum';
+export * from './sort-direction.enum';

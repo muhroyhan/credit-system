@@ -12,8 +12,10 @@ Pengajuan kredit dan review BPR memakai fitur terpisah. Service review boleh mem
 - Untuk pembacaan tanpa transaksi ambil const db = connectDatabase().db sekali per fungsi. Jangan menutup pool per repository; tutup hanya saat aplikasi/runner mandiri berakhir. Audit actor berasal server; createdAt dan updatedAt dikelola otomatis oleh MySQL dan tidak diisi repository.
 - Middleware hanya dibuat ketika dipakai, diimpor route fitur dan mengakses aturan bisnis melalui service. Bungkus middleware bawaan di folder middleware yang sama. ACL berupa PROGRAM_ACTION melalui permission(...); daftar aksi dan mapping program hanya di kontrak API.
 - Pertahankan tipe Hono RPC saat route digabung. Tipe AppType boleh diimpor frontend dengan import type; jangan memasukkan kode server atau kredensial ke bundle browser.
-- Ekspor PDF/XLSX dibentuk di server memakai utils/export-file.ts; controller memakai exportHeaders dari utilitas yang sama untuk MIME dan nama attachment. Service menyiapkan kolom/data, memakai repository listing yang sama tanpa pagination atau batas jumlah data, menerapkan filter/sort/scope. Frontend hanya mengunduh hasil.
+- Ekspor PDF/XLSX/CSV dibentuk di server memakai utils/export-file.ts; controller memakai exportHeaders dari utilitas yang sama untuk MIME dan nama attachment. Service menyiapkan kolom/data, memakai repository listing yang sama tanpa pagination atau batas jumlah data, menerapkan filter/sort/scope. Frontend hanya mengunduh hasil.
 
 Rujuk [kontrak API](../../docs/credit-system/api-contract.md) dan [model data](../../docs/credit-system/data-model.md) untuk perubahan terkait.
 
 Helper controller di utils/controller.ts menangani pembacaan JSON dan pemetaan kategori service-error; error teknis diteruskan. Error fitur mewarisi kategori bersama. Hash password akun memakai utils/password.ts. Child kredit memakai saveChild bertipe di repository dengan transaksi dari service.
+
+ZIP dokumen menggunakan query listing dengan scope yang sama, membaca key privat yang dihasilkan server maksimal lima paralel dan mengembalikan arsip kosong jika tidak ada dokumen. Jangan mengambil URL klien atau URL eksternal.

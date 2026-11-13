@@ -1,3 +1,4 @@
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import { Alert } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -21,15 +22,15 @@ function Content() {
     <RecordState id={Number(id)} query={query}>
       {(row) => (
         <>
-          {row.credit.status === 'approved' ||
-          row.credit.status === 'rejected' ? (
+          {row.credit.status === CreditStatusEnum.Approved ||
+          row.credit.status === CreditStatusEnum.Rejected ? (
             <Alert>Pengajuan sudah terkunci</Alert>
           ) : (
             <CreditForm
               token={token}
               debitorId={row.credit.debitorId ?? 0}
               row={row}
-              self={session?.type === 'debitor'}
+              self={session?.type === AccountTypeEnum.Debitor}
             />
           )}
           <Link to="/credits">Kembali</Link>

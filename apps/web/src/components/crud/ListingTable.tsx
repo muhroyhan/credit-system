@@ -1,3 +1,4 @@
+import { ExportTypeEnum } from '@credit/contracts';
 import { Alert, Button, Group, NumberInput, Table, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
@@ -13,6 +14,8 @@ export function ListingTable<T extends { id: number }>({
   onPageChange,
   exporting,
   onExport,
+  onExportZip,
+  zipping,
   addAction,
   filters,
 }: {
@@ -25,7 +28,9 @@ export function ListingTable<T extends { id: number }>({
   total: number;
   onPageChange: (page: number) => void;
   exporting: boolean;
-  onExport: (format: 'pdf' | 'xlsx') => void;
+  onExportZip?: () => void;
+  zipping?: boolean;
+  onExport: (format: ExportTypeEnum) => void;
   addAction?: ReactNode;
   filters: ReactNode;
 }) {
@@ -39,17 +44,29 @@ export function ListingTable<T extends { id: number }>({
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport('pdf')}
+          onClick={() => onExport(ExportTypeEnum.PDF)}
         >
           Export PDF
         </Button>
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport('xlsx')}
+          onClick={() => onExport(ExportTypeEnum.XLSX)}
         >
           Export XLSX
         </Button>
+        <Button
+          loading={exporting}
+          disabled={loading}
+          onClick={() => onExport(ExportTypeEnum.CSV)}
+        >
+          Export CSV
+        </Button>
+        {onExportZip && (
+          <Button loading={zipping} disabled={loading} onClick={onExportZip}>
+            Export ZIP
+          </Button>
+        )}
       </Group>
       {loading && <Text>Memuat...</Text>}
       <Table>

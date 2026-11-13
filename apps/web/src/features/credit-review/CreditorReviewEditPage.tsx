@@ -1,3 +1,4 @@
+import { CreditStatusEnum } from '@credit/contracts';
 import {
   Alert,
   Button,
@@ -44,9 +45,9 @@ function Content() {
               Keputusan tersimpan. Notifikasi: {notification}
             </Alert>
           )}
-          {row.credit.status === 'approved' &&
-          row.credit.statusAdminApproval !== 'rejected' &&
-          row.credit.statusAdminApproval !== 'completed' ? (
+          {row.credit.status === CreditStatusEnum.Approved &&
+          row.credit.statusAdminApproval !== CreditStatusEnum.Rejected &&
+          row.credit.statusAdminApproval !== CreditStatusEnum.Completed ? (
             <Form
               token={token}
               row={row}
@@ -82,7 +83,7 @@ function Form({
     handleSubmit,
     formState: { errors },
   } = form;
-  const approved = row.credit.statusAdminApproval === 'approved';
+  const approved = row.credit.statusAdminApproval === CreditStatusEnum.Approved;
   const locked = approved || !canUpdate;
   return (
     <form noValidate onSubmit={handleSubmit((value) => save.mutate(value))}>

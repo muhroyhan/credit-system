@@ -1,4 +1,4 @@
-import type { ExportFormat } from '@web/constant/type';
+import type { ExportTypeEnum } from '@credit/contracts';
 import {
   type CompanyInput,
   companyDetailSchema,
@@ -65,7 +65,7 @@ export async function deleteCompany(token: string, id: number) {
 export async function exportCompanies(
   token: string,
   query: URLSearchParams,
-  format: ExportFormat,
+  format: ExportTypeEnum,
 ) {
   const response = await client.api.user.export.$get(
     { query: toExportQuery(query, format) } as never,

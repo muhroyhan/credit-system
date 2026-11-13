@@ -4,6 +4,7 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { creditReviewService } from '@server/features/credit-review/credit-review.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
@@ -49,14 +50,16 @@ async function reviewDetail(c: Context<AuthEnv>) {
   }
 }
 async function reviewExport(c: Context<AuthEnv>) {
-  const query = creditQuerySchema.safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (!query.success || (format !== 'pdf' && format !== 'xlsx')) {
+  const query = creditQuerySchema
+    .extend({ format: exportFormatSchema })
+    .safeParse(c.req.query());
+  if (!query.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = query.data;
   try {
     const result = await creditReviewService.exportReviews(
-      query.data,
+      filters,
       c.get('identity'),
       format,
     );
@@ -65,7 +68,27 @@ async function reviewExport(c: Context<AuthEnv>) {
     return controllerFailure(c, error);
   }
 }
+async function exportZip(c: Context<AuthEnv>) {
+  const query = creditQuerySchema.safeParse(c.req.query());
+  if (!query.success) {
+    return c.json({ error: 'invalid query' }, 400);
+  }
+  try {
+    const result = await creditReviewService.exportZip(
+      query.data,
+      c.get('identity'),
+    );
+    return c.body(new Uint8Array(result), 200, {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': 'attachment; filename="credit-documents.zip"',
+      'Cache-Control': 'private, no-store',
+    });
+  } catch (error) {
+    return controllerFailure(c, error);
+  }
+}
 export const creditReviewController = {
+  exportZip,
   review,
   reviewList,
   reviewDetail,

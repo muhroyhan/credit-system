@@ -1,10 +1,13 @@
+import { ExportTypeEnum } from '@credit/contracts';
 /** Supplies attachment headers for controller responses with trusted filenames. */
-export function exportHeaders(filename: string, format: 'pdf' | 'xlsx') {
+export function exportHeaders(filename: string, format: ExportTypeEnum) {
   return {
     'Content-Type':
-      format === 'pdf'
+      format === ExportTypeEnum.PDF
         ? 'application/pdf'
-        : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        : format === ExportTypeEnum.CSV
+          ? 'text/csv; charset=utf-8'
+          : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'Content-Disposition': `attachment; filename="${filename}.${format}"`,
   };
 }
@@ -19,9 +22,18 @@ export async function exportFile({
   title: string;
   columns: string[];
   values: string[][];
-  format: 'pdf' | 'xlsx';
+  format: ExportTypeEnum;
 }) {
-  if (format === 'xlsx') {
+  if (format === ExportTypeEnum.CSV) {
+    const encode = (value: string) => {
+      const safe = /^[\s]*[=+@-]/.test(value) ? `'${value}` : value;
+      return `"${safe.replaceAll('"', '""')}"`;
+    };
+    return new TextEncoder().encode(
+      `\uFEFF${[columns, ...values].map((row) => row.map(encode).join(',')).join('\r\n')}\r\n`,
+    );
+  }
+  if (format === ExportTypeEnum.XLSX) {
     const ExcelJS = (await import('exceljs')).default;
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet(title);

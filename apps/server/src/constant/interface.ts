@@ -19,3 +19,11 @@ export interface DocumentStorage {
   get(key: string): Promise<Uint8Array | null>;
   remove(key: string): Promise<void>;
 }
+
+export interface ZipDocument {
+  id: number;
+  debitorId: number | null;
+  companyName: string | null;
+  createdAt: Date;
+  key: string | null;
+}

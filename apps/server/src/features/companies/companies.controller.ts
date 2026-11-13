@@ -1,4 +1,5 @@
 import {
+  AccountTypeEnum,
   adminDeleteSchema,
   companyCreateSchema,
   companyQuerySchema,
@@ -6,6 +7,7 @@ import {
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
+import { exportFormatSchema } from '@server/constant/schema';
 import { companiesService } from '@server/features/companies/companies.service';
 import { controllerFailure, parseJsonInput } from '@server/utils/controller';
 import { exportHeaders } from '@server/utils/export-file';
@@ -77,7 +79,7 @@ async function interests(c: Context<AuthEnv>) {
   if (!slug) {
     return c.json({ error: 'slug required' }, 400);
   }
-  if (identity.type !== 'admin' && identity.slug !== slug) {
+  if (identity.type !== AccountTypeEnum.Admin && identity.slug !== slug) {
     return c.json({ error: 'forbidden' }, 403);
   }
   return c.json(await companiesService.interests(slug));
@@ -85,13 +87,14 @@ async function interests(c: Context<AuthEnv>) {
 async function exportFile(c: Context<AuthEnv>) {
   const parsed = companyQuerySchema
     .omit({ page: true, limit: true })
+    .extend({ format: exportFormatSchema })
     .safeParse(c.req.query());
-  const format = c.req.query('format');
-  if (!parsed.success || (format !== 'pdf' && format !== 'xlsx')) {
+  if (!parsed.success) {
     return c.json({ error: 'invalid query' }, 400);
   }
+  const { format, ...filters } = parsed.data;
   const file = await companiesService.exportFile(
-    { ...parsed.data, page: 1, limit: 20 },
+    { ...filters, page: 1, limit: 20 },
     format,
   );
   return c.body(file, 200, exportHeaders('companies', format));

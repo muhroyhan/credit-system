@@ -1,6 +1,6 @@
 # Rencana pengembangan
 
-Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P10 selesai; P11 dan P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
+Daftar phase, task dan pelacakan commit; aturan pelaksanaan berada di [AGENTS.md](../../AGENTS.md). P00 sampai P11 selesai; P12 belum dikerjakan. Bukti test terakhir hanya di [testing.md](testing.md); sumber konteks lain ada pada AGENTS.md root.
 
 ## Phase dan dependensi
 
@@ -128,6 +128,8 @@ Hasil: sesudah rekening tersimpan, dokumen dibentuk, URL disimpan dan halaman te
 | P10-T04 | Verifikasi akhir phase: unit nomor/tanggal/biaya, integration renderer PDF nyata terpisah dari adapter deterministik, E2E perjalanan registrasi hingga unduh dokumen. |
 
 ## P11 — Ekspor CSV dan ZIP
+
+Status: done. P11-T01: 1a61c03; P11-T01a: 1e998b0; P11-T02: 93b3973; P11-T02a: 1df6d09; P11-T03: lihat footer Task: P11-T03. Bukti pada testing.md.
 
 Hasil: ekspor perusahaan, debitor, kredit dan dokumen mengikuti filter, sort dan lingkup aktor pada layar sumber yang sudah tersedia.
 

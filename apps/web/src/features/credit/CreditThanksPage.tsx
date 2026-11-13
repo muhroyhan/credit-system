@@ -1,3 +1,4 @@
+import { CreditStatusEnum } from '@credit/contracts';
 import { Alert, Button, Text } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -22,7 +23,7 @@ function Content() {
       {(row) => (
         <>
           {row.credit.debitorAcknowledgmentTimestamp &&
-          row.credit.statusAdminApproval === 'approved' &&
+          row.credit.statusAdminApproval === CreditStatusEnum.Approved &&
           row.credit.docUrl ? (
             <>
               <Text>Konfirmasi Anda telah tersimpan dan dokumen tersedia.</Text>

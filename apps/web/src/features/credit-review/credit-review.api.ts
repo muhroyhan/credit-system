@@ -1,5 +1,4 @@
-import type { CreditReview } from '@credit/contracts';
-import type { ExportFormat } from '@web/constant/type';
+import type { CreditReview, ExportTypeEnum } from '@credit/contracts';
 import { creditListSchema } from '@web/features/credit/credit.type';
 import {
   creditReviewDetailSchema,
@@ -40,7 +39,7 @@ export async function saveReview(token: string, input: CreditReview) {
 export async function exportReviews(
   token: string,
   query: URLSearchParams,
-  format: ExportFormat,
+  format: ExportTypeEnum,
 ) {
   await downloadFile(
     await api.review.export.$get(
@@ -48,5 +47,15 @@ export async function exportReviews(
       apiOptions(token),
     ),
     `credit-reviews.${format}`,
+  );
+}
+
+export async function exportReviewZip(token: string, query: URLSearchParams) {
+  await downloadFile(
+    await api.review['export-zip'].$get(
+      { query: Object.fromEntries(query) } as never,
+      apiOptions(token),
+    ),
+    'credit-documents.zip',
   );
 }

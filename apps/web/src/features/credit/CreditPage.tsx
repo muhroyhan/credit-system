@@ -1,3 +1,4 @@
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -24,7 +25,9 @@ function Content() {
         id: row.credit.id,
       }))}
       loading={rows.list.isFetching}
-      error={(rows.list.error ?? rows.exporting.error)?.message}
+      error={
+        (rows.list.error ?? rows.exporting.error ?? rows.zip.error)?.message
+      }
       page={rows.queries.page}
       total={rows.list.data?.count ?? 0}
       onPageChange={(page) =>
@@ -32,6 +35,8 @@ function Content() {
       }
       exporting={rows.exporting.isPending}
       onExport={(format) => rows.exporting.mutate(format)}
+      onExportZip={() => rows.zip.mutate()}
+      zipping={rows.zip.isPending}
       columns={[
         { label: 'Nama', render: (r) => r.nama },
         { label: 'Perusahaan', render: (r) => r.companyName },
@@ -40,7 +45,7 @@ function Content() {
         { label: 'Status', render: (r) => r.credit.status },
       ]}
       addAction={
-        (access.create || session?.type === 'debitor') && (
+        (access.create || session?.type === AccountTypeEnum.Debitor) && (
           <Link to="/credits/add">Tambah pengajuan</Link>
         )
       }
@@ -60,7 +65,7 @@ function Content() {
           />
           <Select
             label="Status"
-            data={['pending', 'approved', 'rejected', 'completed']}
+            data={Object.values(CreditStatusEnum)}
             clearable
             value={rows.queries.status || null}
             onChange={(v) => {
@@ -98,8 +103,8 @@ function Content() {
             Lihat
           </Link>
           {access.update &&
-            row.credit.status !== 'approved' &&
-            row.credit.status !== 'rejected' && (
+            row.credit.status !== CreditStatusEnum.Approved &&
+            row.credit.status !== CreditStatusEnum.Rejected && (
               <Link to="/credits/$id/edit" params={{ id: String(row.id) }}>
                 Ubah
               </Link>

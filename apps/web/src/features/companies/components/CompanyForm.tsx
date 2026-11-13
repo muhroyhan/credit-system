@@ -1,3 +1,4 @@
+import { CompanyStatusEnum } from '@credit/contracts';
 import {
   Alert,
   Button,
@@ -86,7 +87,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
             <Select
               label="Status perusahaan"
               {...field}
-              data={['active', 'inactive', 'blocked']}
+              data={Object.values(CompanyStatusEnum)}
               onChange={(v) => {
                 if (v) {
                   field.onChange(v);

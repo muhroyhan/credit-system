@@ -3,6 +3,7 @@ import type {
   EmployeeProfile,
   EmployeeQuery,
 } from '@credit/contracts';
+import { CreditStatusEnum, SortDirectionEnum } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   credits,
@@ -26,6 +27,7 @@ import {
   getTableColumns,
   like,
   ne,
+  sql,
 } from 'drizzle-orm';
 
 const columns = {
@@ -88,12 +90,17 @@ export const employeesRepository = {
       .from(debitors)
       .where(where);
     const selection = db
-      .select(columns)
+      .select({
+        ...columns,
+        sumPengajuan: sql<string>`(SELECT COALESCE(SUM(CAST(${credits.jumlahPengajuan} AS DECIMAL(20, 0))), 0) FROM ${credits} WHERE ${credits.debitorId} = ${debitors.id} AND ${credits.status} IN (${CreditStatusEnum.Pending}, ${CreditStatusEnum.Approved}))`,
+      })
       .from(debitors)
       .leftJoin(users, eq(users.id, debitors.userId))
       .where(where)
       .orderBy(
-        (query.sortDirection === 'asc' ? asc : desc)(debitors[query.sortBy]),
+        (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
+          debitors[query.sortBy],
+        ),
         desc(debitors.id),
       );
     return {

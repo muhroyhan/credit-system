@@ -1,3 +1,4 @@
+import { SortDirectionEnum } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   debitors,
@@ -46,7 +47,9 @@ export const companiesRepository = {
       .leftJoin(entityTypes, eq(users.entityTypeId, entityTypes.id))
       .where(where)
       .orderBy(
-        (query.sortDirection === 'asc' ? asc : desc)(users[query.sortBy]),
+        (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
+          users[query.sortBy],
+        ),
         desc(users.id),
       );
     return {

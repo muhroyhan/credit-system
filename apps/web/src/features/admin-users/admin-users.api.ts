@@ -1,5 +1,5 @@
+import type { ExportTypeEnum } from '@credit/contracts';
 import { adminInputSchema, programSchema } from '@credit/contracts';
-import type { ExportFormat } from '@web/constant/type';
 import {
   type Admin,
   type AdminInput,
@@ -60,7 +60,7 @@ export async function deleteAdmin(token: string, id: number) {
 export async function exportAdmins(
   token: string,
   filters: URLSearchParams,
-  format: ExportFormat,
+  format: ExportTypeEnum,
 ): Promise<void> {
   const response = await client.api['admin-user'].export.$get(
     { query: toExportQuery(filters, format) } as never,

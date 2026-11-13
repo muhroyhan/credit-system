@@ -1,6 +1,6 @@
+import type { ExportTypeEnum } from '@credit/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ListingOptions } from '@web/constant/interface';
-import type { ExportFormat } from '@web/constant/type';
 import { toSearchParams } from '@web/utils/search-params';
 import { useState } from 'react';
 
@@ -18,7 +18,7 @@ export function useListing<
     queryFn: () => options.load(toSearchParams(queries)),
   });
   const exporting = useMutation({
-    mutationFn: (format: ExportFormat) =>
+    mutationFn: (format: ExportTypeEnum) =>
       options.exportFile(toSearchParams(queries), format),
   });
   const remove = useMutation({

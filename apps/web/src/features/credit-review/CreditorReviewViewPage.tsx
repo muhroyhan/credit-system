@@ -1,3 +1,4 @@
+import { CreditStatusEnum } from '@credit/contracts';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
@@ -47,9 +48,9 @@ function Content() {
             />
           ))}
           {crudaAccess(session, 'DKN').approve &&
-            row.credit.status === 'approved' &&
-            row.credit.statusAdminApproval !== 'rejected' &&
-            row.credit.statusAdminApproval !== 'completed' && (
+            row.credit.status === CreditStatusEnum.Approved &&
+            row.credit.statusAdminApproval !== CreditStatusEnum.Rejected &&
+            row.credit.statusAdminApproval !== CreditStatusEnum.Completed && (
               <Link to="/credit-reviews/$id/edit" params={{ id }}>
                 Ubah keputusan
               </Link>

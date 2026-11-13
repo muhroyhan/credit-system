@@ -1,3 +1,4 @@
+import { AccountTypeEnum, CompanyStatusEnum } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   adminUsers,
@@ -16,7 +17,7 @@ export async function findAccount(
   transaction?: DatabaseTransaction,
 ) {
   const db = transaction ?? connectDatabase().db;
-  if (type === 'admin') {
+  if (type === AccountTypeEnum.Admin) {
     const [account] = await db
       .select()
       .from(adminUsers)
@@ -55,9 +56,9 @@ export async function findAccount(
   if (!company) {
     return null;
   }
-  if (type === 'company') {
+  if (type === AccountTypeEnum.Company) {
     if (
-      company.status !== 'active' ||
+      company.status !== CompanyStatusEnum.Active ||
       (company.username !== username && company.email !== username)
     ) {
       return null;
@@ -103,8 +104,8 @@ export async function resolveIdentity(
   slug: string,
 ) {
   const db = connectDatabase().db;
-  if (type === 'admin') {
-    if (slug !== 'admin') {
+  if (type === AccountTypeEnum.Admin) {
+    if (slug !== AccountTypeEnum.Admin) {
       return null;
     }
     const [account] = await db
@@ -122,7 +123,7 @@ export async function resolveIdentity(
       .where(eq(roles.adminUserId, id));
     return { id, type, slug, permissions };
   }
-  if (type === 'company') {
+  if (type === AccountTypeEnum.Company) {
     const [company] = await db
       .select({ id: users.id })
       .from(users)
