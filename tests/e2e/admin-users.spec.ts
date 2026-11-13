@@ -67,7 +67,7 @@ test('admin CRUD, role checks and conflicts', async ({ request }) => {
   ).toBe(401);
   expect(
     (
-      await request.get('/api/admin-user/export?format=csv', {
+      await request.get('/api/admin-user/export?format=xml', {
         headers: readHeaders,
       })
     ).status(),

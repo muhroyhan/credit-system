@@ -40,7 +40,7 @@ Admin/perusahaan login dengan username atau email; debitor dengan username. Bcry
 | Admin User: /admin-user | /list, /detail?id=..., /export?format=pdf\|xlsx | /create | /update, /delete |
 | Perusahaan: /user | /list, /detail?id=..., /export?format=pdf\|xlsx | /create | /update, /delete |
 
-Path lama /admin-users, /admin-user, /users dan /user tanpa child tidak tersedia. Client harus menggunakan child route di tabel. Delete menerima `{id}`. Update menambahkan id ke payload create dan password opsional. List mengembalikan `{count, data}`; password tidak disertakan. Default page=1, limit=20 (maksimum 100), sortDirection=desc, sortBy=createdAt; tie-breaker id menurun. Ekspor memakai filter/sort yang sama tanpa pagination dan respons file attachment, bukan CSV pada implementasi saat ini.
+Path lama /admin-users, /admin-user, /users dan /user tanpa child tidak tersedia. Client harus menggunakan child route di tabel. Delete menerima `{id}`. Update menambahkan id ke payload create dan password opsional. List mengembalikan `{count, data}`; password tidak disertakan. Default page=1, limit=20 (maksimum 100), sortDirection=desc, sortBy=createdAt; tie-breaker id menurun. Ekspor memakai filter/sort yang sama tanpa pagination dan respons file attachment dalam format PDF/XLSX/CSV.
 
 | Fitur | Body create | Filter/sort |
 | --- | --- | --- |
@@ -59,7 +59,7 @@ GET /list menerima namaLengkap, namaAlias, userId, sortBy id/employeeId/namaLeng
 
 PUT /profile menerima {id, profile}: identitas wajib sesuai business-flow, takehomePay string integer nonnegatif maksimum 4294967295, field profil opsional string kosong. Tanggal YYYY-MM-DD dikirim tanpa offset; nomor telepon string. POST /documents memakai multipart id dan file fotoUrl/selfieUrl/kkUrl/slipGajiUrl/tandaTanganUrl serta npwpUrl opsional. Lima dokumen harus tersedia dari simpan lama atau file baru; satu file per jenis, JPEG/PNG/PDF dengan signature/MIME/extension sesuai, maksimum 10 MB/file, total request 64 MB. Client tidak dapat mengirim URL/file key.
 
-Detail menambahkan profile dan documents (URL unduhan privat atau null). GET /document?id&kind memeriksa READ dan ownership sebelum mengirim attachment no-store. File disimpan lewat adapter disk privat; kegagalan upload/SQL membersihkan file baru, SQL rollback. GET /export?format=pdf|xlsx memakai query listing yang sama tanpa pagination/batas data dan scope identik. CSV mengikuti P11.
+Detail menambahkan profile dan documents (URL unduhan privat atau null). GET /document?id&kind memeriksa READ dan ownership sebelum mengirim attachment no-store. File disimpan lewat adapter disk privat; kegagalan upload/SQL membersihkan file baru, SQL rollback. GET /export?format=pdf|xlsx|csv memakai query listing yang sama tanpa pagination/batas data dan scope identik.
 
 ### Pengajuan kredit (P06)
 
@@ -67,22 +67,18 @@ P08: GET /credit/review/list dan /detail?id memerlukan DKN_READ; daftar default 
 
 P07: PUT /credit/update juga menerima body strict `{id, status}` dengan status `approved` atau `rejected`, hanya untuk HRD perusahaan pemilik. Keputusan hanya tersedia dari `pending`; status lain dan pengulangan menghasilkan 409. Debitor/admin atau HRD tenant lain mendapat 403. Audit ditentukan server. Payload keputusan tidak dapat dicampur dengan field pengajuan atau biaya.
 
-Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, insurance, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected.
+Prefix /credit memuat GET /list dan /detail?id, POST /create dan /simulation, PUT /update serta GET /rates?id dan /export?format=pdf|xlsx|csv. Body create/simulation berupa debitorId, jumlahPengajuan, jangkaWaktuBulan dan tanggalPengajuan; update menambahkan id. Nominal menerima digit atau pemisah ribuan titik. Collection, guarantor, insurance, slikBmpk dan spouse opsional disimpan sebagai child dalam transaksi; input approval, rekening dan biaya ditolak. Detail mengembalikan parent, child dan total angsuran. Daftar menerapkan filter perusahaan/debitor, nama/NIK, status, tanggal, urutan dan pagination; ekspor memakai filter dan scope daftar tanpa pagination. Scope perusahaan dan identitas debitor ditetapkan server, sedangkan admin memerlukan CGP sesuai aksi. Edit terkunci pada HRD approved/rejected.
 
-## Rancangan API P07–P12 (belum tersedia)
+## Rancangan API P12 (belum tersedia)
 
 | Method dan path | Fungsi |
 | --- | --- |
-| `GET /debitor/export` | CSV identitas dan jumlah pengajuan terbuka. |
-| `GET /credit/export` | CSV kredit sesuai filter; format karyawan BPR memakai tipe `/kredit-karyawan`. |
-| `GET /credit/export/bulk` | Mengumpulkan dokumen PDF terfilter sebagai ZIP dan mengembalikan URL/nama. |
 
 Filter kredit mencakup perusahaan, rentang tanggal dibuat, debitor, nama, NIK dan status HRD/BPR. Admin memperoleh daftar berstatus HRD `approved` sebagai kondisi awal. Detail dan risiko filter/otorisasi harus dikaji berdasarkan [logic-holes.md](logic-holes.md).
 
 - Detail kredit mencakup debitor/perusahaan, biaya, collection, guarantor, insurance, potongan, SLIK/BMPK dan spouse. Update mendukung upsert collection, guarantor, insurance, potongan, SLIK/BMPK dan spouse; snapshot expense dibuat pada approval.
 - Daftar debitor menyediakan `count`, data debitor dan jumlah pengajuan terbuka. Detail memuat profil, dokumen dan data finansial. Filter utama: id, nama lengkap dan alias. CSV memuat nomor induk, nama lengkap, alias, NIK dan jumlah pengajuan terbuka.
 - Daftar kredit menyediakan `count`, data kredit, total angsuran, dan untuk admin skor serta jumlah pengajuan. Filter tanggal menggunakan awal/akhir hari; nama perusahaan dan nama debitor menggunakan pencarian parsial. CSV menyediakan format pengajuan umum dan format daftar kredit karyawan, termasuk status HRD/BPR, rekening dan tanggal.
-- Ekspor ZIP mengambil kredit yang memiliki URL dokumen, membatasi pengambilan paralel hingga lima, menamai PDF dengan id debitor/kredit, identitas perusahaan dan bulan/tahun, lalu mengembalikan nama dan URL arsip. Kasus dokumen tidak ditemukan menghasilkan error.
 
 
 GET /dashboard/data direncanakan mengembalikan totalUsers, totalDebitor, totalCredits dengan agregasi sesuai business-flow.md. CSV perusahaan pada P11 melengkapi ekspor PDF/XLSX yang telah tersedia; format dan path final harus ditetapkan sebelum implementasi.
@@ -94,3 +90,5 @@ P09-T01: `PUT /credit/cancel` menerima `{ "id": number }` dari debitor pemilik. 
 P09-T02: `GET /credit/status?id=` hanya untuk debitor pemilik dan memuat rincian biaya snapshot. `PUT /credit/confirm` menerima `id`, `bankName`, `bankBranch`, `bankAccountName`, `bankAccountNumber`, `confirmationName`, `confirmed: true`; nama konfirmasi harus sama persis dengan nama debitor. Kedua approval harus approved dan acknowledgment belum ada. Server menetapkan tanggal acknowledgment; pengulangan menghasilkan 409.
 
 P10: POST `/credit/doc/render` dengan `{id}` hanya untuk debitor pemilik dengan dua approval, acknowledgment dan rekening lengkap; menghasilkan `{url, number}`. GET `/credit/doc?id=` mengunduh PDF privat, GET `/credit/doc/count?id=` mengembalikan `{count}` dokumen global bulan kredit setelah memeriksa akses. Render berulang mengembalikan dokumen yang sama; GET tidak membuat PDF. Admin CGP_READ dan HRD tenant dapat mengunduh sesuai scope detail kredit.
+
+P11: `format=csv` tersedia pada export administrator, perusahaan, debitor, kredit dan review; filter/sort serta scope mengikuti listing dan pagination diabaikan. CSV UTF-8 BOM, nilai yang dapat dibaca sebagai formula spreadsheet diberi awalan apostrof. ZIP di `GET /credit/export-zip` (CGP/scope kredit) dan `GET /credit/review/export-zip` (DKN_READ), memakai filter listing dan hanya dokumen yang tercatat. Arsip kosong valid; key tidak sah atau file hilang menghasilkan 404. ZIP dikirim sebagai attachment `credit-documents.zip`, nama isi mencakup debitor, kredit, perusahaan dan bulan pembuatan. Dokumen berasal dari storage privat, tanpa akses URL eksternal; maksimal lima file dibaca paralel.

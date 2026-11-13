@@ -1,4 +1,4 @@
-import { exportHeaders } from '@server/utils/export-file';
+import { exportFile, exportHeaders } from '@server/utils/export-file';
 import { describe, expect, it } from 'vitest';
 
 describe('export response headers', () => {
@@ -23,4 +23,19 @@ describe('export response headers', () => {
       expect(new Uint8Array(await response.arrayBuffer())).toEqual(bytes);
     },
   );
+});
+
+it('escapes CSV fields and spreadsheet formulas without truncation', async () => {
+  const bytes = await exportFile({
+    title: 'CSV',
+    columns: ['Nama', 'Catatan'],
+    values: [
+      ['A, B', 'quoted "line"'],
+      ['=formula', 'baris\nbaru'],
+    ],
+    format: 'csv',
+  });
+  const text = new TextDecoder().decode(bytes);
+  expect(text).toContain('"A, B","quoted ""line"""');
+  expect(text).toContain('"\'=formula","baris\nbaru"');
 });
