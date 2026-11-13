@@ -170,7 +170,7 @@ dilengkapi pada task dokumentasi terakhir. Tidak ada task diblokir keputusan bis
 | P13-T07 | Approval HRD dan konkurensi | done | 7b55030 |
 | P13-T08 | Review BPR, snapshot dan kegagalan notifikasi | done | fc00169 |
 | P13-T09 | Konfirmasi/pembatalan nasabah dan matriks status | done | 6b47935 |
-| P13-T10 | Perjanjian, penomoran dan PDF | done | footer Task: P13-T10 |
-| P13-T11 | Ekspor, ZIP dan parameter listing | doing | footer Task: P13-T11 |
+| P13-T10 | Perjanjian, penomoran dan PDF | done | c9e93dd |
+| P13-T11 | Ekspor, ZIP dan parameter listing | done | footer Task: P13-T11 |
 | P13-T12 | Dashboard dan agregat scoped | doing | footer Task: P13-T12 |
 | P13-T13 | Dokumentasi, analisis, bukti verifikasi dan cleanup akhir | doing | footer Task: P13-T13 |

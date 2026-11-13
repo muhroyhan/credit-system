@@ -1,9 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { loginBrowser } from './fixtures/login';
 
-const password = process.env.SEED_PASSWORD;
-test.skip(!password, 'Synthetic database required');
-
 test('listing filters omit cleared values from requests', async ({ page }) => {
   await loginBrowser(page, { type: 'admin', username: 'admin_sintetis' });
   for (const [link, label, endpoint, key] of [
