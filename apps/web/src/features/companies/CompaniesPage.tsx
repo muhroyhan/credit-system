@@ -1,3 +1,4 @@
+import { CompanyStatusEnum } from '@credit/contracts';
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -87,7 +88,7 @@ function Listing() {
           <Select
             label="Status"
             clearable
-            data={['active', 'inactive', 'blocked']}
+            data={Object.values(CompanyStatusEnum)}
             value={users.queries.status || null}
             onChange={(v) =>
               users.setQueries((current) => ({

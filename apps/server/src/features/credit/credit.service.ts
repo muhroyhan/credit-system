@@ -3,7 +3,9 @@ import type {
   CreditApproval,
   CreditConfirmation,
   CreditQuery,
+  ExportTypeEnum,
 } from '@credit/contracts';
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import type { Identity } from '@server/constant/interface';
 import type { DatabaseTransaction } from '@server/constant/type';
 import { authService } from '@server/features/auth/auth.service';
@@ -24,7 +26,7 @@ import { zipDocuments } from '@server/utils/zip-documents';
 
 function authorize(identity: Identity, action: 'READ' | 'CREATE' | 'UPDATE') {
   if (
-    identity.type === 'admin' &&
+    identity.type === AccountTypeEnum.Admin &&
     !authService.hasAclPermission(identity, `CGP_${action}`)
   ) {
     throw new CreditForbidden();
@@ -32,7 +34,7 @@ function authorize(identity: Identity, action: 'READ' | 'CREATE' | 'UPDATE') {
 }
 
 async function companyScope(identity: Identity, tx?: DatabaseTransaction) {
-  if (identity.type === 'admin') {
+  if (identity.type === AccountTypeEnum.Admin) {
     return undefined;
   }
   const company = await employeesRepository.company(identity.slug, tx);
@@ -54,7 +56,7 @@ async function requireDebitor(
   const companyId = await companyScope(identity, tx);
   if (
     (companyId !== undefined && companyId !== row.userId) ||
-    (identity.type === 'debitor' && identity.id !== debitorId)
+    (identity.type === AccountTypeEnum.Debitor && identity.id !== debitorId)
   ) {
     throw new CreditForbidden();
   }
@@ -78,7 +80,7 @@ export const creditService = {
     const result = await creditRepository.list(
       query,
       await companyScope(identity),
-      identity.type === 'debitor' ? identity.id : undefined,
+      identity.type === AccountTypeEnum.Debitor ? identity.id : undefined,
       false,
     );
     const entries = result.data
@@ -99,7 +101,7 @@ export const creditService = {
 
   parseAmount,
   async confirm(input: CreditConfirmation, identity: Identity) {
-    if (identity.type !== 'debitor') {
+    if (identity.type !== AccountTypeEnum.Debitor) {
       throw new CreditForbidden();
     }
     return withTransaction(async (tx) => {
@@ -109,8 +111,8 @@ export const creditService = {
       }
       await requireDebitor(identity, row.credit.debitorId, tx);
       if (
-        row.credit.status !== 'approved' ||
-        row.credit.statusAdminApproval !== 'approved' ||
+        row.credit.status !== CreditStatusEnum.Approved ||
+        row.credit.statusAdminApproval !== CreditStatusEnum.Approved ||
         row.credit.debitorAcknowledgmentTimestamp
       ) {
         throw new CreditConflict('Pengajuan tidak dapat dikonfirmasi');
@@ -129,14 +131,14 @@ export const creditService = {
     });
   },
   async status(id: number, identity: Identity) {
-    if (identity.type !== 'debitor') {
+    if (identity.type !== AccountTypeEnum.Debitor) {
       throw new CreditForbidden();
     }
     const row = await creditService.detail(id, identity);
     return { ...row, expenses: await creditReviewRepository.expenses(id) };
   },
   async cancel(id: number, identity: Identity) {
-    if (identity.type !== 'debitor') {
+    if (identity.type !== AccountTypeEnum.Debitor) {
       throw new CreditForbidden();
     }
     return withTransaction(async (tx) => {
@@ -146,8 +148,8 @@ export const creditService = {
       }
       await requireDebitor(identity, row.credit.debitorId, tx);
       if (
-        row.credit.status !== 'approved' ||
-        row.credit.statusAdminApproval !== 'approved' ||
+        row.credit.status !== CreditStatusEnum.Approved ||
+        row.credit.statusAdminApproval !== CreditStatusEnum.Approved ||
         row.credit.debitorAcknowledgmentTimestamp
       ) {
         throw new CreditConflict('Pengajuan tidak dapat dibatalkan');
@@ -157,7 +159,7 @@ export const creditService = {
     });
   },
   async approve(input: CreditApproval, identity: Identity) {
-    if (identity.type !== 'company') {
+    if (identity.type !== AccountTypeEnum.Company) {
       throw new CreditForbidden();
     }
     return withTransaction(async (tx) => {
@@ -170,7 +172,7 @@ export const creditService = {
       if (!row || row.credit.debitorId !== debitorId) {
         throw new CreditNotFound();
       }
-      if (row.credit.status !== 'pending') {
+      if (row.credit.status !== CreditStatusEnum.Pending) {
         throw new CreditConflict('Pengajuan tidak dalam status pending');
       }
       await creditRepository.approve(
@@ -194,13 +196,13 @@ export const creditService = {
   async exportFile(
     query: CreditQuery,
     identity: Identity,
-    format: 'pdf' | 'xlsx' | 'csv',
+    format: ExportTypeEnum,
   ) {
     authorize(identity, 'READ');
     const result = await creditRepository.list(
       query,
       await companyScope(identity),
-      identity.type === 'debitor' ? identity.id : undefined,
+      identity.type === AccountTypeEnum.Debitor ? identity.id : undefined,
       false,
     );
     return exportFile({
@@ -243,7 +245,7 @@ export const creditService = {
     const result = await creditRepository.list(
       query,
       await companyScope(identity),
-      identity.type === 'debitor' ? identity.id : undefined,
+      identity.type === AccountTypeEnum.Debitor ? identity.id : undefined,
     );
     return {
       ...result,
@@ -252,7 +254,10 @@ export const creditService = {
           const totalAngsuran =
             Number(row.credit.jumlahAngsuran ?? 0) *
             Number(row.credit.jangkaWaktuBulan ?? 0);
-          if (identity.type !== 'admin' || row.credit.debitorId === null) {
+          if (
+            identity.type !== AccountTypeEnum.Admin ||
+            row.credit.debitorId === null
+          ) {
             return { ...row, totalAngsuran };
           }
           const data = await creditRepository.simulationData(
@@ -321,8 +326,8 @@ export const creditService = {
           throw new CreditForbidden();
         }
         if (
-          old.credit.status === 'approved' ||
-          old.credit.status === 'rejected'
+          old.credit.status === CreditStatusEnum.Approved ||
+          old.credit.status === CreditStatusEnum.Rejected
         ) {
           throw new CreditConflict('Pengajuan sudah terkunci');
         }

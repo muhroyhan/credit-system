@@ -1,8 +1,10 @@
 import {
+  AccountTypeEnum,
   adminDeleteSchema,
   companyCreateSchema,
   companyQuerySchema,
   companyUpdateSchema,
+  ExportTypeEnum,
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
@@ -77,7 +79,7 @@ async function interests(c: Context<AuthEnv>) {
   if (!slug) {
     return c.json({ error: 'slug required' }, 400);
   }
-  if (identity.type !== 'admin' && identity.slug !== slug) {
+  if (identity.type !== AccountTypeEnum.Admin && identity.slug !== slug) {
     return c.json({ error: 'forbidden' }, 403);
   }
   return c.json(await companiesService.interests(slug));
@@ -89,7 +91,9 @@ async function exportFile(c: Context<AuthEnv>) {
   const format = c.req.query('format');
   if (
     !parsed.success ||
-    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+    (format !== ExportTypeEnum.PDF &&
+      format !== ExportTypeEnum.XLSX &&
+      format !== ExportTypeEnum.CSV)
   ) {
     return c.json({ error: 'invalid query' }, 400);
   }

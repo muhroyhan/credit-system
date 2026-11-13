@@ -2,8 +2,8 @@ import type {
   CreditApplication,
   CreditApproval,
   CreditConfirmation,
+  ExportTypeEnum,
 } from '@credit/contracts';
-import type { ExportFormat } from '@web/constant/type';
 import {
   agreementResultSchema,
   creditListSchema,
@@ -76,7 +76,7 @@ export async function simulateCredit(token: string, input: CreditApplication) {
 export async function exportCredits(
   token: string,
   query: URLSearchParams,
-  format: ExportFormat,
+  format: ExportTypeEnum,
 ) {
   const response = await api.export.$get(
     { query: toExportQuery(query, format) } as never,

@@ -1,3 +1,4 @@
+import { ExportTypeEnum } from '@credit/contracts';
 import { Alert, Button, Group, NumberInput, Table, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
@@ -29,7 +30,7 @@ export function ListingTable<T extends { id: number }>({
   exporting: boolean;
   onExportZip?: () => void;
   zipping?: boolean;
-  onExport: (format: 'pdf' | 'xlsx' | 'csv') => void;
+  onExport: (format: ExportTypeEnum) => void;
   addAction?: ReactNode;
   filters: ReactNode;
 }) {
@@ -43,21 +44,21 @@ export function ListingTable<T extends { id: number }>({
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport('pdf')}
+          onClick={() => onExport(ExportTypeEnum.PDF)}
         >
           Export PDF
         </Button>
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport('xlsx')}
+          onClick={() => onExport(ExportTypeEnum.XLSX)}
         >
           Export XLSX
         </Button>
         <Button
           loading={exporting}
           disabled={loading}
-          onClick={() => onExport('csv')}
+          onClick={() => onExport(ExportTypeEnum.CSV)}
         >
           Export CSV
         </Button>

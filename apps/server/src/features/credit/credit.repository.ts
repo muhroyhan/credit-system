@@ -3,6 +3,7 @@ import type {
   CreditConfirmation,
   CreditQuery,
 } from '@credit/contracts';
+import { CreditStatusEnum, SortDirectionEnum } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import {
   creditCollection,
@@ -139,7 +140,10 @@ export const creditRepository = {
       .where(
         and(
           eq(credits.debitorId, debitorId),
-          inArray(credits.status, ['pending', 'approved']),
+          inArray(credits.status, [
+            CreditStatusEnum.Pending,
+            CreditStatusEnum.Approved,
+          ]),
         ),
       );
     return { income: debitor.income, rates, open };
@@ -251,7 +255,7 @@ export const creditRepository = {
       .leftJoin(users, eq(debitors.userId, users.id))
       .where(where)
       .orderBy(
-        (query.sortDirection === 'asc' ? asc : desc)(
+        (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
           query.sortBy === 'jumlahPengajuan'
             ? sql`CAST(${credits.jumlahPengajuan} AS DECIMAL(20, 0))`
             : credits[query.sortBy],

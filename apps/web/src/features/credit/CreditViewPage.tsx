@@ -1,3 +1,4 @@
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import { Alert, Button, Group } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -49,9 +50,9 @@ function Content() {
           {approval.error && (
             <Alert color="red">{approval.error.message}</Alert>
           )}
-          {session?.type === 'company' &&
+          {session?.type === AccountTypeEnum.Company &&
             crudaAccess(session, 'CGP').approve &&
-            row.credit.status === 'pending' && (
+            row.credit.status === CreditStatusEnum.Pending && (
               <Group>
                 <Button
                   disabled={approval.isPending}
@@ -82,7 +83,7 @@ function Content() {
                 </Button>
               </Group>
             )}
-          {session?.type === 'debitor' && (
+          {session?.type === AccountTypeEnum.Debitor && (
             <CustomerCreditStatus
               token={session.authToken}
               id={row.credit.id}

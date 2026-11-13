@@ -1,3 +1,4 @@
+import { AccountTypeEnum } from '@credit/contracts';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -14,7 +15,9 @@ import { useForm } from 'react-hook-form';
 export function useEmployeeForm({ token, id, initial }: EmployeePageProps) {
   const { session } = useSession();
   const form = useForm<EmployeeFormInput>({
-    resolver: zodResolver(accountFormSchema(!!id, session?.type === 'admin')),
+    resolver: zodResolver(
+      accountFormSchema(!!id, session?.type === AccountTypeEnum.Admin),
+    ),
     mode: 'onTouched',
     defaultValues: {
       namaLengkap: initial?.namaLengkap ?? '',

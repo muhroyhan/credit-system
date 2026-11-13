@@ -1,6 +1,7 @@
 import {
   adminDeleteSchema,
   type EmployeeDocumentKind,
+  ExportTypeEnum,
   employeeCreateSchema,
   employeeDocumentKindSchema,
   employeeDocumentKinds,
@@ -190,7 +191,9 @@ async function exportFile(c: Context<AuthEnv>) {
   const format = c.req.query('format');
   if (
     !parsed.success ||
-    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+    (format !== ExportTypeEnum.PDF &&
+      format !== ExportTypeEnum.XLSX &&
+      format !== ExportTypeEnum.CSV)
   ) {
     return c.json({ error: 'invalid query' }, 400);
   }

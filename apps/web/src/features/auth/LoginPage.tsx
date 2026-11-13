@@ -1,3 +1,4 @@
+import { AccountTypeEnum } from '@credit/contracts';
 import {
   Alert,
   Button,
@@ -56,7 +57,11 @@ export function LoginPage() {
                   allowDeselect={false}
                   error={errors.type?.message}
                   onChange={(v) => {
-                    if (v === 'admin' || v === 'company' || v === 'debitor') {
+                    if (
+                      v === AccountTypeEnum.Admin ||
+                      v === AccountTypeEnum.Company ||
+                      v === AccountTypeEnum.Debitor
+                    ) {
                       field.onChange(v);
                       setValue('slug', undefined, { shouldValidate: true });
                     }
@@ -64,7 +69,7 @@ export function LoginPage() {
                 />
               )}
             />
-            {type !== 'admin' && (
+            {type !== AccountTypeEnum.Admin && (
               <Controller
                 name="slug"
                 control={control}
@@ -98,7 +103,7 @@ export function LoginPage() {
             </Button>
           </Stack>
         </form>
-        {type === 'debitor' && slug && (
+        {type === AccountTypeEnum.Debitor && slug && (
           <Link to="/registration/$slug" params={{ slug }}>
             Daftar nasabah
           </Link>

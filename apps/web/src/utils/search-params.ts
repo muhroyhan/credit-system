@@ -1,7 +1,10 @@
-import type { ExportFormat } from '@web/constant/type';
+import type { ExportTypeEnum } from '@credit/contracts';
 
 /** Copies listing filters before adding the export format. */
-export function toExportQuery(filters: URLSearchParams, format: ExportFormat) {
+export function toExportQuery(
+  filters: URLSearchParams,
+  format: ExportTypeEnum,
+) {
   const params = new URLSearchParams(filters);
   params.set('format', format);
   return Object.fromEntries(params);

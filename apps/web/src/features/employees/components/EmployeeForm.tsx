@@ -1,3 +1,4 @@
+import { AccountTypeEnum } from '@credit/contracts';
 import {
   Alert,
   NumberInput,
@@ -41,7 +42,7 @@ export function EmployeeForm(props: EmployeePageProps) {
           error={errors.password?.message}
           required={!props.id}
         />
-        {session?.type === 'admin' && !props.id && (
+        {session?.type === AccountTypeEnum.Admin && !props.id && (
           <>
             <Text>
               {companies.data

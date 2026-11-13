@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { employeeDocumentKinds } from './employees.constant';
+import { SortDirectionEnum } from './sortdirection.enum';
 
 export const employeeAccountSchema = z
   .object({
@@ -35,7 +36,7 @@ export const employeeQuerySchema = z.object({
   sortBy: z
     .enum(['id', 'employeeId', 'namaLengkap', 'createdAt'])
     .default('createdAt'),
-  sortDirection: z.enum(['asc', 'desc']).default('desc'),
+  sortDirection: z.enum(SortDirectionEnum).default('desc'),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });

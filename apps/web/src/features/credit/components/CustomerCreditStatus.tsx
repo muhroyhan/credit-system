@@ -1,3 +1,4 @@
+import { CreditStatusEnum } from '@credit/contracts';
 import { Alert, Button, Checkbox, Stack, Text, TextInput } from '@mantine/core';
 import { RecordState } from '@web/components/crud/RecordState';
 import { useCustomerCredit } from '@web/features/credit/hooks/useCustomerCredit';
@@ -29,14 +30,14 @@ export function CustomerCreditStatus({
           )}
           {row.credit.debitorAcknowledgmentTimestamp && (
             <Alert color="green">
-              {row.credit.statusAdminApproval === 'rejected'
+              {row.credit.statusAdminApproval === CreditStatusEnum.Rejected
                 ? 'Pembatalan'
                 : 'Konfirmasi'}{' '}
               tersimpan pada {row.credit.debitorAcknowledgmentTimestamp}.
             </Alert>
           )}
           {row.credit.debitorAcknowledgmentTimestamp &&
-            row.credit.statusAdminApproval === 'approved' && (
+            row.credit.statusAdminApproval === CreditStatusEnum.Approved && (
               <Button
                 loading={generate.isPending}
                 onClick={() => generate.mutate()}
@@ -52,8 +53,8 @@ export function CustomerCreditStatus({
               {(cancel.error ?? confirm.error)?.message}
             </Alert>
           )}
-          {row.credit.status === 'approved' &&
-            row.credit.statusAdminApproval === 'approved' &&
+          {row.credit.status === CreditStatusEnum.Approved &&
+            row.credit.statusAdminApproval === CreditStatusEnum.Approved &&
             !row.credit.debitorAcknowledgmentTimestamp && (
               <>
                 <Button

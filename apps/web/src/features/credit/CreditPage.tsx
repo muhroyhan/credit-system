@@ -1,3 +1,4 @@
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -44,7 +45,7 @@ function Content() {
         { label: 'Status', render: (r) => r.credit.status },
       ]}
       addAction={
-        (access.create || session?.type === 'debitor') && (
+        (access.create || session?.type === AccountTypeEnum.Debitor) && (
           <Link to="/credits/add">Tambah pengajuan</Link>
         )
       }
@@ -64,7 +65,7 @@ function Content() {
           />
           <Select
             label="Status"
-            data={['pending', 'approved', 'rejected', 'completed']}
+            data={Object.values(CreditStatusEnum)}
             clearable
             value={rows.queries.status || null}
             onChange={(v) => {
@@ -102,8 +103,8 @@ function Content() {
             Lihat
           </Link>
           {access.update &&
-            row.credit.status !== 'approved' &&
-            row.credit.status !== 'rejected' && (
+            row.credit.status !== CreditStatusEnum.Approved &&
+            row.credit.status !== CreditStatusEnum.Rejected && (
               <Link to="/credits/$id/edit" params={{ id: String(row.id) }}>
                 Ubah
               </Link>

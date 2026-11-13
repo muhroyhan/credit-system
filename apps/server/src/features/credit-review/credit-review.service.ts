@@ -1,4 +1,9 @@
-import type { CreditQuery, CreditReview } from '@credit/contracts';
+import type {
+  CreditQuery,
+  CreditReview,
+  ExportTypeEnum,
+} from '@credit/contracts';
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import type { Identity } from '@server/constant/interface';
 import { authService } from '@server/features/auth/auth.service';
 import {
@@ -27,7 +32,7 @@ function decimalFromCents(value: bigint) {
 export const creditReviewService = {
   async exportZip(query: CreditQuery, identity: Identity) {
     if (
-      identity.type !== 'admin' ||
+      identity.type !== AccountTypeEnum.Admin ||
       !authService.hasAclPermission(identity, 'DKN_READ')
     ) {
       throw new CreditForbidden();
@@ -56,7 +61,7 @@ export const creditReviewService = {
 
   async reviewList(query: CreditQuery, identity: Identity) {
     if (
-      identity.type !== 'admin' ||
+      identity.type !== AccountTypeEnum.Admin ||
       !authService.hasAclPermission(identity, 'DKN_READ')
     ) {
       throw new CreditForbidden();
@@ -69,10 +74,10 @@ export const creditReviewService = {
   async exportReviews(
     query: CreditQuery,
     identity: Identity,
-    format: 'pdf' | 'xlsx' | 'csv',
+    format: ExportTypeEnum,
   ) {
     if (
-      identity.type !== 'admin' ||
+      identity.type !== AccountTypeEnum.Admin ||
       !authService.hasAclPermission(identity, 'DKN_READ')
     ) {
       throw new CreditForbidden();
@@ -120,7 +125,7 @@ export const creditReviewService = {
   },
   async reviewDetail(id: number, identity: Identity) {
     if (
-      identity.type !== 'admin' ||
+      identity.type !== AccountTypeEnum.Admin ||
       !authService.hasAclPermission(identity, 'DKN_READ')
     ) {
       throw new CreditForbidden();
@@ -148,7 +153,7 @@ export const creditReviewService = {
   },
   async review(input: CreditReview, identity: Identity) {
     if (
-      identity.type !== 'admin' ||
+      identity.type !== AccountTypeEnum.Admin ||
       !authService.hasAclPermission(identity, 'DKN_APPROVAL')
     ) {
       throw new CreditForbidden();
@@ -166,9 +171,9 @@ export const creditReviewService = {
         throw new CreditNotFound();
       }
       if (
-        row.credit.status !== 'approved' ||
-        row.credit.statusAdminApproval === 'rejected' ||
-        row.credit.statusAdminApproval === 'completed'
+        row.credit.status !== CreditStatusEnum.Approved ||
+        row.credit.statusAdminApproval === CreditStatusEnum.Rejected ||
+        row.credit.statusAdminApproval === CreditStatusEnum.Completed
       ) {
         throw new CreditConflict('Pengajuan tidak dapat ditinjau');
       }
@@ -181,13 +186,13 @@ export const creditReviewService = {
         throw new CreditForbidden();
       }
       if (
-        row.credit.statusAdminApproval === 'approved' &&
-        input.statusAdminApproval !== 'completed'
+        row.credit.statusAdminApproval === CreditStatusEnum.Approved &&
+        input.statusAdminApproval !== CreditStatusEnum.Completed
       ) {
         throw new CreditConflict('Pengajuan telah disetujui BPR');
       }
       if (
-        row.credit.statusAdminApproval === 'approved' &&
+        row.credit.statusAdminApproval === CreditStatusEnum.Approved &&
         (row.credit.jumlahPengajuan !==
           String(creditService.parseAmount(input.jumlahPengajuan)) ||
           row.credit.jangkaWaktuBulan !== input.jangkaWaktuBulan ||
@@ -202,7 +207,7 @@ export const creditReviewService = {
         tx,
       );
       const actor = `${identity.type}:${identity.id}`;
-      if (input.statusAdminApproval === 'approved') {
+      if (input.statusAdminApproval === CreditStatusEnum.Approved) {
         const config = await creditReviewRepository.expenseConfiguration(
           row.userId,
           tx,
@@ -233,7 +238,7 @@ export const creditReviewService = {
       );
       return input.id;
     });
-    if (input.statusAdminApproval !== 'approved') {
+    if (input.statusAdminApproval !== CreditStatusEnum.Approved) {
       return { id, notification: 'not-required' as const };
     }
     const {

@@ -49,3 +49,5 @@ Profil proyek mengadaptasi [TypeScript Declaration Files](https://www.typescript
 
 - [Server](apps/server/AGENTS.md), [web](apps/web/AGENTS.md), [database](packages/database/AGENTS.md), [E2E](tests/e2e/AGENTS.md).
 - [Alur bisnis](docs/credit-system/business-flow.md), [kontrak API](docs/credit-system/api-contract.md), [model data](docs/credit-system/data-model.md), [rencana](docs/credit-system/development-plan.md), [acceptance dan hasil](docs/credit-system/testing.md), [pengembangan lokal](docs/credit-system/local-development.md).
+
+Nilai pilihan domain yang dipakai berulang ditetapkan sebagai objek enum `as const` beserta tipe union bernama sama, satu definisi per file `nama.enum.ts` (contoh `ExportTypeEnum` di `exporttype.enum.ts`). Definisi lintas aplikasi berada di packages/contracts dan diimpor melalui ekspor publik; schema Zod, perbandingan nilai dan UI memakai sumber yang sama. Nama kolom/path serta teks bebas bukan enum.

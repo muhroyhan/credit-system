@@ -1,3 +1,4 @@
+import { SortDirectionEnum } from '@credit/contracts';
 import { connectDatabase } from '@credit/database/client';
 import { adminUsers, programs, roles } from '@credit/database/schema';
 import type { AdminRepository } from '@server/features/admin-users/admin-users.type';
@@ -31,7 +32,9 @@ export const adminUsersRepository: AdminRepository = {
       .from(adminUsers)
       .where(where)
       .orderBy(
-        (query.sortDirection === 'asc' ? asc : desc)(adminUsers[query.sortBy]),
+        (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
+          adminUsers[query.sortBy],
+        ),
         desc(adminUsers.id),
       );
     const data = await (paginate

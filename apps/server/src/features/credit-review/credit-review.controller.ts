@@ -1,6 +1,7 @@
 import {
   creditQuerySchema,
   creditReviewSchema,
+  ExportTypeEnum,
   idQuerySchema,
 } from '@credit/contracts';
 import type { AuthEnv } from '@server/constant/interface';
@@ -53,7 +54,9 @@ async function reviewExport(c: Context<AuthEnv>) {
   const format = c.req.query('format');
   if (
     !query.success ||
-    (format !== 'pdf' && format !== 'xlsx' && format !== 'csv')
+    (format !== ExportTypeEnum.PDF &&
+      format !== ExportTypeEnum.XLSX &&
+      format !== ExportTypeEnum.CSV)
   ) {
     return c.json({ error: 'invalid query' }, 400);
   }

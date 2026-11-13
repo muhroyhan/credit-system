@@ -1,11 +1,14 @@
 import {
+  AccountTypeEnum,
   type EmployeeAccount,
   type EmployeeDocumentKind,
   type EmployeeProfile,
   type EmployeeQuery,
+  type ExportTypeEnum,
   employeeDetailSchema,
   employeeDocumentKinds,
   employeeProfileSchema,
+  PermissionActionEnum,
 } from '@credit/contracts';
 import type { DocumentStorage, Identity } from '@server/constant/interface';
 import type { DatabaseTransaction } from '@server/constant/type';
@@ -31,17 +34,18 @@ function requireAction(
   action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE',
 ) {
   if (
-    identity.type === 'admin' &&
+    identity.type === AccountTypeEnum.Admin &&
     authService.hasAclPermission(identity, `CGP_${action}`)
   ) {
     return;
   }
-  if (identity.type === 'company') {
+  if (identity.type === AccountTypeEnum.Company) {
     return;
   }
   if (
-    identity.type === 'debitor' &&
-    (action === 'READ' || action === 'UPDATE')
+    identity.type === AccountTypeEnum.Debitor &&
+    (action === PermissionActionEnum.Read ||
+      action === PermissionActionEnum.Update)
   ) {
     return;
   }
@@ -52,7 +56,7 @@ async function scope(
   userId?: number,
   tx?: DatabaseTransaction,
 ) {
-  if (identity.type === 'admin') {
+  if (identity.type === AccountTypeEnum.Admin) {
     return userId;
   }
   const company = await employeesRepository.company(identity.slug, tx);
@@ -68,8 +72,9 @@ async function detail(id: number, identity: Identity) {
     throw new EmployeeNotFound();
   }
   if (
-    (identity.type !== 'admin' && row.userId !== (await scope(identity))) ||
-    (identity.type === 'debitor' && row.id !== identity.id)
+    (identity.type !== AccountTypeEnum.Admin &&
+      row.userId !== (await scope(identity))) ||
+    (identity.type === AccountTypeEnum.Debitor && row.id !== identity.id)
   ) {
     throw new EmployeeForbidden('forbidden');
   }
@@ -135,7 +140,7 @@ export function createEmployeesService(
       return employeesRepository.list(
         query,
         await scope(identity, query.userId),
-        identity.type === 'debitor' ? identity.id : undefined,
+        identity.type === AccountTypeEnum.Debitor ? identity.id : undefined,
       );
     },
     async register(input: EmployeeAccount & { slug: string }) {
@@ -193,8 +198,8 @@ export function createEmployeesService(
         const userId = previous?.userId ?? companyId;
         if (
           !userId ||
-          (identity.type !== 'admin' && userId !== companyId) ||
-          (identity.type === 'debitor' && id !== identity.id)
+          (identity.type !== AccountTypeEnum.Admin && userId !== companyId) ||
+          (identity.type === AccountTypeEnum.Debitor && id !== identity.id)
         ) {
           throw new EmployeeForbidden('forbidden');
         }
@@ -236,8 +241,9 @@ export function createEmployeesService(
           throw new EmployeeNotFound();
         }
         if (
-          (identity.type !== 'admin' && row.userId !== companyId) ||
-          (identity.type === 'debitor' && id !== identity.id)
+          (identity.type !== AccountTypeEnum.Admin &&
+            row.userId !== companyId) ||
+          (identity.type === AccountTypeEnum.Debitor && id !== identity.id)
         ) {
           throw new EmployeeForbidden('forbidden');
         }
@@ -266,8 +272,9 @@ export function createEmployeesService(
             throw new EmployeeNotFound();
           }
           if (
-            (identity.type !== 'admin' && row.userId !== companyId) ||
-            (identity.type === 'debitor' && id !== identity.id)
+            (identity.type !== AccountTypeEnum.Admin &&
+              row.userId !== companyId) ||
+            (identity.type === AccountTypeEnum.Debitor && id !== identity.id)
           ) {
             throw new EmployeeForbidden('forbidden');
           }
@@ -329,13 +336,13 @@ export function createEmployeesService(
     async exportFile(
       query: EmployeeQuery,
       identity: Identity,
-      format: 'pdf' | 'xlsx' | 'csv',
+      format: ExportTypeEnum,
     ) {
       requireAction(identity, 'READ');
       const result = await employeesRepository.list(
         query,
         await scope(identity, query.userId),
-        identity.type === 'debitor' ? identity.id : undefined,
+        identity.type === AccountTypeEnum.Debitor ? identity.id : undefined,
         false,
       );
       return exportFile({
@@ -368,7 +375,10 @@ export function createEmployeesService(
         if (!row) {
           throw new EmployeeNotFound();
         }
-        if (identity.type !== 'admin' && row.userId !== companyId) {
+        if (
+          identity.type !== AccountTypeEnum.Admin &&
+          row.userId !== companyId
+        ) {
           throw new EmployeeForbidden('forbidden');
         }
         if (await employeesRepository.hasCredit(id, tx)) {

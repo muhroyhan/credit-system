@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { CreditStatusEnum } from './creditstatus.enum';
+import { SortDirectionEnum } from './sortdirection.enum';
 
 const amount = z
   .string()
@@ -94,7 +96,7 @@ export const creditUpdateSchema = creditApplicationSchema.extend({
 });
 export const creditApprovalSchema = z.strictObject({
   id: z.number().int().positive(),
-  status: z.enum(['approved', 'rejected']),
+  status: z.enum([CreditStatusEnum.Approved, CreditStatusEnum.Rejected]),
 });
 export const creditUpdateRequestSchema = z.union([
   creditApprovalSchema,
@@ -117,10 +119,8 @@ export const creditQuerySchema = z.object({
   debitorId: z.coerce.number().int().positive().optional(),
   nama: z.string().max(255).optional(),
   noKtp: z.string().max(255).optional(),
-  status: z.enum(['pending', 'approved', 'rejected', 'completed']).optional(),
-  statusAdminApproval: z
-    .enum(['pending', 'approved', 'rejected', 'completed'])
-    .optional(),
+  status: z.enum(CreditStatusEnum).optional(),
+  statusAdminApproval: z.enum(CreditStatusEnum).optional(),
   createdFrom: calendarDate.optional(),
   createdTo: calendarDate.optional(),
   page: z.coerce.number().int().positive().default(1),
@@ -128,7 +128,7 @@ export const creditQuerySchema = z.object({
   sortBy: z
     .enum(['id', 'createdAt', 'tanggalPengajuan', 'jumlahPengajuan'])
     .default('createdAt'),
-  sortDirection: z.enum(['asc', 'desc']).default('desc'),
+  sortDirection: z.enum(SortDirectionEnum).default('desc'),
 });
 
 export type CreditApplication = z.infer<typeof creditApplicationSchema>;

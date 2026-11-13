@@ -1,3 +1,4 @@
+import { AccountTypeEnum, PermissionActionEnum } from '@credit/contracts';
 import type { CrudaAction, Session } from '@web/constant/type';
 
 /** Maps the login role snapshot to UI actions; the API checks current permissions. */
@@ -5,18 +6,18 @@ export function crudaAccess(
   session: Session | null,
   program: string,
 ): Record<CrudaAction, boolean> {
-  if (session && program === 'CGP' && session.type !== 'admin') {
+  if (session && program === 'CGP' && session.type !== AccountTypeEnum.Admin) {
     return {
-      create: session.type === 'company',
+      create: session.type === AccountTypeEnum.Company,
       read: true,
       update: true,
-      delete: session.type === 'company',
-      approve: session.type === 'company',
+      delete: session.type === AccountTypeEnum.Company,
+      approve: session.type === AccountTypeEnum.Company,
     };
   }
   const roles: unknown = session?.userData.roles;
   const values =
-    session?.type === 'admin' && Array.isArray(roles)
+    session?.type === AccountTypeEnum.Admin && Array.isArray(roles)
       ? roles
           .filter(
             (role): role is { program: string; value: string } =>
@@ -29,10 +30,10 @@ export function crudaAccess(
           .map((role) => role.value)
       : [];
   return {
-    create: values.includes('CREATE'),
-    read: values.includes('READ'),
-    update: values.includes('UPDATE'),
-    delete: values.includes('DELETE'),
-    approve: values.includes('APPROVAL'),
+    create: values.includes(PermissionActionEnum.Create),
+    read: values.includes(PermissionActionEnum.Read),
+    update: values.includes(PermissionActionEnum.Update),
+    delete: values.includes(PermissionActionEnum.Delete),
+    approve: values.includes(PermissionActionEnum.Approval),
   };
 }

@@ -1,3 +1,4 @@
+import { CreditStatusEnum } from '@credit/contracts';
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
@@ -64,7 +65,7 @@ function Content() {
           />
           <Select
             label="Status BPR"
-            data={['pending', 'approved', 'rejected', 'completed']}
+            data={Object.values(CreditStatusEnum)}
             clearable
             value={queries.statusAdminApproval ?? null}
             onChange={(value) => {
@@ -89,7 +90,7 @@ function Content() {
           />
           <Select
             label="Status HRD"
-            data={['pending', 'approved', 'rejected', 'completed']}
+            data={Object.values(CreditStatusEnum)}
             value={queries.status ?? ''}
             onChange={(value) => {
               setQueries((current) => ({

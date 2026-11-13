@@ -1,3 +1,4 @@
+import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
 import type { DocumentStorage, Identity } from '@server/constant/interface';
 import type { DatabaseTransaction } from '@server/constant/type';
 import { AGREEMENT_WORDS } from '@server/features/agreement/agreement.constant';
@@ -87,7 +88,7 @@ async function reserveNumber(
   identity: Identity,
   tx: DatabaseTransaction,
 ) {
-  if (identity.type !== 'debitor') {
+  if (identity.type !== AccountTypeEnum.Debitor) {
     throw new AgreementForbidden();
   }
 
@@ -99,8 +100,8 @@ async function reserveNumber(
     throw new AgreementForbidden();
   }
   if (
-    row.status !== 'approved' ||
-    row.statusAdminApproval !== 'approved' ||
+    row.status !== CreditStatusEnum.Approved ||
+    row.statusAdminApproval !== CreditStatusEnum.Approved ||
     !row.acknowledgment ||
     !row.bankName ||
     !row.bankBranch ||

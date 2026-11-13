@@ -1,9 +1,9 @@
+import type { ExportTypeEnum } from '@credit/contracts';
 import {
   type EmployeeProfile,
   employeeDetailSchema,
   employeeListSchema,
 } from '@credit/contracts';
-import type { ExportFormat } from '@web/constant/type';
 import type { EmployeeFormInput } from '@web/features/employees/employees.type';
 import { apiClient, apiOptions, readApiResponse } from '@web/utils/api-client';
 import { downloadFile } from '@web/utils/download-file';
@@ -97,7 +97,7 @@ export async function deleteEmployee(token: string, id: number) {
 export async function exportEmployees(
   token: string,
   query: URLSearchParams,
-  format: ExportFormat,
+  format: ExportTypeEnum,
 ) {
   await downloadFile(
     await client.export.$get(

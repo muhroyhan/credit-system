@@ -1,3 +1,4 @@
+import type { ExportTypeEnum } from '@credit/contracts';
 import {
   CompanyConflict,
   CompanyNotFound,
@@ -18,7 +19,7 @@ export const companiesService = {
       ? ((await companiesRepository.detail(id))?.bungaKredits ?? [])
       : [];
   },
-  async exportFile(query: CompanyQuery, format: 'pdf' | 'xlsx' | 'csv') {
+  async exportFile(query: CompanyQuery, format: ExportTypeEnum) {
     const result = await companiesRepository.list(query, false);
     return exportFile({
       title: 'Perusahaan',
