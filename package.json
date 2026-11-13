@@ -13,8 +13,8 @@
     "db:migrate": "bun packages/database/src/migrate.ts",
     "db:seed": "bun packages/database/src/seed.ts",
     "test:unit": "vitest run --project unit",
-    "test:integration": "vitest run --project integration",
-    "test:e2e": "playwright test"
+    "test:integration": "vitest run --project integration && playwright test --project api",
+    "test:e2e": "playwright test --project browser"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
@@ -27,6 +27,8 @@
     "@types/node": "^22.20.5",
     "drizzle-kit": "^0.31.0",
     "drizzle-orm": "0.44.7",
+    "exceljs": "4.4.0",
+    "jszip": "3.10.2",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3",
     "vitest": "^5.1.0"

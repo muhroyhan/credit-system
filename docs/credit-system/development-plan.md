@@ -150,3 +150,27 @@ Hasil: admin, HRD dan debitor melihat ringkasan sesuai kontrak, dengan navigasi 
 | P12-T01 | Implementasikan agregasi totalUsers active/inactive tanpa blocked, totalDebitor sesuai aktor (nol bagi debitor), totalCredits berupa nominal per status HRD pending/approved/completed. Catat totalUsers global dan dampak cancellation sesuai SUPPORT-04/15, bukan mengubah agregat menjadi saldo cicilan. |
 | P12-T02 | Pasang GET dashboard/data dan UI ringkasan sesuai aktor, state kosong/loading/gagal dan nominal/tanggal konsisten; gunakan query sesuai scope backend. |
 | P12-T03 | Verifikasi akhir phase: unit agregasi, integration dua tenant/seluruh aktor dan status, E2E dashboard. Regresikan seluruh fitur yang telah selesai; jika P09–P11 belum dikerjakan, regresinya dilakukan pada task terakhir phase tersebut ketika selesai. Hapus script test sementara dan catat hasil aktual. |
+
+
+## P13 — QA cleanup dan perluasan automation
+
+Status: doing. Tidak mengubah source aplikasi, schema atau aturan bisnis.
+Seluruh test ditulis sebelum batch eksekusi; hasil dan batas bukti pada testing.md.
+Commit per fitur memakai footer Task yang sama dengan kode berikut; hash final
+dilengkapi pada task dokumentasi terakhir. Tidak ada task diblokir keputusan bisnis.
+
+| Kode | Task | Status | Commit |
+| --- | --- | --- | --- |
+| P13-T01 | Harness, isolasi lingkungan, fixture bersama dan cleanup adapter | done | footer Task: P13-T01 |
+| P13-T02 | Auth, referensi dan ACL | doing | footer Task: P13-T02 |
+| P13-T03 | Administrator dan role | doing | footer Task: P13-T03 |
+| P13-T04 | Perusahaan dan konfigurasi child | doing | footer Task: P13-T04 |
+| P13-T05 | Registrasi, profil dan dokumen karyawan | doing | footer Task: P13-T05 |
+| P13-T06 | Simulasi, scope dan child kredit | doing | footer Task: P13-T06 |
+| P13-T07 | Approval HRD dan konkurensi | doing | footer Task: P13-T07 |
+| P13-T08 | Review BPR, snapshot dan kegagalan notifikasi | doing | footer Task: P13-T08 |
+| P13-T09 | Konfirmasi/pembatalan nasabah dan matriks status | doing | footer Task: P13-T09 |
+| P13-T10 | Perjanjian, penomoran dan PDF | doing | footer Task: P13-T10 |
+| P13-T11 | Ekspor, ZIP dan parameter listing | doing | footer Task: P13-T11 |
+| P13-T12 | Dashboard dan agregat scoped | doing | footer Task: P13-T12 |
+| P13-T13 | Dokumentasi, analisis, bukti verifikasi dan cleanup akhir | doing | footer Task: P13-T13 |
