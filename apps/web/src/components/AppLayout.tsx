@@ -2,12 +2,13 @@ import {
   AppShell,
   Burger,
   Button,
+  Drawer,
   Group,
   NavLink,
   Stack,
   Text,
 } from '@mantine/core';
-import { useDisclosure, useHotkeys } from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { crudaAccess } from '@web/utils/cruda';
@@ -15,7 +16,6 @@ import { crudaAccess } from '@web/utils/cruda';
 export function AppLayout() {
   const { session, logout } = useSession();
   const [opened, { toggle, close }] = useDisclosure();
-  useHotkeys([['Escape', close]]);
   const path = useRouterState({ select: (state) => state.location.pathname });
   if (!session || path === '/login' || path.startsWith('/registration/')) {
     return <Outlet />;
@@ -48,10 +48,40 @@ export function AppLayout() {
       visible: crudaAccess(session, 'DKN').read,
     },
   ];
+  const navigation = (
+    <Stack gap={4}>
+      {items
+        .filter((item) => item.visible)
+        .map((item) => (
+          <NavLink
+            key={item.to}
+            color="#005691"
+            component={Link}
+            to={item.to}
+            label={item.label}
+            aria-current={
+              (
+                item.to === '/'
+                  ? path === '/'
+                  : path === item.to || path.startsWith(`${item.to}/`)
+              )
+                ? 'page'
+                : undefined
+            }
+            active={
+              item.to === '/'
+                ? path === '/'
+                : path === item.to || path.startsWith(`${item.to}/`)
+            }
+            onClick={close}
+          />
+        ))}
+    </Stack>
+  );
   return (
     <AppShell
       header={{ height: 64 }}
-      navbar={{ width: 250, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      navbar={{ width: 250, breakpoint: 'sm', collapsed: { mobile: true } }}
       padding={{ base: 'md', sm: 'xl' }}
     >
       <AppShell.Header>
@@ -62,7 +92,7 @@ export function AppLayout() {
               onClick={toggle}
               hiddenFrom="sm"
               aria-expanded={opened}
-              aria-controls="main-navigation"
+              aria-controls="mobile-navigation"
               aria-label={opened ? 'Tutup menu' : 'Buka menu'}
             />
             <Text fw={700} c="#005691">
@@ -87,34 +117,18 @@ export function AppLayout() {
         <Text size="xs" fw={700} c="dimmed" mb="sm">
           NAVIGASI
         </Text>
-        <Stack gap={4} component="nav" aria-label="Navigasi utama">
-          {items
-            .filter((item) => item.visible)
-            .map((item) => (
-              <NavLink
-                key={item.to}
-                component={Link}
-                to={item.to}
-                label={item.label}
-                aria-current={
-                  (
-                    item.to === '/'
-                      ? path === '/'
-                      : path === item.to || path.startsWith(`${item.to}/`)
-                  )
-                    ? 'page'
-                    : undefined
-                }
-                active={
-                  item.to === '/'
-                    ? path === '/'
-                    : path === item.to || path.startsWith(`${item.to}/`)
-                }
-                onClick={close}
-              />
-            ))}
-        </Stack>
+        <nav aria-label="Navigasi utama">{navigation}</nav>
       </AppShell.Navbar>
+      <Drawer
+        id="mobile-navigation"
+        opened={opened}
+        onClose={close}
+        title="Navigasi"
+        size={280}
+        hiddenFrom="sm"
+      >
+        <nav aria-label="Navigasi mobile">{navigation}</nav>
+      </Drawer>
       <AppShell.Main bg="#f0f0f0">
         <Outlet />
       </AppShell.Main>

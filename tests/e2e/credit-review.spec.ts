@@ -58,12 +58,24 @@ test('BPR can approve, reject and complete HRD-approved applications', async ({
         .filter({
           has: page.locator(`a[href="/credit-reviews/${ids[index]}"]`),
         })
-        .filter({ hasText: amount })
+        .filter({
+          hasText: new Intl.NumberFormat('id-ID').format(Number(amount)),
+        })
         .getByRole('link', { name: 'Lihat' })
         .click();
       await page.getByRole('link', { name: 'Ubah keputusan' }).click();
       await page.getByRole('textbox', { name: 'Keputusan BPR' }).click();
-      await page.getByRole('option', { name: status, exact: true }).click();
+      await page
+        .getByRole('option', {
+          name:
+            status === 'approved'
+              ? 'Disetujui'
+              : status === 'rejected'
+                ? 'Ditolak'
+                : 'Selesai',
+          exact: true,
+        })
+        .click();
       await page.getByRole('button', { name: 'Simpan keputusan' }).click();
       await expect(page.getByText(/Keputusan tersimpan/).first()).toBeVisible();
       if (status !== 'approved') {

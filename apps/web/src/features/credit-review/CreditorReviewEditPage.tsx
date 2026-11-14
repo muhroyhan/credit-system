@@ -2,9 +2,12 @@ import { CreditStatusEnum } from '@credit/contracts';
 import { Alert, Button, NumberInput, Select, TextInput } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
+import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
 import { FieldsGrid } from '@web/components/FieldsGrid';
 import { FormSection } from '@web/components/FormSection';
+import { StatusBadge } from '@web/components/StatusBadge';
+import { statusPresentation } from '@web/constant/constant';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import type { CreditReviewDetail } from '@web/features/credit-review/credit-review.type';
 import { useCreditReview } from '@web/features/credit-review/hooks/useCreditReview';
@@ -29,6 +32,20 @@ function Content() {
     <RecordState id={Number(id)} query={query}>
       {(row) => (
         <>
+          <DetailFields
+            fields={[
+              { label: 'Nama', value: row.nama },
+              { label: 'Perusahaan', value: row.companyName },
+              {
+                label: 'Status HRD',
+                value: <StatusBadge value={row.credit.status} />,
+              },
+              {
+                label: 'Status BPR',
+                value: <StatusBadge value={row.credit.statusAdminApproval} />,
+              },
+            ]}
+          />
           {notification && (
             <Alert
               color={
@@ -123,11 +140,17 @@ function Form({
               <Select
                 label="Keputusan BPR"
                 allowDeselect={false}
-                data={
-                  approved
-                    ? ['completed']
-                    : ['approved', 'rejected', 'completed']
-                }
+                data={(approved
+                  ? [CreditStatusEnum.Completed]
+                  : [
+                      CreditStatusEnum.Approved,
+                      CreditStatusEnum.Rejected,
+                      CreditStatusEnum.Completed,
+                    ]
+                ).map((value) => ({
+                  value,
+                  label: statusPresentation[value]?.label ?? value,
+                }))}
                 value={field.value}
                 onChange={(value) => field.onChange(value)}
                 error={errors.statusAdminApproval?.message}
@@ -136,18 +159,6 @@ function Form({
           />
         </FieldsGrid>
         {save.error && <Alert color="red">{save.error.message}</Alert>}
-        {save.data && (
-          <Alert
-            color={
-              save.data.notification === 'failed' ||
-              save.data.notification === 'not-configured'
-                ? 'yellow'
-                : 'green'
-            }
-          >
-            Keputusan tersimpan. Notifikasi: {save.data.notification}
-          </Alert>
-        )}
         <Button type="submit" loading={save.isPending}>
           Simpan keputusan
         </Button>

@@ -13,6 +13,7 @@ import { Link } from '@tanstack/react-router';
 import { FormActions } from '@web/components/crud/FormActions';
 import { FieldsGrid } from '@web/components/FieldsGrid';
 import { FormSection } from '@web/components/FormSection';
+import { statusPresentation } from '@web/constant/constant';
 import type { CompanyFormProps } from '@web/features/companies/companies.type';
 import { useCompanyForm } from '@web/features/companies/hooks/useCompanyForm';
 import { useEntities } from '@web/features/companies/hooks/useEntities';
@@ -92,7 +93,10 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
               <Select
                 label="Status perusahaan"
                 {...field}
-                data={Object.values(CompanyStatusEnum)}
+                data={Object.values(CompanyStatusEnum).map((value) => ({
+                  value,
+                  label: statusPresentation[value]?.label ?? value,
+                }))}
                 onChange={(v) => {
                   if (v) {
                     field.onChange(v);

@@ -29,7 +29,11 @@ export function ListingTable<T extends { id: number }>({
   sort,
 }: {
   rows: T[];
-  columns: Array<{ label: string; render: (row: T) => ReactNode }>;
+  columns: Array<{
+    label: string;
+    render: (row: T) => ReactNode;
+    align?: 'right';
+  }>;
   actions: (row: T) => ReactNode;
   loading: boolean;
   error?: string;
@@ -52,6 +56,7 @@ export function ListingTable<T extends { id: number }>({
         <Group gap="xs">
           <Button
             variant="outline"
+            color="#005691"
             loading={exporting}
             disabled={loading}
             onClick={() => onExport(ExportTypeEnum.PDF)}
@@ -60,6 +65,7 @@ export function ListingTable<T extends { id: number }>({
           </Button>
           <Button
             variant="outline"
+            color="#005691"
             loading={exporting}
             disabled={loading}
             onClick={() => onExport(ExportTypeEnum.XLSX)}
@@ -68,6 +74,7 @@ export function ListingTable<T extends { id: number }>({
           </Button>
           <Button
             variant="outline"
+            color="#005691"
             loading={exporting}
             disabled={loading}
             onClick={() => onExport(ExportTypeEnum.CSV)}
@@ -77,6 +84,7 @@ export function ListingTable<T extends { id: number }>({
           {onExportZip && (
             <Button
               variant="outline"
+              color="#005691"
               loading={zipping}
               disabled={loading}
               onClick={onExportZip}
@@ -104,7 +112,9 @@ export function ListingTable<T extends { id: number }>({
           <Table.Thead>
             <Table.Tr>
               {columns.map((col) => (
-                <Table.Th key={col.label}>{col.label}</Table.Th>
+                <Table.Th key={col.label} ta={col.align}>
+                  {col.label}
+                </Table.Th>
               ))}
               <Table.Th>Aksi</Table.Th>
             </Table.Tr>
@@ -113,7 +123,17 @@ export function ListingTable<T extends { id: number }>({
             {rows.map((row) => (
               <Table.Tr key={row.id}>
                 {columns.map((col) => (
-                  <Table.Td key={col.label}>{col.render(row)}</Table.Td>
+                  <Table.Td
+                    key={col.label}
+                    ta={col.align}
+                    style={
+                      col.align
+                        ? { fontVariantNumeric: 'tabular-nums' }
+                        : undefined
+                    }
+                  >
+                    {col.render(row)}
+                  </Table.Td>
                 ))}
                 <Table.Td>
                   <Group>{actions(row)}</Group>

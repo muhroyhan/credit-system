@@ -1,5 +1,5 @@
 import { employeeDocumentKinds } from '@credit/contracts';
-import { Text } from '@mantine/core';
+import { Text, Title } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
@@ -11,6 +11,7 @@ import {
   employeeProfileFields,
 } from '@web/features/employees/employees.constant';
 import { useEmployeeDetail } from '@web/features/employees/hooks/useEmployeeDetail';
+import { formatMoney } from '@web/utils/format-money';
 export function EmployeesViewPage() {
   return (
     <CrudPage program="CGP" action="read" title="Detail karyawan">
@@ -27,22 +28,31 @@ function Content() {
       {(data) => (
         <>
           <DetailFields
+            title="Identitas dan alamat"
             fields={[
               { label: 'Username', value: data.username },
               ...employeeProfileFields.map(([key, label]) => ({
                 label,
                 value: data.profile[key],
               })),
+            ]}
+          />
+          <DetailFields
+            title="Kontak dan penghasilan"
+            fields={[
               ...employeeOptionalFields.map(([key, label]) => ({
                 label,
                 value: data.profile[key],
               })),
               {
                 label: 'Pendapatan bersih bulanan',
-                value: data.profile.takehomePay,
+                value: formatMoney(data.profile.takehomePay),
               },
             ]}
           />
+          <Title order={2} size="h3">
+            Dokumen
+          </Title>
           {employeeDocumentKinds.map((kind) => (
             <Text key={kind}>
               {employeeDocumentLabels[kind]}:{' '}

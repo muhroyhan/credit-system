@@ -5,6 +5,8 @@ import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
 import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
+import { StatusBadge } from '@web/components/StatusBadge';
+import { statusPresentation } from '@web/constant/constant';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCompanies } from '@web/features/companies/hooks/useCompanies';
 import { useEntities } from '@web/features/companies/hooks/useEntities';
@@ -47,7 +49,10 @@ function Listing() {
         { label: 'Username', render: (row) => row.username },
         { label: 'Email', render: (row) => row.email },
         { label: 'Slug', render: (row) => row.slug },
-        { label: 'Status', render: (row) => row.status },
+        {
+          label: 'Status',
+          render: (row) => <StatusBadge value={row.status} />,
+        },
       ]}
       addAction={
         access.create && (
@@ -113,7 +118,10 @@ function Listing() {
           <Select
             label="Status"
             clearable
-            data={Object.values(CompanyStatusEnum)}
+            data={Object.values(CompanyStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             value={users.queries.status || null}
             onChange={(v) =>
               users.setQueries((current) => ({

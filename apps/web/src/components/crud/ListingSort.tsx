@@ -1,4 +1,5 @@
 import { type ComboboxData, Select } from '@mantine/core';
+import { listingSortLabels } from '@web/constant/constant';
 
 export function ListingSort({
   value,
@@ -17,7 +18,14 @@ export function ListingSort({
     <>
       <Select
         label="Urutkan"
-        data={options}
+        data={options.map((option) =>
+          typeof option === 'string'
+            ? {
+                value: option,
+                label: listingSortLabels[option] ?? option,
+              }
+            : option,
+        )}
         value={value}
         allowDeselect={false}
         onChange={(next) => {

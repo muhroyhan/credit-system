@@ -83,10 +83,10 @@ test('nasabah registers, logs in, validates profile and uploads five distinct do
     });
     await row.getByRole('link', { name: 'Lihat' }).click();
     await expect(
-      page.getByText('Tanggal lahir: 1992-03-04', { exact: true }),
+      page.getByRole('definition').filter({ hasText: '1992-03-04' }),
     ).toBeVisible();
     await expect(
-      page.getByText('Nomor HP: 08123456789', { exact: true }),
+      page.getByRole('definition').filter({ hasText: '08123456789' }),
     ).toBeVisible();
     await expect(page.locator('input')).toHaveCount(0);
     const self = await loginHeaders(request, {

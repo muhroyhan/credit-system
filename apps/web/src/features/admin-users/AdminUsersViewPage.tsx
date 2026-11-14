@@ -30,6 +30,7 @@ function ViewContent() {
       {(data) => (
         <>
           <DetailFields
+            title="Akun administrator"
             fields={[
               { label: 'Username', value: data.username },
               { label: 'Email', value: data.email },

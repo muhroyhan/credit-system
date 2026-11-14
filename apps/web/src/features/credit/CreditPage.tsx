@@ -4,9 +4,12 @@ import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
+import { StatusBadge } from '@web/components/StatusBadge';
+import { statusPresentation } from '@web/constant/constant';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCredits } from '@web/features/credit/hooks/useCredits';
 import { crudaAccess } from '@web/utils/cruda';
+import { formatMoney } from '@web/utils/format-money';
 export function CreditPage() {
   return (
     <CrudPage program="CGP" action="read" title="Pengajuan Kredit">
@@ -40,9 +43,16 @@ function Content() {
       columns={[
         { label: 'Nama', render: (r) => r.nama },
         { label: 'Perusahaan', render: (r) => r.companyName },
-        { label: 'Nominal', render: (r) => r.credit.jumlahPengajuan },
+        {
+          label: 'Nominal',
+          align: 'right',
+          render: (r) => formatMoney(r.credit.jumlahPengajuan),
+        },
         { label: 'Tenor', render: (r) => r.credit.jangkaWaktuBulan },
-        { label: 'Status', render: (r) => r.credit.status },
+        {
+          label: 'Status',
+          render: (r) => <StatusBadge value={r.credit.status} />,
+        },
       ]}
       addAction={
         (access.create || session?.type === AccountTypeEnum.Debitor) && (
@@ -88,7 +98,10 @@ function Content() {
           />
           <Select
             label="Status"
-            data={Object.values(CreditStatusEnum)}
+            data={Object.values(CreditStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             clearable
             value={rows.queries.status || null}
             onChange={(v) => {

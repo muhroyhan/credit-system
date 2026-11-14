@@ -5,6 +5,7 @@ export const theme = createTheme({
   fontFamily: 'Inter, Arial, sans-serif',
   fontFamilyMonospace: '"JetBrains Mono", monospace',
   defaultRadius: 'md',
+  black: '#333333',
   primaryColor: 'brand',
   primaryShade: 6,
   autoContrast: true,

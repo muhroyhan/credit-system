@@ -4,8 +4,11 @@ import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
+import { StatusBadge } from '@web/components/StatusBadge';
+import { statusPresentation } from '@web/constant/constant';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCreditReviews } from '@web/features/credit-review/hooks/useCreditReviews';
+import { formatMoney } from '@web/utils/format-money';
 export function CreditorReviewPage() {
   return (
     <CrudPage program="DKN" action="read" title="Daftar Kredit Karyawan">
@@ -82,7 +85,10 @@ function Content() {
           />
           <Select
             label="Status BPR"
-            data={Object.values(CreditStatusEnum)}
+            data={Object.values(CreditStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             clearable
             value={queries.statusAdminApproval ?? null}
             onChange={(value) => {
@@ -107,7 +113,10 @@ function Content() {
           />
           <Select
             label="Status HRD"
-            data={Object.values(CreditStatusEnum)}
+            data={Object.values(CreditStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             value={queries.status ?? ''}
             onChange={(value) => {
               setQueries((current) => ({
@@ -122,11 +131,20 @@ function Content() {
       columns={[
         { label: 'Nama', render: (row) => row.nama },
         { label: 'Perusahaan', render: (row) => row.companyName },
-        { label: 'Nominal', render: (row) => row.credit.jumlahPengajuan },
-        { label: 'Status HRD', render: (row) => row.credit.status },
+        {
+          label: 'Nominal',
+          align: 'right',
+          render: (row) => formatMoney(row.credit.jumlahPengajuan),
+        },
+        {
+          label: 'Status HRD',
+          render: (row) => <StatusBadge value={row.credit.status} />,
+        },
         {
           label: 'Status BPR',
-          render: (row) => row.credit.statusAdminApproval,
+          render: (row) => (
+            <StatusBadge value={row.credit.statusAdminApproval} />
+          ),
         },
       ]}
       actions={(row) => (
