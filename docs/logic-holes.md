@@ -21,11 +21,11 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 ## Compatibility and operational risks
 
-- The frontend design guide describes a future classic-sidebar layout; current
-  pages use separate containers and dashboard links. Any implementation must
-  preserve direct-route access gates, permission-dependent actions, public flows
-  and existing dashboard aggregate meanings. Custom design proposals are tracked
-  in `design-improvement.md`; none changes current behavior by itself.
+- The frontend now has a classic-sidebar shell. Direct-route access gates,
+  permission-dependent actions, public flows and existing dashboard aggregate
+  meanings must remain intact in further design work. Mobile navigation uses an
+  AppShell navbar rather than a modal drawer; focus trapping and focus return have
+  not been verified. Remaining custom proposals are in `design-improvement.md`.
 - P08 stores expense snapshots as `DECIMAL(30,2)` and calculates in cents, a
   change from the original integer dictionary. Check legacy data compatibility.
   Stamp duty is Rp10,000 and fixed savings Rp100,000. The snapshot and decision

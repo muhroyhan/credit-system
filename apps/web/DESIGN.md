@@ -12,6 +12,26 @@ References: [Shneiderman's eight golden rules](https://figr.design/blog/eight-go
 and [AdminLTE dashboard design](https://adminlte.io/blog/admin-dashboard-design/),
 especially its classic sidebar pattern.
 
+## Implemented baseline and verification
+
+The authenticated shell now provides a 250px sidebar, a top bar with session
+context and logout, and a mobile menu below Mantine's `sm` breakpoint. Existing
+permission checks determine navigation visibility. CRUD content uses a white
+surface, dashboard summaries use responsive cards, and listing tables have a
+keyboard-focusable horizontal scroll region. Public authentication and
+registration remain outside the shell. Existing routes and business rules are
+unchanged.
+
+The current theme requests Inter with a sans-serif fallback, uses Mantine's
+blue primary palette and medium radius; the font is not bundled. The original
+token table below remains the design target, rather than a statement that every
+token or page pattern is implemented. In particular, the mobile menu is an
+AppShell navbar and does not yet provide the focus management of a modal drawer.
+Review remaining patterns and color contrast before claiming full compliance.
+The responsive browser tests cover admin login, navigation, a list and a form
+at 320px, 768px and 1440px; they do not establish that every page, role or
+accessibility scenario has been verified.
+
 ## Product and visual direction
 
 Design for an operational credit administration application: users scan records,
@@ -37,16 +57,16 @@ decoration, nested cards or prominent shadows. Maintain a light appearance.
 
 ### Original design tokens
 
-| Token | Value | Intended use |
-| --- | --- | --- |
-| Primary | `#2ECC40` | Primary brand and action color |
-| Secondary | `#005691` | Deep blue brand color |
-| Tertiary | `#FFFFFF` | White content surfaces |
-| Neutral | `#333333` | Main text and dark neutral surfaces |
-| Surface | `#FFD700` | Warning and attention |
-| Accent | `#FF8C00` | Secondary emphasis |
-| Additional accent | `#9370DB` | Limited emphasis |
-| Light neutral | `#F0F0F0` | Muted surfaces and borders |
+| Token             | Value     | Intended use                        |
+| ----------------- | --------- | ----------------------------------- |
+| Primary           | `#2ECC40` | Primary brand and action color      |
+| Secondary         | `#005691` | Deep blue brand color               |
+| Tertiary          | `#FFFFFF` | White content surfaces              |
+| Neutral           | `#333333` | Main text and dark neutral surfaces |
+| Surface           | `#FFD700` | Warning and attention               |
+| Accent            | `#FF8C00` | Secondary emphasis                  |
+| Additional accent | `#9370DB` | Limited emphasis                    |
+| Light neutral     | `#F0F0F0` | Muted surfaces and borders          |
 
 The original primary button uses the primary background, neutral text and 12px
 padding. Preserve these tokens as design intent while checking each actual color
@@ -64,8 +84,7 @@ The base radius is `8px` and the spacing unit is `8px`.
 For authenticated work areas, the target shell has a persistent left navigation
 on desktop, a compact top bar and a main work area. Mantine `AppShell`, `NavLink`,
 `Burger`, `Group`, `Stack` and `Container` are suitable starting points. The
-current implementation uses individual containers and dashboard links, so this
-is a future layout target, not existing behavior.
+shell provides the main structure; the remaining details below guide future work.
 
 ```text
 Desktop:  [brand / sidebar] [top bar: context             account / logout]
