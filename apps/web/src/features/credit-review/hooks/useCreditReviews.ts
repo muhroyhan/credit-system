@@ -10,6 +10,7 @@ import { toSearchParams } from '@web/utils/search-params';
 export function useCreditReviews(token: string) {
   const listing = useListing({
     initialQueries: {
+      search: undefined as string | undefined,
       page: 1,
       limit: 20,
       nama: undefined as string | undefined,

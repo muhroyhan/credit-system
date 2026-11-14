@@ -33,7 +33,7 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     id = (await createResponse.json()).id;
     await expect(page).toHaveURL(/\/credits$/);
     await page
-      .getByLabel('Nama', { exact: true })
+      .getByLabel('Cari', { exact: true })
       .fill('Debitor Sintetis Satu');
     const row = page
       .getByRole('row')

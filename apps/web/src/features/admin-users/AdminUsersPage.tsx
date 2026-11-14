@@ -2,7 +2,6 @@ import { Button, Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
-import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useAdminUsers } from '@web/features/admin-users/hooks/useAdminUsers';
 import { useSession } from '@web/features/auth/hooks/useSession';
@@ -32,10 +31,15 @@ function Listing() {
       exporting={users.exporting}
       onExport={users.exportRows}
       columns={[
-        { label: 'Username', render: (row) => row.username },
-        { label: 'Email', render: (row) => row.email },
+        {
+          label: 'Username',
+          sortKey: 'username',
+          render: (row) => row.username,
+        },
+        { label: 'Email', sortKey: 'email', render: (row) => row.email },
         {
           label: 'Status',
+          sortKey: 'isActive',
           render: (row) => (row.isActive ? 'Aktif' : 'Tidak aktif'),
         },
       ]}
@@ -46,58 +50,35 @@ function Listing() {
           </Button>
         )
       }
-      sort={
-        <ListingSort
-          value={users.queries.sortBy}
-          direction={users.queries.sortDirection}
-          options={[
-            { value: 'createdAt', label: 'Tanggal dibuat' },
-            { value: 'username', label: 'Username' },
-            { value: 'email', label: 'Email' },
-            { value: 'isActive', label: 'Status' },
-          ]}
-          onSort={(value) =>
-            users.setQueries((current) => ({
-              ...current,
-              sortBy: value,
-              page: 1,
-            }))
-          }
-          onDirection={(value) =>
-            users.setQueries((current) => ({
-              ...current,
-              sortDirection: value,
-              page: 1,
-            }))
-          }
-        />
+      sortBy={users.queries.sortBy}
+      sortDirection={users.queries.sortDirection}
+      onSort={(key) =>
+        users.setQueries((current) => ({
+          ...current,
+          sortBy: key,
+          sortDirection:
+            current.sortBy === key && current.sortDirection === 'asc'
+              ? 'desc'
+              : 'asc',
+          page: 1,
+        }))
       }
       filters={
         <>
           <TextInput
-            label="Username"
-            value={users.queries.username ?? ''}
-            onChange={(e) => {
-              const value = e.currentTarget.value || undefined;
+            label="Cari"
+            description="Cari berdasarkan: Username, email"
+            value={users.queries.search ?? ''}
+            onChange={(event) => {
+              const value = event.currentTarget.value || undefined;
               users.setQueries((current) => ({
                 ...current,
-                username: value,
+                search: value,
                 page: 1,
               }));
             }}
           />
-          <TextInput
-            label="Email"
-            value={users.queries.email ?? ''}
-            onChange={(e) => {
-              const value = e.currentTarget.value || undefined;
-              users.setQueries((current) => ({
-                ...current,
-                email: value,
-                page: 1,
-              }));
-            }}
-          />
+
           <Select
             label="Status"
             clearable

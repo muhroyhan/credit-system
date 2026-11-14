@@ -8,6 +8,7 @@ import { useListing } from '@web/hooks/useListing';
 export function useAdminUsers(token: string) {
   const { queries, setQueries, list, exporting, remove } = useListing({
     initialQueries: {
+      search: undefined as string | undefined,
       page: 1,
       limit: 20,
       username: undefined as string | undefined,

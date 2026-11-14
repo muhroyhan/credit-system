@@ -3,7 +3,6 @@ import { Button, Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
-import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { StatusBadge } from '@web/components/StatusBadge';
 import { statusPresentation } from '@web/constant/constant';
@@ -44,13 +43,26 @@ function Listing() {
       exporting={users.exporting.isPending}
       onExport={(format) => users.exporting.mutate(format)}
       columns={[
-        { label: 'Badan usaha', render: (row) => row.entityType },
-        { label: 'Nama', render: (row) => row.companyName },
-        { label: 'Username', render: (row) => row.username },
-        { label: 'Email', render: (row) => row.email },
-        { label: 'Slug', render: (row) => row.slug },
+        {
+          label: 'Badan usaha',
+          sortKey: 'entityType',
+          render: (row) => row.entityType,
+        },
+        {
+          label: 'Nama',
+          sortKey: 'companyName',
+          render: (row) => row.companyName,
+        },
+        {
+          label: 'Username',
+          sortKey: 'username',
+          render: (row) => row.username,
+        },
+        { label: 'Email', sortKey: 'email', render: (row) => row.email },
+        { label: 'Slug', sortKey: 'slug', render: (row) => row.slug },
         {
           label: 'Status',
+          sortKey: 'status',
           render: (row) => <StatusBadge value={row.status} />,
         },
       ]}
@@ -61,44 +73,34 @@ function Listing() {
           </Button>
         )
       }
-      sort={
-        <ListingSort
-          value={users.queries.sortBy}
-          direction={users.queries.sortDirection}
-          options={['createdAt', 'companyName', 'username', 'email', 'status']}
-          onSort={(value) =>
-            users.setQueries((current) => ({
-              ...current,
-              sortBy: value,
-              page: 1,
-            }))
-          }
-          onDirection={(value) =>
-            users.setQueries((current) => ({
-              ...current,
-              sortDirection: value,
-              page: 1,
-            }))
-          }
-        />
+      sortBy={users.queries.sortBy}
+      sortDirection={users.queries.sortDirection}
+      onSort={(key) =>
+        users.setQueries((current) => ({
+          ...current,
+          sortBy: key,
+          sortDirection:
+            current.sortBy === key && current.sortDirection === 'asc'
+              ? 'desc'
+              : 'asc',
+          page: 1,
+        }))
       }
       filters={
         <>
-          {(['companyName', 'username', 'email'] as const).map((name, i) => (
-            <TextInput
-              key={name}
-              label={['Nama perusahaan', 'Username', 'Email'][i]}
-              value={users.queries[name] ?? ''}
-              onChange={(e) => {
-                const value = e.currentTarget.value || undefined;
-                users.setQueries((current) => ({
-                  ...current,
-                  [name]: value,
-                  page: 1,
-                }));
-              }}
-            />
-          ))}
+          <TextInput
+            label="Cari"
+            description="Cari berdasarkan: Nama perusahaan, username, email"
+            value={users.queries.search ?? ''}
+            onChange={(event) => {
+              const value = event.currentTarget.value || undefined;
+              users.setQueries((current) => ({
+                ...current,
+                search: value,
+                page: 1,
+              }));
+            }}
+          />
           <Select
             label="Badan usaha"
             clearable

@@ -2,7 +2,6 @@ import { CreditStatusEnum } from '@credit/contracts';
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
-import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { StatusBadge } from '@web/components/StatusBadge';
 import { statusPresentation } from '@web/constant/constant';
@@ -36,25 +35,30 @@ function Content() {
       onExport={(format) => exporting.mutate(format)}
       onExportZip={() => zip.mutate()}
       zipping={zip.isPending}
-      sort={
-        <ListingSort
-          value={queries.sortBy}
-          direction={queries.sortDirection}
-          options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
-          onSort={(value) =>
-            setQueries((current) => ({ ...current, sortBy: value, page: 1 }))
-          }
-          onDirection={(value) =>
-            setQueries((current) => ({
-              ...current,
-              sortDirection: value,
-              page: 1,
-            }))
-          }
-        />
+      sortBy={queries.sortBy}
+      sortDirection={queries.sortDirection}
+      onSort={(key) =>
+        setQueries((current) => ({
+          ...current,
+          sortBy: key,
+          sortDirection:
+            current.sortBy === key && current.sortDirection === 'asc'
+              ? 'desc'
+              : 'asc',
+          page: 1,
+        }))
       }
       filters={
         <>
+          <TextInput
+            label="Cari"
+            description="Cari berdasarkan: Nama, perusahaan"
+            value={queries.search ?? ''}
+            onChange={(event) => {
+              const value = event.currentTarget.value || undefined;
+              setQueries((current) => ({ ...current, search: value, page: 1 }));
+            }}
+          />
           <TextInput
             label="ID perusahaan"
             type="number"
@@ -99,18 +103,7 @@ function Content() {
               }));
             }}
           />
-          <TextInput
-            label="Nama"
-            value={queries.nama ?? ''}
-            onChange={(event) => {
-              const value = event.currentTarget.value || undefined;
-              setQueries((current) => ({
-                ...current,
-                nama: value,
-                page: 1,
-              }));
-            }}
-          />
+
           <Select
             label="Status HRD"
             data={Object.values(CreditStatusEnum).map((value) => ({
@@ -129,19 +122,26 @@ function Content() {
         </>
       }
       columns={[
-        { label: 'Nama', render: (row) => row.nama },
-        { label: 'Perusahaan', render: (row) => row.companyName },
+        { label: 'Nama', sortKey: 'nama', render: (row) => row.nama },
+        {
+          label: 'Perusahaan',
+          sortKey: 'companyName',
+          render: (row) => row.companyName,
+        },
         {
           label: 'Nominal',
+          sortKey: 'jumlahPengajuan',
           align: 'right',
           render: (row) => formatMoney(row.credit.jumlahPengajuan),
         },
         {
           label: 'Status HRD',
+          sortKey: 'status',
           render: (row) => <StatusBadge value={row.credit.status} />,
         },
         {
           label: 'Status BPR',
+          sortKey: 'statusAdminApproval',
           render: (row) => (
             <StatusBadge value={row.credit.statusAdminApproval} />
           ),

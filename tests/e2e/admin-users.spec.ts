@@ -71,7 +71,7 @@ test('admin interface adds and finds a user', async ({ page, request }) => {
     await expect(page.locator('input')).toHaveCount(0);
     await page.getByRole('link', { name: 'Kembali' }).click();
     await page
-      .getByRole('textbox', { name: 'Username', exact: true })
+      .getByRole('textbox', { name: 'Cari', exact: true })
       .fill(username);
     await expect(page.getByText('Total: 1', { exact: true })).toBeVisible();
     for (const format of ['PDF', 'XLSX']) {

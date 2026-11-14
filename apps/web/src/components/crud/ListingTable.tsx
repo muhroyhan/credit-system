@@ -26,13 +26,16 @@ export function ListingTable<T extends { id: number }>({
   zipping,
   addAction,
   filters,
-  sort,
+  sortBy,
+  sortDirection,
+  onSort,
 }: {
   rows: T[];
   columns: Array<{
     label: string;
     render: (row: T) => ReactNode;
     align?: 'right';
+    sortKey?: string;
   }>;
   actions: (row: T) => ReactNode;
   loading: boolean;
@@ -46,7 +49,9 @@ export function ListingTable<T extends { id: number }>({
   onExport: (format: ExportTypeEnum) => void;
   addAction?: ReactNode;
   filters: ReactNode;
-  sort: ReactNode;
+  sortBy: string;
+  sortDirection: string;
+  onSort: (key: string) => void;
 }) {
   return (
     <>
@@ -98,14 +103,6 @@ export function ListingTable<T extends { id: number }>({
         <SimpleGrid type="container" cols={{ base: 1, '480px': 2, '760px': 3 }}>
           {filters}
         </SimpleGrid>
-        <SimpleGrid
-          maw={640}
-          w="100%"
-          type="container"
-          cols={{ base: 1, '480px': 2 }}
-        >
-          {sort}
-        </SimpleGrid>
       </Stack>
       {loading && <Text>Memuat...</Text>}
       <Table.ScrollContainer
@@ -119,8 +116,34 @@ export function ListingTable<T extends { id: number }>({
           <Table.Thead>
             <Table.Tr>
               {columns.map((col) => (
-                <Table.Th key={col.label} ta={col.align}>
-                  {col.label}
+                <Table.Th
+                  key={col.label}
+                  ta={col.align}
+                  aria-sort={
+                    col.sortKey === sortBy
+                      ? sortDirection === 'asc'
+                        ? 'ascending'
+                        : 'descending'
+                      : undefined
+                  }
+                >
+                  {col.sortKey ? (
+                    <Button
+                      variant="subtle"
+                      color="#005691"
+                      size="compact-sm"
+                      onClick={() => col.sortKey && onSort(col.sortKey)}
+                    >
+                      {col.label}{' '}
+                      {col.sortKey === sortBy
+                        ? sortDirection === 'asc'
+                          ? '↑'
+                          : '↓'
+                        : '↕'}
+                    </Button>
+                  ) : (
+                    col.label
+                  )}
                 </Table.Th>
               ))}
               <Table.Th>Aksi</Table.Th>

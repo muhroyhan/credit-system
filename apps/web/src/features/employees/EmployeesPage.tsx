@@ -2,7 +2,6 @@ import { Button, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
-import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useEmployees } from '@web/features/employees/hooks/useEmployees';
@@ -33,11 +32,19 @@ function Listing() {
       exporting={rows.exporting.isPending}
       onExport={(format) => rows.exporting.mutate(format)}
       columns={[
-        { label: 'Nomor induk', render: (r) => r.employeeId },
-        { label: 'Nama', render: (r) => r.namaLengkap },
-        { label: 'Alias', render: (r) => r.namaAlias },
-        { label: 'NIK', render: (r) => r.noKtp },
-        { label: 'Perusahaan', render: (r) => r.companyName },
+        {
+          label: 'Nomor induk',
+          sortKey: 'employeeId',
+          render: (r) => r.employeeId,
+        },
+        { label: 'Nama', sortKey: 'namaLengkap', render: (r) => r.namaLengkap },
+        { label: 'Alias', sortKey: 'namaAlias', render: (r) => r.namaAlias },
+        { label: 'NIK', sortKey: 'noKtp', render: (r) => r.noKtp },
+        {
+          label: 'Perusahaan',
+          sortKey: 'companyName',
+          render: (r) => r.companyName,
+        },
       ]}
       addAction={
         access.create && (
@@ -46,49 +53,30 @@ function Listing() {
           </Button>
         )
       }
-      sort={
-        <ListingSort
-          value={rows.queries.sortBy}
-          direction={rows.queries.sortDirection}
-          options={['createdAt', 'id', 'employeeId', 'namaLengkap']}
-          onSort={(value) =>
-            rows.setQueries((current) => ({
-              ...current,
-              sortBy: value,
-              page: 1,
-            }))
-          }
-          onDirection={(value) =>
-            rows.setQueries((current) => ({
-              ...current,
-              sortDirection: value,
-              page: 1,
-            }))
-          }
-        />
+      sortBy={rows.queries.sortBy}
+      sortDirection={rows.queries.sortDirection}
+      onSort={(key) =>
+        rows.setQueries((current) => ({
+          ...current,
+          sortBy: key,
+          sortDirection:
+            current.sortBy === key && current.sortDirection === 'asc'
+              ? 'desc'
+              : 'asc',
+          page: 1,
+        }))
       }
       filters={
         <>
           <TextInput
-            label="Cari nama"
-            value={rows.queries.namaLengkap ?? ''}
-            onChange={(e) => {
-              const value = e.currentTarget.value || undefined;
+            label="Cari"
+            description="Cari berdasarkan: Nama, alias"
+            value={rows.queries.search ?? ''}
+            onChange={(event) => {
+              const value = event.currentTarget.value || undefined;
               rows.setQueries((current) => ({
                 ...current,
-                namaLengkap: value,
-                page: 1,
-              }));
-            }}
-          />
-          <TextInput
-            label="Cari alias"
-            value={rows.queries.namaAlias ?? ''}
-            onChange={(e) => {
-              const value = e.currentTarget.value || undefined;
-              rows.setQueries((current) => ({
-                ...current,
-                namaAlias: value,
+                search: value,
                 page: 1,
               }));
             }}

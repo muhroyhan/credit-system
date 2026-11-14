@@ -1,40 +1,144 @@
 import { expect, test } from '@playwright/test';
 import { loginBrowser } from './fixtures/login';
 
-test('listing filters omit cleared values from requests', async ({ page }) => {
+test('listing search and header sort use shared query state', async ({
+  page,
+}) => {
   await loginBrowser(page, { type: 'admin', username: 'admin_sintetis' });
-  for (const [link, label, endpoint, key] of [
-    ['Admin User', 'Username', '/api/admin-user/list', 'username'],
-    ['Perusahaan', 'Nama perusahaan', '/api/user/list', 'companyName'],
-    ['Master Karyawan', 'Cari nama', '/api/debitor/list', 'namaLengkap'],
-    ['Pengajuan Kredit', 'Nama', '/api/credit/list', 'nama'],
-    ['Daftar Kredit Karyawan', 'Nama', '/api/credit/review/list', 'nama'],
+  for (const [link, endpoint, header, sortBy] of [
+    ['Admin User', '/api/admin-user/list', 'Username', 'username'],
+    ['Perusahaan', '/api/user/list', 'Nama', 'companyName'],
+    ['Master Karyawan', '/api/debitor/list', 'Nama', 'namaLengkap'],
+    ['Pengajuan Kredit', '/api/credit/list', 'Nominal', 'jumlahPengajuan'],
+    [
+      'Daftar Kredit Karyawan',
+      '/api/credit/review/list',
+      'Nominal',
+      'jumlahPengajuan',
+    ],
   ] as const) {
     await page.getByRole('link', { name: link, exact: true }).click();
-    await expect(page.getByRole('textbox', { name: 'Urutkan' })).toBeVisible();
-    const sorted = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === endpoint &&
-        new URL(response.url()).searchParams.get('sortDirection') === 'asc',
-    );
-    await page.getByRole('textbox', { name: 'Arah urutan' }).click();
-    await page.getByRole('option', { name: 'Naik', exact: true }).click();
+    const column = page.getByRole('columnheader', {
+      name: new RegExp(`^${header}`),
+    });
+    const sorted = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return (
+        url.pathname === endpoint &&
+        url.searchParams.get('sortBy') === sortBy &&
+        url.searchParams.get('sortDirection') === 'asc'
+      );
+    });
+    await column.getByRole('button').click();
     expect((await sorted).ok()).toBe(true);
-    const field = page.getByLabel(label, { exact: true });
-    const filtered = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === endpoint &&
-        new URL(response.url()).searchParams.get(key) === 'sintetis',
-    );
+    await expect(column).toHaveAttribute('aria-sort', 'ascending');
+    const reversed = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return (
+        url.pathname === endpoint &&
+        url.searchParams.get('sortBy') === sortBy &&
+        url.searchParams.get('sortDirection') === 'desc'
+      );
+    });
+    await column.getByRole('button').click();
+    expect((await reversed).ok()).toBe(true);
+    await expect(column).toHaveAttribute('aria-sort', 'descending');
+    const field = page.getByRole('textbox', { name: 'Cari', exact: true });
+    const filtered = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return (
+        url.pathname === endpoint &&
+        url.searchParams.get('search') === 'sintetis' &&
+        url.searchParams.get('page') === '1'
+      );
+    });
     await field.fill('sintetis');
     expect((await filtered).ok()).toBe(true);
-    const cleared = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === endpoint &&
-        !new URL(response.url()).searchParams.has(key),
-    );
+    const cleared = page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return url.pathname === endpoint && !url.searchParams.has('search');
+    });
     await field.clear();
     expect((await cleared).ok()).toBe(true);
-    await page.goBack();
+  }
+});
+
+test('all visible data columns support server-side sorting', async ({
+  page,
+}) => {
+  await loginBrowser(page, { type: 'admin', username: 'admin_sintetis' });
+  for (const [link, endpoint, columns] of [
+    [
+      'Admin User',
+      '/api/admin-user/list',
+      [
+        ['Username', 'username'],
+        ['Email', 'email'],
+        ['Status', 'isActive'],
+      ],
+    ],
+    [
+      'Perusahaan',
+      '/api/user/list',
+      [
+        ['Badan usaha', 'entityType'],
+        ['Nama', 'companyName'],
+        ['Username', 'username'],
+        ['Email', 'email'],
+        ['Slug', 'slug'],
+        ['Status', 'status'],
+      ],
+    ],
+    [
+      'Master Karyawan',
+      '/api/debitor/list',
+      [
+        ['Nomor induk', 'employeeId'],
+        ['Nama', 'namaLengkap'],
+        ['Alias', 'namaAlias'],
+        ['NIK', 'noKtp'],
+        ['Perusahaan', 'companyName'],
+      ],
+    ],
+    [
+      'Pengajuan Kredit',
+      '/api/credit/list',
+      [
+        ['Nama', 'nama'],
+        ['Perusahaan', 'companyName'],
+        ['Nominal', 'jumlahPengajuan'],
+        ['Tenor', 'jangkaWaktuBulan'],
+        ['Status', 'status'],
+      ],
+    ],
+    [
+      'Daftar Kredit Karyawan',
+      '/api/credit/review/list',
+      [
+        ['Nama', 'nama'],
+        ['Perusahaan', 'companyName'],
+        ['Nominal', 'jumlahPengajuan'],
+        ['Status HRD', 'status'],
+        ['Status BPR', 'statusAdminApproval'],
+      ],
+    ],
+  ] as const) {
+    await page.getByRole('link', { name: link, exact: true }).click();
+    for (const [label, key] of columns) {
+      const header = page.getByRole('columnheader', {
+        name: new RegExp(`^${label} `),
+      });
+      const response = page.waitForResponse((result) => {
+        const url = new URL(result.url());
+        return (
+          url.pathname === endpoint &&
+          url.searchParams.get('sortBy') === key &&
+          url.searchParams.get('sortDirection') === 'asc'
+        );
+      });
+      await header.getByRole('button').click();
+      expect((await response).status()).toBe(200);
+      await expect(header).toHaveAttribute('aria-sort', 'ascending');
+    }
   }
 });
