@@ -7,7 +7,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useHotkeys } from '@mantine/hooks';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { crudaAccess } from '@web/utils/cruda';
@@ -15,6 +15,7 @@ import { crudaAccess } from '@web/utils/cruda';
 export function AppLayout() {
   const { session, logout } = useSession();
   const [opened, { toggle, close }] = useDisclosure();
+  useHotkeys([['Escape', close]]);
   const path = useRouterState({ select: (state) => state.location.pathname });
   if (!session || path === '/login' || path.startsWith('/registration/')) {
     return <Outlet />;
@@ -60,6 +61,8 @@ export function AppLayout() {
               opened={opened}
               onClick={toggle}
               hiddenFrom="sm"
+              aria-expanded={opened}
+              aria-controls="main-navigation"
               aria-label={opened ? 'Tutup menu' : 'Buka menu'}
             />
             <Text fw={700} c="#005691">
@@ -76,7 +79,11 @@ export function AppLayout() {
           </Group>
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p="md">
+      <AppShell.Navbar
+        p="md"
+        id="main-navigation"
+        style={{ overflowY: 'auto' }}
+      >
         <Text size="xs" fw={700} c="dimmed" mb="sm">
           NAVIGASI
         </Text>
@@ -89,6 +96,15 @@ export function AppLayout() {
                 component={Link}
                 to={item.to}
                 label={item.label}
+                aria-current={
+                  (
+                    item.to === '/'
+                      ? path === '/'
+                      : path === item.to || path.startsWith(`${item.to}/`)
+                  )
+                    ? 'page'
+                    : undefined
+                }
                 active={
                   item.to === '/'
                     ? path === '/'

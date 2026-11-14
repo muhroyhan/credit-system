@@ -1,6 +1,7 @@
 import {
   Alert,
   Container,
+  Paper,
   SimpleGrid,
   Stack,
   Text,
@@ -41,13 +42,17 @@ function DashboardSummary({ token }: { token: string }) {
     `Rp ${new Intl.NumberFormat('id-ID').format(BigInt(value))}`;
   return (
     <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-      <Text>Perusahaan aktif dan nonaktif: {query.data.totalUsers}</Text>
-      <Text>Jumlah debitor: {query.data.totalDebitor}</Text>
-      <Text>Pengajuan pending: {money(query.data.totalCredits.pending)}</Text>
-      <Text>Pengajuan approved: {money(query.data.totalCredits.approved)}</Text>
-      <Text>
-        Pengajuan completed: {money(query.data.totalCredits.completed)}
-      </Text>
+      {[
+        `Perusahaan aktif dan nonaktif: ${query.data.totalUsers}`,
+        `Jumlah debitor: ${query.data.totalDebitor}`,
+        `Pengajuan pending: ${money(query.data.totalCredits.pending)}`,
+        `Pengajuan approved: ${money(query.data.totalCredits.approved)}`,
+        `Pengajuan completed: ${money(query.data.totalCredits.completed)}`,
+      ].map((value) => (
+        <Paper key={value} p="md" radius="md" withBorder>
+          <Text>{value}</Text>
+        </Paper>
+      ))}
     </SimpleGrid>
   );
 }
