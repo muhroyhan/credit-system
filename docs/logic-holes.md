@@ -23,9 +23,10 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 - The frontend now has a classic-sidebar shell. Direct-route access gates,
   permission-dependent actions, public flows and existing dashboard aggregate
-  meanings must remain intact in further design work. Mobile navigation uses an
-  AppShell navbar rather than a modal drawer; focus trapping and focus return have
-  not been verified. Remaining custom proposals are in `design-improvement.md`.
+  meanings must remain intact in further design work. Mobile navigation uses a
+  Mantine Drawer. Responsive tests check Escape dismissal and focus return on
+  mobile; a complete assistive-technology audit is still outstanding. Remaining
+  custom proposals are in `design-improvement.md`.
 - P08 stores expense snapshots as `DECIMAL(30,2)` and calculates in cents, a
   change from the original integer dictionary. Check legacy data compatibility.
   Stamp duty is Rp10,000 and fixed savings Rp100,000. The snapshot and decision
@@ -56,11 +57,12 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 ## Technical limitations
 
-- The 14 November frontend source audit in `design-audit.md` identifies unresolved
-  layout and usability gaps across CRUD features. Passing browser tests do not
-  establish visual conformance: current responsive coverage checks one admin
-  list/form. Lookup-selector proposals depend on authorized data sources and must
-  preserve current tenant scopes and input contracts.
+- The 14 November frontend source audit in `design-audit.md` led to shared
+  responsive form/filter grids and grouped details across CRUD features. Browser
+  coverage now checks all feature page patterns at three widths, public card
+  colors and page overflow. It is not a pixel-baseline or full accessibility
+  audit. Fonts use fallbacks unless installed locally. Lookup-selector proposals
+  depend on authorized data sources and must preserve tenant scopes/contracts.
 - The recorded audit found sixteen `as never` assertions in RPC gateways,
   including four P05 manual controller query validations. They weaken end-to-end
   input type checking; verify current code and use typed Hono validators before

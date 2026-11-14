@@ -1,6 +1,7 @@
 # Frontend design audit — 14 November 2026
 
-Status: source audit and proposed layout decisions; no UI or business-rule changes.
+Status: historical source audit; the implementation follow-up below records the
+subsequent UI work. Business-rule changes remain outside scope.
 Reviewed all feature page entry points, their shared CRUD wrappers and form
 components, DESIGN.md, and the existing responsive test. This is not a new visual
 browser, contrast or assistive-technology verification. Earlier passing E2E tests
@@ -140,3 +141,27 @@ context. Next improve detail groups, action hierarchy, financial formatting and
 feedback. Finally verify accessibility and assess lookup/custom interaction work.
 All recommendations preserve current fields, endpoint parameters, authorization,
 credit formulas and transitions unless separately approved.
+
+## Implementation follow-up
+
+The shared layouts and feature forms have been implemented in commits `77c3886`,
+`7c59f39` and `6fca0b9`. See `apps/web/DESIGN.md` for the resulting patterns:
+public white cards on gray backgrounds; container-based filter/form grids;
+separate sorting and export hierarchy; two-column read-only details; financial
+display formatting without rounding strings; status labels/badges; BPR decision
+identity and consolidated feedback; document help; edit-password guidance; and
+standard Mantine mobile Drawer behavior.
+
+Validation: 319 unit tests pass, including two precision/missing-value formatting
+tests. The 23 functional browser scenarios pass; all three expanded responsive
+scenarios pass after correcting the debtor-login synchronization in the test.
+The responsive scenarios save 23 screenshots each across 320px, 768px and 1440px.
+Representative screenshots were visually reviewed. This is not a claim of full
+assistive-technology, device, zoom or pixel-baseline coverage.
+
+Remaining proposals: searchable ID lookups, persisted density/sidebar preferences,
+undo and unsaved-change protection. These require the compatibility/product
+review described in `design-improvement.md`. Font files are not bundled; the
+theme requests the original families with local fallbacks. Some contract-provided
+validation messages remain technical; translating these requires a separate
+shared-message review rather than silently altering validation behavior.
