@@ -1,6 +1,14 @@
 import { ExportTypeEnum } from '@credit/contracts';
-import { Alert, Button, Group, NumberInput, Table, Text } from '@mantine/core';
-import { Link } from '@tanstack/react-router';
+import {
+  Alert,
+  Button,
+  Group,
+  NumberInput,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+} from '@mantine/core';
 import type { ReactNode } from 'react';
 
 export function ListingTable<T extends { id: number }>({
@@ -18,9 +26,17 @@ export function ListingTable<T extends { id: number }>({
   zipping,
   addAction,
   filters,
+  sortBy,
+  sortDirection,
+  onSort,
 }: {
   rows: T[];
-  columns: Array<{ label: string; render: (row: T) => ReactNode }>;
+  columns: Array<{
+    label: string;
+    render: (row: T) => ReactNode;
+    align?: 'right';
+    sortKey?: string;
+  }>;
   actions: (row: T) => ReactNode;
   loading: boolean;
   error?: string;
@@ -33,73 +49,146 @@ export function ListingTable<T extends { id: number }>({
   onExport: (format: ExportTypeEnum) => void;
   addAction?: ReactNode;
   filters: ReactNode;
+  sortBy: string;
+  sortDirection: string;
+  onSort: (key: string) => void;
 }) {
   return (
     <>
-      {error && <Alert color="red">{error}</Alert>}
-      <Link to="/">Beranda</Link>
-      <Group>{filters}</Group>
-      <Group>
+      {error && <Alert color="red.8">{error}</Alert>}
+      <Group justify="space-between" align="flex-start">
         {addAction}
-        <Button
-          loading={exporting}
-          disabled={loading}
-          onClick={() => onExport(ExportTypeEnum.PDF)}
-        >
-          Export PDF
-        </Button>
-        <Button
-          loading={exporting}
-          disabled={loading}
-          onClick={() => onExport(ExportTypeEnum.XLSX)}
-        >
-          Export XLSX
-        </Button>
-        <Button
-          loading={exporting}
-          disabled={loading}
-          onClick={() => onExport(ExportTypeEnum.CSV)}
-        >
-          Export CSV
-        </Button>
-        {onExportZip && (
-          <Button loading={zipping} disabled={loading} onClick={onExportZip}>
-            Export ZIP
+        <Group gap="xs">
+          <Button
+            variant="outline"
+            color="#005691"
+            loading={exporting}
+            disabled={loading}
+            onClick={() => onExport(ExportTypeEnum.PDF)}
+          >
+            Export PDF
           </Button>
-        )}
+          <Button
+            variant="outline"
+            color="#005691"
+            loading={exporting}
+            disabled={loading}
+            onClick={() => onExport(ExportTypeEnum.XLSX)}
+          >
+            Export XLSX
+          </Button>
+          <Button
+            variant="outline"
+            color="#005691"
+            loading={exporting}
+            disabled={loading}
+            onClick={() => onExport(ExportTypeEnum.CSV)}
+          >
+            Export CSV
+          </Button>
+          {onExportZip && (
+            <Button
+              variant="outline"
+              color="#005691"
+              loading={zipping}
+              disabled={loading}
+              onClick={onExportZip}
+            >
+              Export ZIP
+            </Button>
+          )}
+        </Group>
       </Group>
+      <Stack component="section" aria-label="Filter dan pengurutan" gap="md">
+        <SimpleGrid type="container" cols={{ base: 1, '480px': 2, '760px': 3 }}>
+          {filters}
+        </SimpleGrid>
+      </Stack>
       {loading && <Text>Memuat...</Text>}
-      <Table>
-        <Table.Thead>
-          <Table.Tr>
-            {columns.map((col) => (
-              <Table.Th key={col.label}>{col.label}</Table.Th>
-            ))}
-            <Table.Th>Aksi</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((row) => (
-            <Table.Tr key={row.id}>
+      <Table.ScrollContainer
+        minWidth={700}
+        type="native"
+        role="region"
+        aria-label="Tabel hasil"
+        tabIndex={0}
+      >
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
               {columns.map((col) => (
-                <Table.Td key={col.label}>{col.render(row)}</Table.Td>
+                <Table.Th
+                  key={col.label}
+                  ta={col.align}
+                  aria-sort={
+                    col.sortKey === sortBy
+                      ? sortDirection === 'asc'
+                        ? 'ascending'
+                        : 'descending'
+                      : undefined
+                  }
+                >
+                  {col.sortKey ? (
+                    <Button
+                      variant="subtle"
+                      color="#005691"
+                      size="compact-sm"
+                      onClick={() => col.sortKey && onSort(col.sortKey)}
+                    >
+                      {col.label}{' '}
+                      {col.sortKey === sortBy
+                        ? sortDirection === 'asc'
+                          ? '↑'
+                          : '↓'
+                        : '↕'}
+                    </Button>
+                  ) : (
+                    col.label
+                  )}
+                </Table.Th>
               ))}
-              <Table.Td>
-                <Group>{actions(row)}</Group>
-              </Table.Td>
+              <Table.Th>Aksi</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {!loading && !rows.length && <Text>Tidak ada data</Text>}
-      <NumberInput
-        label="Halaman"
-        min={1}
-        max={Math.max(1, Math.ceil(total / 20))}
-        value={page}
-        onChange={(v) => onPageChange(Math.max(1, Math.floor(Number(v) || 1)))}
-      />
-      <Text>Total: {total}</Text>
+          </Table.Thead>
+          <Table.Tbody>
+            {rows.map((row) => (
+              <Table.Tr key={row.id}>
+                {columns.map((col) => (
+                  <Table.Td
+                    key={col.label}
+                    ta={col.align}
+                    style={
+                      col.align
+                        ? { fontVariantNumeric: 'tabular-nums' }
+                        : undefined
+                    }
+                  >
+                    {col.render(row)}
+                  </Table.Td>
+                ))}
+                <Table.Td>
+                  <Group>{actions(row)}</Group>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+      {!loading && !error && !rows.length && (
+        <Text c="dimmed">Tidak ada data</Text>
+      )}
+      <Group justify="space-between" align="end">
+        <NumberInput
+          w={120}
+          label="Halaman"
+          min={1}
+          max={Math.max(1, Math.ceil(total / 20))}
+          value={page}
+          onChange={(v) =>
+            onPageChange(Math.max(1, Math.floor(Number(v) || 1)))
+          }
+        />
+        <Text>Total: {total}</Text>
+      </Group>
     </>
   );
 }

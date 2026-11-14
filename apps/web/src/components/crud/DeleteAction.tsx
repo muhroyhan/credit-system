@@ -13,7 +13,8 @@ export function DeleteAction({
 }) {
   return allowed ? (
     <Button
-      color="red"
+      color="red.8"
+      variant="subtle"
       disabled={pending}
       onClick={() => {
         if (window.confirm(message)) {

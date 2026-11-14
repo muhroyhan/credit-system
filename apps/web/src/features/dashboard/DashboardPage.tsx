@@ -1,45 +1,28 @@
 import {
   Alert,
-  Button,
   Container,
+  Paper,
   SimpleGrid,
   Stack,
   Text,
   Title,
 } from '@mantine/core';
-import { Link, Navigate } from '@tanstack/react-router';
+import { Navigate } from '@tanstack/react-router';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useDashboard } from '@web/features/dashboard/hooks/useDashboard';
-import { crudaAccess } from '@web/utils/cruda';
 
 export function DashboardPage() {
-  const { session, logout } = useSession();
+  const { session } = useSession();
   if (!session) {
     return <Navigate to="/login" replace />;
   }
   return (
-    <Container>
+    <Container size="xl" px={0}>
       <Stack>
         <Text>Beranda</Text>
         <Title>Credit System</Title>
         <Text>Masuk sebagai {session.type}</Text>
         <DashboardSummary token={session.authToken} />
-        {crudaAccess(session, 'USA').read && (
-          <Link to="/admin-users">Admin User</Link>
-        )}
-        {crudaAccess(session, 'USC').read && (
-          <Link to="/companies">Perusahaan</Link>
-        )}
-        {crudaAccess(session, 'CGP').read && (
-          <Link to="/employees">Master Karyawan</Link>
-        )}
-        {crudaAccess(session, 'CGP').read && (
-          <Link to="/credits">Pengajuan Kredit</Link>
-        )}
-        {crudaAccess(session, 'DKN').read && (
-          <Link to="/credit-reviews">Daftar Kredit Karyawan</Link>
-        )}
-        <Button onClick={logout}>Keluar</Button>
       </Stack>
     </Container>
   );
@@ -52,20 +35,48 @@ function DashboardSummary({ token }: { token: string }) {
   }
   if (query.error) {
     return (
-      <Alert color="red">Gagal memuat ringkasan: {query.error.message}</Alert>
+      <Alert color="red.8">Gagal memuat ringkasan: {query.error.message}</Alert>
     );
   }
   const money = (value: string) =>
     `Rp ${new Intl.NumberFormat('id-ID').format(BigInt(value))}`;
   return (
-    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-      <Text>Perusahaan aktif dan nonaktif: {query.data.totalUsers}</Text>
-      <Text>Jumlah debitor: {query.data.totalDebitor}</Text>
-      <Text>Pengajuan pending: {money(query.data.totalCredits.pending)}</Text>
-      <Text>Pengajuan approved: {money(query.data.totalCredits.approved)}</Text>
-      <Text>
-        Pengajuan completed: {money(query.data.totalCredits.completed)}
-      </Text>
+    <SimpleGrid type="container" cols={{ base: 1, '580px': 2, '900px': 3 }}>
+      {[
+        {
+          label: 'Perusahaan aktif dan nonaktif',
+          value: query.data.totalUsers,
+        },
+        { label: 'Jumlah debitor', value: query.data.totalDebitor },
+        {
+          label: 'Pengajuan pending',
+          value: money(query.data.totalCredits.pending),
+        },
+        {
+          label: 'Pengajuan approved',
+          value: money(query.data.totalCredits.approved),
+        },
+        {
+          label: 'Pengajuan completed',
+          value: money(query.data.totalCredits.completed),
+        },
+      ].map(({ label, value }) => (
+        <Paper key={label} p="lg" radius="md" withBorder>
+          <Text size="sm" c="dimmed">
+            {label}:{' '}
+            <Text
+              component="span"
+              display="block"
+              size="xl"
+              fw={700}
+              c="#333333"
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {value}
+            </Text>
+          </Text>
+        </Paper>
+      ))}
     </SimpleGrid>
   );
 }

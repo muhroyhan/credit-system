@@ -35,7 +35,7 @@ function Content() {
                 Unduh perjanjian
               </Button>
               {download.error && (
-                <Alert color="red">{download.error.message}</Alert>
+                <Alert color="red.8">{download.error.message}</Alert>
               )}
             </>
           ) : (

@@ -21,6 +21,19 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 ## Compatibility and operational risks
 
+- The frontend persists the login snapshot and bearer token in sessionStorage
+  per tab to survive reload. Same-origin JavaScript can read it, so an XSS can
+  expose the token; closing the tab clears it. Client expiry checks are not
+  signature verification: the API remains authoritative for token and access
+  validation, and revoked accounts can retain a stale UI snapshot until login.
+- Listing APIs accept an optional `search` parameter that OR-matches the text
+  columns named in each listing. Existing per-column parameters remain supported
+  and combine with `search` as additional filters. List, count and exports use
+  the same criteria and tenant scope. New sort keys cover visible columns;
+  clients using old sort keys remain supported. Search retains MySQL LIKE
+  wildcard and collation behavior, which may differ from literal matching.
+  Credit search also matches partial company and debtor IDs as text; the older
+  exact ID API parameters remain available to clients that require exact match.
 - P08 stores expense snapshots as `DECIMAL(30,2)` and calculates in cents, a
   change from the original integer dictionary. Check legacy data compatibility.
   Stamp duty is Rp10,000 and fixed savings Rp100,000. The snapshot and decision

@@ -1,13 +1,8 @@
-import {
-  Alert,
-  Button,
-  NumberInput,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Alert, Button, NumberInput, Table, TextInput } from '@mantine/core';
+import { DetailFields } from '@web/components/crud/DetailFields';
 import { FormActions } from '@web/components/crud/FormActions';
+import { FieldsGrid } from '@web/components/FieldsGrid';
+import { FormSection } from '@web/components/FormSection';
 import type { CreditRow } from '@web/features/credit/credit.type';
 import { useCreditForm } from '@web/features/credit/hooks/useCreditForm';
 import { Controller } from 'react-hook-form';
@@ -35,7 +30,7 @@ export function CreditForm({
   } = form;
   return (
     <form noValidate onSubmit={handleSubmit((input) => save.mutate(input))}>
-      <Stack>
+      <FormSection title="Data pengajuan">
         <Controller
           name="debitorId"
           control={control}
@@ -51,7 +46,7 @@ export function CreditForm({
             />
           )}
         />
-        {rates.error && <Alert color="red">{rates.error.message}</Alert>}
+        {rates.error && <Alert color="red.8">{rates.error.message}</Alert>}
         {rates.data && (
           <Table>
             <Table.Thead>
@@ -70,33 +65,35 @@ export function CreditForm({
             </Table.Tbody>
           </Table>
         )}
-        <TextInput
-          label="Nominal pengajuan"
-          {...register('jumlahPengajuan')}
-          error={errors.jumlahPengajuan?.message}
-          required
-        />
-        <Controller
-          name="jangkaWaktuBulan"
-          control={control}
-          render={({ field }) => (
-            <NumberInput
-              label="Tenor (bulan)"
-              min={1}
-              value={field.value || ''}
-              onChange={(v) => field.onChange(Number(v) || 0)}
-              error={errors.jangkaWaktuBulan?.message}
-              required
-            />
-          )}
-        />
-        <TextInput
-          type="date"
-          label="Tanggal pengajuan"
-          {...register('tanggalPengajuan')}
-          error={errors.tanggalPengajuan?.message}
-          required
-        />
+        <FieldsGrid>
+          <TextInput
+            label="Nominal pengajuan"
+            {...register('jumlahPengajuan')}
+            error={errors.jumlahPengajuan?.message}
+            required
+          />
+          <Controller
+            name="jangkaWaktuBulan"
+            control={control}
+            render={({ field }) => (
+              <NumberInput
+                label="Tenor (bulan)"
+                min={1}
+                value={field.value || ''}
+                onChange={(v) => field.onChange(Number(v) || 0)}
+                error={errors.jangkaWaktuBulan?.message}
+                required
+              />
+            )}
+          />
+          <TextInput
+            type="date"
+            label="Tanggal pengajuan"
+            {...register('tanggalPengajuan')}
+            error={errors.tanggalPengajuan?.message}
+            required
+          />
+        </FieldsGrid>
         <Button
           type="button"
           loading={simulation.isPending}
@@ -105,24 +102,40 @@ export function CreditForm({
           Hitung simulasi
         </Button>
         {simulation.data && (
-          <Text>
-            Angsuran bulanan: Rp
-            {simulation.data.installment.toLocaleString('id-ID')} | Total: Rp
-            {simulation.data.total.toLocaleString('id-ID')} | Bunga:{' '}
-            {simulation.data.percentage}% | Pengajuan terbuka: Rp
-            {simulation.data.open.toLocaleString('id-ID')} | Score: Rp
-            {simulation.data.score.toLocaleString('id-ID')}
-          </Text>
+          <DetailFields
+            title="Hasil simulasi"
+            fields={[
+              {
+                label: 'Angsuran bulanan',
+                value: `Rp ${simulation.data.installment.toLocaleString('id-ID')}`,
+              },
+              {
+                label: 'Total',
+                value: `Rp ${simulation.data.total.toLocaleString('id-ID')}`,
+              },
+              { label: 'Bunga', value: `${simulation.data.percentage}%` },
+              {
+                label: 'Pengajuan terbuka',
+                value: `Rp ${simulation.data.open.toLocaleString('id-ID')}`,
+              },
+              {
+                label: 'Score',
+                value: `Rp ${simulation.data.score.toLocaleString('id-ID')}`,
+              },
+            ]}
+          />
         )}
         {(save.error || simulation.error) && (
-          <Alert color="red">{(save.error || simulation.error)?.message}</Alert>
+          <Alert color="red.8">
+            {(save.error || simulation.error)?.message}
+          </Alert>
         )}
         <FormActions
           pending={save.isPending}
           label="Simpan pengajuan"
           cancel={null}
         />
-      </Stack>
+      </FormSection>
     </form>
   );
 }

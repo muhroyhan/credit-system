@@ -3,6 +3,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
+import { StatusBadge } from '@web/components/StatusBadge';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCompanyDetail } from '@web/features/companies/hooks/useCompanyDetail';
 import { useEntities } from '@web/features/companies/hooks/useEntities';
@@ -31,6 +32,7 @@ function Content() {
       {(data) => (
         <>
           <DetailFields
+            title="Identitas perusahaan"
             fields={[
               {
                 label: 'Badan usaha',
@@ -42,16 +44,20 @@ function Content() {
               { label: 'Username', value: data.username },
               { label: 'Email', value: data.email },
               { label: 'Slug', value: data.slug },
-              { label: 'Status', value: data.status },
+              { label: 'Status', value: <StatusBadge value={data.status} /> },
             ]}
           />
           <Title order={2}>Bunga per tenor</Title>
+          {data.bungaKredits.length === 0 && (
+            <Text c="dimmed">Tidak ada bunga per tenor</Text>
+          )}
           {data.bungaKredits.map((v) => (
             <Text key={v.id}>
               {v.jangkaWaktuBulan} bulan: {v.bungaPercentage}%
             </Text>
           ))}
           <Title order={2}>Biaya</Title>
+          {data.biaya.length === 0 && <Text c="dimmed">Tidak ada biaya</Text>}
           {data.biaya.map((v) => (
             <Text key={v.id}>
               {v.expenseType}: {v.value} ({v.type})

@@ -83,10 +83,10 @@ test('nasabah registers, logs in, validates profile and uploads five distinct do
     });
     await row.getByRole('link', { name: 'Lihat' }).click();
     await expect(
-      page.getByText('Tanggal lahir: 1992-03-04', { exact: true }),
+      page.getByRole('definition').filter({ hasText: '1992-03-04' }),
     ).toBeVisible();
     await expect(
-      page.getByText('Nomor HP: 08123456789', { exact: true }),
+      page.getByRole('definition').filter({ hasText: '08123456789' }),
     ).toBeVisible();
     await expect(page.locator('input')).toHaveCount(0);
     const self = await loginHeaders(request, {
@@ -199,7 +199,7 @@ test('HRD creates and deletes a scoped employee through standard pages', async (
   await page.getByRole('button', { name: 'Simpan akun' }).click();
   const { id } = await (await created).json();
   try {
-    await page.getByLabel('Cari nama').fill(username);
+    await page.getByLabel(/^Cari:/).fill(username);
     const row = page
       .getByRole('row')
       .filter({ has: page.getByRole('cell', { name: new RegExp(username) }) });

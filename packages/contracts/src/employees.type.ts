@@ -30,11 +30,20 @@ export const employeeUpdateSchema = employeeAccountSchema
   .partial({ password: true })
   .extend({ id: z.number().int().positive() });
 export const employeeQuerySchema = z.object({
+  search: z.string().max(255).optional(),
   namaLengkap: z.string().max(255).optional(),
   namaAlias: z.string().max(255).optional(),
   userId: z.coerce.number().int().positive().optional(),
   sortBy: z
-    .enum(['id', 'employeeId', 'namaLengkap', 'createdAt'])
+    .enum([
+      'id',
+      'employeeId',
+      'namaLengkap',
+      'namaAlias',
+      'noKtp',
+      'companyName',
+      'createdAt',
+    ])
     .default('createdAt'),
   sortDirection: z.enum(SortDirectionEnum).default('desc'),
   page: z.coerce.number().int().min(1).default(1),

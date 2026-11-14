@@ -1,5 +1,8 @@
 # Frontend
 
+Use [DESIGN.md](DESIGN.md) as the primary guide for frontend layout and visual
+design, including proposed custom design work.
+
 Components use hooks/use cases; RPC and DTO mapping live in `feature.api.ts`.
 Each feature hook has its own file named after the hook. Import package types
 directly from public exports. Dashboard, auth, credit applications, BPR review
@@ -13,7 +16,7 @@ downloads. DTO validation stays in the feature. Use `toExportQuery` from
 The root router defines `/`, `/login` and feature prefixes; feature routes use
 `createCrudRoutes`. Standard list, add, edit and view pages provide filtering,
 sorting, pagination and export; view pages display text rather than disabled
-inputs. Reuse `CrudPage`, `ListingTable`, `ListingSort`, `RecordState`,
+inputs. Reuse `CrudPage`, `ListingTable`, `RecordState`,
 `DetailFields`, `DeleteAction` and `FormActions` from `src/components/crud`.
 
 TanStack Router handles routing and Query handles API state. Include session and

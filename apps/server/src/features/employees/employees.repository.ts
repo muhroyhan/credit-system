@@ -27,6 +27,7 @@ import {
   getTableColumns,
   like,
   ne,
+  or,
   sql,
 } from 'drizzle-orm';
 
@@ -76,6 +77,12 @@ export const employeesRepository = {
   ) {
     const db = connectDatabase().db;
     const where = and(
+      query.search
+        ? or(
+            like(debitors.namaLengkap, `%${query.search}%`),
+            like(debitors.namaAlias, `%${query.search}%`),
+          )
+        : undefined,
       userId ? eq(debitors.userId, userId) : undefined,
       debitorId ? eq(debitors.id, debitorId) : undefined,
       query.namaLengkap
@@ -99,7 +106,9 @@ export const employeesRepository = {
       .where(where)
       .orderBy(
         (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
-          debitors[query.sortBy],
+          query.sortBy === 'companyName'
+            ? users.companyName
+            : debitors[query.sortBy],
         ),
         desc(debitors.id),
       );

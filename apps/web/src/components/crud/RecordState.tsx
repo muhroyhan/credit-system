@@ -15,16 +15,16 @@ export function RecordState<T>({
   children: (data: T) => ReactNode;
 }) {
   if (!Number.isInteger(id) || id <= 0) {
-    return <Alert color="red">ID tidak valid</Alert>;
+    return <Alert color="red.8">ID tidak valid</Alert>;
   }
   if (query.isPending || pending) {
-    return <Text>Memuat...</Text>;
+    return <Text role="status">Memuat...</Text>;
   }
   if (query.error || error) {
-    return <Alert color="red">{(query.error ?? error)?.message}</Alert>;
+    return <Alert color="red.8">{(query.error ?? error)?.message}</Alert>;
   }
   if (!query.data) {
-    return <Alert color="red">Data tidak ditemukan</Alert>;
+    return <Alert color="red.8">Data tidak ditemukan</Alert>;
   }
   return children(query.data);
 }

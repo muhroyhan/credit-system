@@ -64,13 +64,13 @@ test('admin interface adds and finds a user', async ({ page, request }) => {
     ).toBeVisible();
     await row.getByRole('link', { name: 'Lihat' }).click();
     await expect(
-      page.getByText(`Email: ${username}_edit@example.invalid`),
+      page
+        .getByRole('definition')
+        .filter({ hasText: `${username}_edit@example.invalid` }),
     ).toBeVisible();
     await expect(page.locator('input')).toHaveCount(0);
     await page.getByRole('link', { name: 'Kembali' }).click();
-    await page
-      .getByRole('textbox', { name: 'Username', exact: true })
-      .fill(username);
+    await page.getByRole('textbox', { name: /^Cari:/ }).fill(username);
     await expect(page.getByText('Total: 1', { exact: true })).toBeVisible();
     for (const format of ['PDF', 'XLSX']) {
       const downloaded = page.waitForEvent('download');
