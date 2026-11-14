@@ -39,6 +39,7 @@ import {
   inArray,
   like,
   lte,
+  or,
   sql,
 } from 'drizzle-orm';
 
@@ -225,6 +226,12 @@ export const creditRepository = {
       query.debitorId === undefined
         ? undefined
         : eq(credits.debitorId, query.debitorId),
+      query.search
+        ? or(
+            like(debitors.namaLengkap, `%${query.search}%`),
+            like(users.companyName, `%${query.search}%`),
+          )
+        : undefined,
       query.nama ? like(debitors.namaLengkap, `%${query.nama}%`) : undefined,
       query.noKtp ? like(debitors.noKtp, `%${query.noKtp}%`) : undefined,
       query.status ? eq(credits.status, query.status) : undefined,
@@ -242,6 +249,7 @@ export const creditRepository = {
       .select({ count: count() })
       .from(credits)
       .innerJoin(debitors, eq(credits.debitorId, debitors.id))
+      .leftJoin(users, eq(debitors.userId, users.id))
       .where(where);
     const selection = db
       .select({
@@ -258,7 +266,11 @@ export const creditRepository = {
         (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
           query.sortBy === 'jumlahPengajuan'
             ? sql`CAST(${credits.jumlahPengajuan} AS DECIMAL(20, 0))`
-            : credits[query.sortBy],
+            : query.sortBy === 'nama'
+              ? debitors.namaLengkap
+              : query.sortBy === 'companyName'
+                ? users.companyName
+                : credits[query.sortBy],
         ),
         desc(credits.id),
       );
