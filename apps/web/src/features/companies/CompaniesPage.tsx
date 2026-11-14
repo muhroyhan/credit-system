@@ -1,5 +1,5 @@
 import { CompanyStatusEnum } from '@credit/contracts';
-import { Select, TextInput } from '@mantine/core';
+import { Button, Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
@@ -50,7 +50,32 @@ function Listing() {
         { label: 'Status', render: (row) => row.status },
       ]}
       addAction={
-        access.create && <Link to="/companies/add">Tambah perusahaan</Link>
+        access.create && (
+          <Button component={Link} to="/companies/add">
+            Tambah perusahaan
+          </Button>
+        )
+      }
+      sort={
+        <ListingSort
+          value={users.queries.sortBy}
+          direction={users.queries.sortDirection}
+          options={['createdAt', 'companyName', 'username', 'email', 'status']}
+          onSort={(value) =>
+            users.setQueries((current) => ({
+              ...current,
+              sortBy: value,
+              page: 1,
+            }))
+          }
+          onDirection={(value) =>
+            users.setQueries((current) => ({
+              ...current,
+              sortDirection: value,
+              page: 1,
+            }))
+          }
+        />
       }
       filters={
         <>
@@ -94,31 +119,6 @@ function Listing() {
               users.setQueries((current) => ({
                 ...current,
                 status: v ?? undefined,
-                page: 1,
-              }))
-            }
-          />
-          <ListingSort
-            value={users.queries.sortBy}
-            direction={users.queries.sortDirection}
-            options={[
-              'createdAt',
-              'companyName',
-              'username',
-              'email',
-              'status',
-            ]}
-            onSort={(value) =>
-              users.setQueries((current) => ({
-                ...current,
-                sortBy: value,
-                page: 1,
-              }))
-            }
-            onDirection={(value) =>
-              users.setQueries((current) => ({
-                ...current,
-                sortDirection: value,
                 page: 1,
               }))
             }

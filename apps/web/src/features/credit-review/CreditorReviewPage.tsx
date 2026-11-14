@@ -33,6 +33,23 @@ function Content() {
       onExport={(format) => exporting.mutate(format)}
       onExportZip={() => zip.mutate()}
       zipping={zip.isPending}
+      sort={
+        <ListingSort
+          value={queries.sortBy}
+          direction={queries.sortDirection}
+          options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
+          onSort={(value) =>
+            setQueries((current) => ({ ...current, sortBy: value, page: 1 }))
+          }
+          onDirection={(value) =>
+            setQueries((current) => ({
+              ...current,
+              sortDirection: value,
+              page: 1,
+            }))
+          }
+        />
+      }
       filters={
         <>
           <TextInput
@@ -99,21 +116,6 @@ function Content() {
                 page: 1,
               }));
             }}
-          />
-          <ListingSort
-            value={queries.sortBy}
-            direction={queries.sortDirection}
-            options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
-            onSort={(value) =>
-              setQueries((current) => ({ ...current, sortBy: value, page: 1 }))
-            }
-            onDirection={(value) =>
-              setQueries((current) => ({
-                ...current,
-                sortDirection: value,
-                page: 1,
-              }))
-            }
           />
         </>
       }

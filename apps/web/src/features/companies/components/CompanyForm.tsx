@@ -2,7 +2,6 @@ import { CompanyStatusEnum } from '@credit/contracts';
 import {
   Alert,
   Button,
-  Group,
   NumberInput,
   PasswordInput,
   Select,
@@ -12,6 +11,8 @@ import {
 } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { FormActions } from '@web/components/crud/FormActions';
+import { FieldsGrid } from '@web/components/FieldsGrid';
+import { FormSection } from '@web/components/FormSection';
 import type { CompanyFormProps } from '@web/features/companies/companies.type';
 import { useCompanyForm } from '@web/features/companies/hooks/useCompanyForm';
 import { useEntities } from '@web/features/companies/hooks/useEntities';
@@ -34,88 +35,103 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
   const expenses = useFieldArray({ control, name: 'biaya', keyName: 'key' });
   return (
     <form noValidate onSubmit={handleSubmit((data) => save.mutate(data))}>
-      <Stack>
+      <FormSection title="Data perusahaan">
         {(save.error ?? entity.error) && (
           <Alert color="red">{(save.error ?? entity.error)?.message}</Alert>
         )}
-        <Controller
-          name="entityTypeId"
-          control={control}
-          render={({ field }) => (
-            <Select
-              label="Badan usaha"
-              data={(entity.data ?? []).map((v) => ({
-                value: String(v.id),
-                label: v.value ?? String(v.id),
-              }))}
-              value={field.value ? String(field.value) : null}
-              onChange={(v) => field.onChange(Number(v))}
-              onBlur={field.onBlur}
-              error={errors.entityTypeId?.message}
-            />
-          )}
-        />
-        <TextInput
-          label="Nama perusahaan"
-          {...register('companyName')}
-          error={errors.companyName?.message}
-        />
-        <TextInput
-          label="Username perusahaan"
-          {...register('username')}
-          error={errors.username?.message}
-        />
-        <TextInput
-          label="Email perusahaan"
-          {...register('email')}
-          error={errors.email?.message}
-        />
-        <TextInput
-          label="Slug"
-          {...register('slug')}
-          error={errors.slug?.message}
-        />
-        <PasswordInput
-          label="Password perusahaan"
-          {...register('password')}
-          error={errors.password?.message}
-        />
-        <Controller
-          name="status"
-          control={control}
-          render={({ field }) => (
-            <Select
-              label="Status perusahaan"
-              {...field}
-              data={Object.values(CompanyStatusEnum)}
-              onChange={(v) => {
-                if (v) {
-                  field.onChange(v);
-                }
-              }}
-              error={errors.status?.message}
-            />
-          )}
-        />
+        <FieldsGrid>
+          <Controller
+            name="entityTypeId"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Badan usaha"
+                data={(entity.data ?? []).map((v) => ({
+                  value: String(v.id),
+                  label: v.value ?? String(v.id),
+                }))}
+                value={field.value ? String(field.value) : null}
+                onChange={(v) => field.onChange(Number(v))}
+                onBlur={field.onBlur}
+                error={errors.entityTypeId?.message}
+              />
+            )}
+          />
+          <TextInput
+            label="Nama perusahaan"
+            {...register('companyName')}
+            error={errors.companyName?.message}
+          />
+          <TextInput
+            label="Username perusahaan"
+            {...register('username')}
+            error={errors.username?.message}
+          />
+          <TextInput
+            label="Email perusahaan"
+            {...register('email')}
+            error={errors.email?.message}
+          />
+          <TextInput
+            label="Slug"
+            {...register('slug')}
+            error={errors.slug?.message}
+          />
+          <PasswordInput
+            label="Password perusahaan"
+            description={
+              id ? 'Kosongkan untuk mempertahankan password.' : undefined
+            }
+            {...register('password')}
+            error={errors.password?.message}
+          />
+          <Controller
+            name="status"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Status perusahaan"
+                {...field}
+                data={Object.values(CompanyStatusEnum)}
+                onChange={(v) => {
+                  if (v) {
+                    field.onChange(v);
+                  }
+                }}
+                error={errors.status?.message}
+              />
+            )}
+          />
+        </FieldsGrid>
         <Title order={2}>Bunga per tenor</Title>
         {interests.fields.map((row, index) => (
-          <Group key={row.key}>
-            <TextInput
-              label={`Bunga ${index + 1} (%)`}
-              {...register(`bungaKredits.${index}.bungaPercentage`)}
-              error={errors.bungaKredits?.[index]?.bungaPercentage?.message}
-            />
-            <TextInput
-              label={`Tenor ${index + 1} (bulan)`}
-              {...register(`bungaKredits.${index}.jangkaWaktuBulan`)}
-              error={errors.bungaKredits?.[index]?.jangkaWaktuBulan?.message}
-            />
-            <Button type="button" onClick={() => interests.remove(index)}>
+          <Stack key={row.key} gap="sm">
+            <FieldsGrid>
+              <TextInput
+                label={`Bunga ${index + 1} (%)`}
+                {...register(`bungaKredits.${index}.bungaPercentage`)}
+                error={errors.bungaKredits?.[index]?.bungaPercentage?.message}
+              />
+              <TextInput
+                label={`Tenor ${index + 1} (bulan)`}
+                {...register(`bungaKredits.${index}.jangkaWaktuBulan`)}
+                error={errors.bungaKredits?.[index]?.jangkaWaktuBulan?.message}
+              />
+            </FieldsGrid>
+            <Button
+              variant="subtle"
+              color="red"
+              style={{ alignSelf: 'flex-start' }}
+              type="button"
+              onClick={() => interests.remove(index)}
+            >
               Hapus bunga {index + 1}
             </Button>
-          </Group>
+          </Stack>
         ))}
         <Button
+          variant="light"
+          style={{ alignSelf: 'flex-start' }}
           type="button"
           onClick={() =>
             interests.append({ bungaPercentage: '', jangkaWaktuBulan: '' })
@@ -125,39 +141,49 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         </Button>
         <Title order={2}>Biaya</Title>
         {expenses.fields.map((row, index) => (
-          <Group key={row.key}>
-            <TextInput
-              label={`Nama biaya ${index + 1}`}
-              {...register(`biaya.${index}.expenseType`)}
-              error={errors.biaya?.[index]?.expenseType?.message}
-            />
-            <TextInput
-              label={`Jenis biaya ${index + 1}`}
-              description="%: nominal pengajuan, x: angsuran, lainnya: nilai tetap"
-              {...register(`biaya.${index}.type`)}
-              error={errors.biaya?.[index]?.type?.message}
-            />
-            <Controller
-              name={`biaya.${index}.value`}
-              control={control}
-              render={({ field }) => (
-                <NumberInput
-                  label={`Nilai biaya ${index + 1}`}
-                  value={field.value}
-                  onChange={(v) =>
-                    field.onChange(v === '' ? undefined : Number(v))
-                  }
-                  onBlur={field.onBlur}
-                  error={errors.biaya?.[index]?.value?.message}
-                />
-              )}
-            />
-            <Button type="button" onClick={() => expenses.remove(index)}>
+          <Stack key={row.key} gap="sm">
+            <FieldsGrid three>
+              <TextInput
+                label={`Nama biaya ${index + 1}`}
+                {...register(`biaya.${index}.expenseType`)}
+                error={errors.biaya?.[index]?.expenseType?.message}
+              />
+              <TextInput
+                label={`Jenis biaya ${index + 1}`}
+                description="%: nominal pengajuan, x: angsuran, lainnya: nilai tetap"
+                {...register(`biaya.${index}.type`)}
+                error={errors.biaya?.[index]?.type?.message}
+              />
+              <Controller
+                name={`biaya.${index}.value`}
+                control={control}
+                render={({ field }) => (
+                  <NumberInput
+                    label={`Nilai biaya ${index + 1}`}
+                    value={field.value}
+                    onChange={(v) =>
+                      field.onChange(v === '' ? undefined : Number(v))
+                    }
+                    onBlur={field.onBlur}
+                    error={errors.biaya?.[index]?.value?.message}
+                  />
+                )}
+              />
+            </FieldsGrid>
+            <Button
+              variant="subtle"
+              color="red"
+              style={{ alignSelf: 'flex-start' }}
+              type="button"
+              onClick={() => expenses.remove(index)}
+            >
               Hapus biaya {index + 1}
             </Button>
-          </Group>
+          </Stack>
         ))}
         <Button
+          variant="light"
+          style={{ alignSelf: 'flex-start' }}
           type="button"
           onClick={() =>
             expenses.append({ expenseType: '', type: '', value: 0 })
@@ -170,7 +196,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
           disabled={!entity.isSuccess}
           cancel={<Link to="/companies">Batal</Link>}
         />
-      </Stack>
+      </FormSection>
     </form>
   );
 }

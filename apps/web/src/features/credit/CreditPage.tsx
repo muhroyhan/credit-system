@@ -1,5 +1,5 @@
 import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
-import { Select, TextInput } from '@mantine/core';
+import { Button, Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { ListingSort } from '@web/components/crud/ListingSort';
@@ -46,8 +46,31 @@ function Content() {
       ]}
       addAction={
         (access.create || session?.type === AccountTypeEnum.Debitor) && (
-          <Link to="/credits/add">Tambah pengajuan</Link>
+          <Button component={Link} to="/credits/add">
+            Tambah pengajuan
+          </Button>
         )
+      }
+      sort={
+        <ListingSort
+          value={rows.queries.sortBy}
+          direction={rows.queries.sortDirection}
+          options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
+          onSort={(value) =>
+            rows.setQueries((current) => ({
+              ...current,
+              sortBy: value,
+              page: 1,
+            }))
+          }
+          onDirection={(value) =>
+            rows.setQueries((current) => ({
+              ...current,
+              sortDirection: value,
+              page: 1,
+            }))
+          }
+        />
       }
       filters={
         <>
@@ -75,25 +98,6 @@ function Content() {
                 page: 1,
               }));
             }}
-          />
-          <ListingSort
-            value={rows.queries.sortBy}
-            direction={rows.queries.sortDirection}
-            options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
-            onSort={(value) =>
-              rows.setQueries((current) => ({
-                ...current,
-                sortBy: value,
-                page: 1,
-              }))
-            }
-            onDirection={(value) =>
-              rows.setQueries((current) => ({
-                ...current,
-                sortDirection: value,
-                page: 1,
-              }))
-            }
           />
         </>
       }

@@ -1,5 +1,14 @@
 import { ExportTypeEnum } from '@credit/contracts';
-import { Alert, Button, Group, NumberInput, Table, Text } from '@mantine/core';
+import {
+  Alert,
+  Button,
+  Group,
+  NumberInput,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+} from '@mantine/core';
 import type { ReactNode } from 'react';
 
 export function ListingTable<T extends { id: number }>({
@@ -17,6 +26,7 @@ export function ListingTable<T extends { id: number }>({
   zipping,
   addAction,
   filters,
+  sort,
 }: {
   rows: T[];
   columns: Array<{ label: string; render: (row: T) => ReactNode }>;
@@ -32,40 +42,56 @@ export function ListingTable<T extends { id: number }>({
   onExport: (format: ExportTypeEnum) => void;
   addAction?: ReactNode;
   filters: ReactNode;
+  sort: ReactNode;
 }) {
   return (
     <>
       {error && <Alert color="red">{error}</Alert>}
-      <Group>{filters}</Group>
-      <Group>
+      <Group justify="space-between" align="flex-start">
         {addAction}
-        <Button
-          loading={exporting}
-          disabled={loading}
-          onClick={() => onExport(ExportTypeEnum.PDF)}
-        >
-          Export PDF
-        </Button>
-        <Button
-          loading={exporting}
-          disabled={loading}
-          onClick={() => onExport(ExportTypeEnum.XLSX)}
-        >
-          Export XLSX
-        </Button>
-        <Button
-          loading={exporting}
-          disabled={loading}
-          onClick={() => onExport(ExportTypeEnum.CSV)}
-        >
-          Export CSV
-        </Button>
-        {onExportZip && (
-          <Button loading={zipping} disabled={loading} onClick={onExportZip}>
-            Export ZIP
+        <Group gap="xs">
+          <Button
+            variant="outline"
+            loading={exporting}
+            disabled={loading}
+            onClick={() => onExport(ExportTypeEnum.PDF)}
+          >
+            Export PDF
           </Button>
-        )}
+          <Button
+            variant="outline"
+            loading={exporting}
+            disabled={loading}
+            onClick={() => onExport(ExportTypeEnum.XLSX)}
+          >
+            Export XLSX
+          </Button>
+          <Button
+            variant="outline"
+            loading={exporting}
+            disabled={loading}
+            onClick={() => onExport(ExportTypeEnum.CSV)}
+          >
+            Export CSV
+          </Button>
+          {onExportZip && (
+            <Button
+              variant="outline"
+              loading={zipping}
+              disabled={loading}
+              onClick={onExportZip}
+            >
+              Export ZIP
+            </Button>
+          )}
+        </Group>
       </Group>
+      <Stack component="section" aria-label="Filter dan pengurutan" gap="md">
+        <SimpleGrid type="container" cols={{ base: 1, '480px': 2, '760px': 3 }}>
+          {filters}
+        </SimpleGrid>
+        <Group align="flex-start">{sort}</Group>
+      </Stack>
       {loading && <Text>Memuat...</Text>}
       <Table.ScrollContainer
         minWidth={700}
@@ -97,15 +123,22 @@ export function ListingTable<T extends { id: number }>({
           </Table.Tbody>
         </Table>
       </Table.ScrollContainer>
-      {!loading && !rows.length && <Text>Tidak ada data</Text>}
-      <NumberInput
-        label="Halaman"
-        min={1}
-        max={Math.max(1, Math.ceil(total / 20))}
-        value={page}
-        onChange={(v) => onPageChange(Math.max(1, Math.floor(Number(v) || 1)))}
-      />
-      <Text>Total: {total}</Text>
+      {!loading && !error && !rows.length && (
+        <Text c="dimmed">Tidak ada data</Text>
+      )}
+      <Group justify="space-between" align="end">
+        <NumberInput
+          w={120}
+          label="Halaman"
+          min={1}
+          max={Math.max(1, Math.ceil(total / 20))}
+          value={page}
+          onChange={(v) =>
+            onPageChange(Math.max(1, Math.floor(Number(v) || 1)))
+          }
+        />
+        <Text>Total: {total}</Text>
+      </Group>
     </>
   );
 }

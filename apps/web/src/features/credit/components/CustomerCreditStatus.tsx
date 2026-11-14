@@ -1,6 +1,8 @@
 import { CreditStatusEnum } from '@credit/contracts';
 import { Alert, Button, Checkbox, Stack, Text, TextInput } from '@mantine/core';
 import { RecordState } from '@web/components/crud/RecordState';
+import { FieldsGrid } from '@web/components/FieldsGrid';
+import { FormSection } from '@web/components/FormSection';
 import { useCustomerCredit } from '@web/features/credit/hooks/useCustomerCredit';
 
 export function CustomerCreditStatus({
@@ -79,32 +81,34 @@ export function CustomerCreditStatus({
                     confirm.mutate(values);
                   })}
                 >
-                  <Stack>
-                    <TextInput
-                      label="Bank"
-                      {...form.register('bankName')}
-                      error={form.formState.errors.bankName?.message}
-                    />
-                    <TextInput
-                      label="Cabang"
-                      {...form.register('bankBranch')}
-                      error={form.formState.errors.bankBranch?.message}
-                    />
-                    <TextInput
-                      label="Nama rekening"
-                      {...form.register('bankAccountName')}
-                      error={form.formState.errors.bankAccountName?.message}
-                    />
-                    <TextInput
-                      label="Nomor rekening"
-                      {...form.register('bankAccountNumber')}
-                      error={form.formState.errors.bankAccountNumber?.message}
-                    />
-                    <TextInput
-                      label="Konfirmasi nama lengkap"
-                      {...form.register('confirmationName')}
-                      error={form.formState.errors.confirmationName?.message}
-                    />
+                  <FormSection title="Konfirmasi rekening">
+                    <FieldsGrid>
+                      <TextInput
+                        label="Bank"
+                        {...form.register('bankName')}
+                        error={form.formState.errors.bankName?.message}
+                      />
+                      <TextInput
+                        label="Cabang"
+                        {...form.register('bankBranch')}
+                        error={form.formState.errors.bankBranch?.message}
+                      />
+                      <TextInput
+                        label="Nama rekening"
+                        {...form.register('bankAccountName')}
+                        error={form.formState.errors.bankAccountName?.message}
+                      />
+                      <TextInput
+                        label="Nomor rekening"
+                        {...form.register('bankAccountNumber')}
+                        error={form.formState.errors.bankAccountNumber?.message}
+                      />
+                      <TextInput
+                        label="Konfirmasi nama lengkap"
+                        {...form.register('confirmationName')}
+                        error={form.formState.errors.confirmationName?.message}
+                      />
+                    </FieldsGrid>
                     <Checkbox
                       label="Saya menyatakan data benar"
                       {...form.register('confirmed')}
@@ -116,7 +120,7 @@ export function CustomerCreditStatus({
                     >
                       Simpan konfirmasi
                     </Button>
-                  </Stack>
+                  </FormSection>
                 </form>
               </>
             )}

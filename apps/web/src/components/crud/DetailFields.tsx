@@ -1,4 +1,4 @@
-import { Text } from '@mantine/core';
+import { Box, SimpleGrid, Text } from '@mantine/core';
 import type { ReactNode } from 'react';
 
 export function DetailFields({
@@ -6,9 +6,27 @@ export function DetailFields({
 }: {
   fields: Array<{ label: string; value: ReactNode }>;
 }) {
-  return fields.map((field) => (
-    <Text key={field.label}>
-      {field.label}: {field.value ?? '—'}
-    </Text>
-  ));
+  return (
+    <SimpleGrid
+      type="container"
+      cols={{ base: 1, '580px': 2 }}
+      spacing="lg"
+      component="dl"
+      m={0}
+    >
+      {fields.map((field) => (
+        <Box
+          key={field.label}
+          style={{ minWidth: 0, overflowWrap: 'anywhere' }}
+        >
+          <Text component="dt" size="sm" c="dimmed">
+            {field.label}
+          </Text>
+          <Text component="dd" m={0} fw={500}>
+            {field.value ?? '—'}
+          </Text>
+        </Box>
+      ))}
+    </SimpleGrid>
+  );
 }

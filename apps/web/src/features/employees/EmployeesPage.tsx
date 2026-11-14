@@ -1,4 +1,4 @@
-import { TextInput } from '@mantine/core';
+import { Button, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
@@ -40,7 +40,32 @@ function Listing() {
         { label: 'Perusahaan', render: (r) => r.companyName },
       ]}
       addAction={
-        access.create && <Link to="/employees/add">Tambah karyawan</Link>
+        access.create && (
+          <Button component={Link} to="/employees/add">
+            Tambah karyawan
+          </Button>
+        )
+      }
+      sort={
+        <ListingSort
+          value={rows.queries.sortBy}
+          direction={rows.queries.sortDirection}
+          options={['createdAt', 'id', 'employeeId', 'namaLengkap']}
+          onSort={(value) =>
+            rows.setQueries((current) => ({
+              ...current,
+              sortBy: value,
+              page: 1,
+            }))
+          }
+          onDirection={(value) =>
+            rows.setQueries((current) => ({
+              ...current,
+              sortDirection: value,
+              page: 1,
+            }))
+          }
+        />
       }
       filters={
         <>
@@ -67,25 +92,6 @@ function Listing() {
                 page: 1,
               }));
             }}
-          />
-          <ListingSort
-            value={rows.queries.sortBy}
-            direction={rows.queries.sortDirection}
-            options={['createdAt', 'id', 'employeeId', 'namaLengkap']}
-            onSort={(value) =>
-              rows.setQueries((current) => ({
-                ...current,
-                sortBy: value,
-                page: 1,
-              }))
-            }
-            onDirection={(value) =>
-              rows.setQueries((current) => ({
-                ...current,
-                sortDirection: value,
-                page: 1,
-              }))
-            }
           />
         </>
       }

@@ -2,12 +2,13 @@ import {
   Alert,
   Button,
   NumberInput,
-  Stack,
   Table,
   Text,
   TextInput,
 } from '@mantine/core';
 import { FormActions } from '@web/components/crud/FormActions';
+import { FieldsGrid } from '@web/components/FieldsGrid';
+import { FormSection } from '@web/components/FormSection';
 import type { CreditRow } from '@web/features/credit/credit.type';
 import { useCreditForm } from '@web/features/credit/hooks/useCreditForm';
 import { Controller } from 'react-hook-form';
@@ -35,7 +36,7 @@ export function CreditForm({
   } = form;
   return (
     <form noValidate onSubmit={handleSubmit((input) => save.mutate(input))}>
-      <Stack>
+      <FormSection title="Data pengajuan">
         <Controller
           name="debitorId"
           control={control}
@@ -70,33 +71,35 @@ export function CreditForm({
             </Table.Tbody>
           </Table>
         )}
-        <TextInput
-          label="Nominal pengajuan"
-          {...register('jumlahPengajuan')}
-          error={errors.jumlahPengajuan?.message}
-          required
-        />
-        <Controller
-          name="jangkaWaktuBulan"
-          control={control}
-          render={({ field }) => (
-            <NumberInput
-              label="Tenor (bulan)"
-              min={1}
-              value={field.value || ''}
-              onChange={(v) => field.onChange(Number(v) || 0)}
-              error={errors.jangkaWaktuBulan?.message}
-              required
-            />
-          )}
-        />
-        <TextInput
-          type="date"
-          label="Tanggal pengajuan"
-          {...register('tanggalPengajuan')}
-          error={errors.tanggalPengajuan?.message}
-          required
-        />
+        <FieldsGrid>
+          <TextInput
+            label="Nominal pengajuan"
+            {...register('jumlahPengajuan')}
+            error={errors.jumlahPengajuan?.message}
+            required
+          />
+          <Controller
+            name="jangkaWaktuBulan"
+            control={control}
+            render={({ field }) => (
+              <NumberInput
+                label="Tenor (bulan)"
+                min={1}
+                value={field.value || ''}
+                onChange={(v) => field.onChange(Number(v) || 0)}
+                error={errors.jangkaWaktuBulan?.message}
+                required
+              />
+            )}
+          />
+          <TextInput
+            type="date"
+            label="Tanggal pengajuan"
+            {...register('tanggalPengajuan')}
+            error={errors.tanggalPengajuan?.message}
+            required
+          />
+        </FieldsGrid>
         <Button
           type="button"
           loading={simulation.isPending}
@@ -122,7 +125,7 @@ export function CreditForm({
           label="Simpan pengajuan"
           cancel={null}
         />
-      </Stack>
+      </FormSection>
     </form>
   );
 }

@@ -1,4 +1,4 @@
-import { Select, TextInput } from '@mantine/core';
+import { Button, Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DeleteAction } from '@web/components/crud/DeleteAction';
@@ -40,7 +40,37 @@ function Listing() {
         },
       ]}
       addAction={
-        access.create && <Link to="/admin-users/add">Tambah administrator</Link>
+        access.create && (
+          <Button component={Link} to="/admin-users/add">
+            Tambah administrator
+          </Button>
+        )
+      }
+      sort={
+        <ListingSort
+          value={users.queries.sortBy}
+          direction={users.queries.sortDirection}
+          options={[
+            { value: 'createdAt', label: 'Tanggal dibuat' },
+            { value: 'username', label: 'Username' },
+            { value: 'email', label: 'Email' },
+            { value: 'isActive', label: 'Status' },
+          ]}
+          onSort={(value) =>
+            users.setQueries((current) => ({
+              ...current,
+              sortBy: value,
+              page: 1,
+            }))
+          }
+          onDirection={(value) =>
+            users.setQueries((current) => ({
+              ...current,
+              sortDirection: value,
+              page: 1,
+            }))
+          }
+        />
       }
       filters={
         <>
@@ -83,30 +113,6 @@ function Listing() {
               { value: 'true', label: 'Aktif' },
               { value: 'false', label: 'Tidak aktif' },
             ]}
-          />
-          <ListingSort
-            value={users.queries.sortBy}
-            direction={users.queries.sortDirection}
-            options={[
-              { value: 'createdAt', label: 'Tanggal dibuat' },
-              { value: 'username', label: 'Username' },
-              { value: 'email', label: 'Email' },
-              { value: 'isActive', label: 'Status' },
-            ]}
-            onSort={(value) =>
-              users.setQueries((current) => ({
-                ...current,
-                sortBy: value,
-                page: 1,
-              }))
-            }
-            onDirection={(value) =>
-              users.setQueries((current) => ({
-                ...current,
-                sortDirection: value,
-                page: 1,
-              }))
-            }
           />
         </>
       }
