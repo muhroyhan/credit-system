@@ -37,8 +37,8 @@ export function LoginPage() {
       <Stack>
         <Title>Credit System</Title>
         <Text>Masuk ke akun</Text>
-        {error && <Alert color="red">{error}</Alert>}
-        {companyError && <Alert color="red">{companyError}</Alert>}
+        {error && <Alert color="red.8">{error}</Alert>}
+        {companyError && <Alert color="red.8">{companyError}</Alert>}
         <form noValidate onSubmit={handleSubmit((data) => login(data))}>
           <Stack>
             <Controller

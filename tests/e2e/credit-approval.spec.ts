@@ -56,12 +56,18 @@ test('HRD approves and rejects while other actors cannot decide', async ({
         .fill(
           status === 'approved' ? 'Debitor Sintetis Satu' : 'Debitor Sintetis',
         );
-      const row = page.getByRole('row').filter({ hasText: amount });
+      const row = page.getByRole('row').filter({
+        hasText: new Intl.NumberFormat('id-ID').format(Number(amount)),
+      });
       await row.getByRole('link', { name: 'Lihat' }).click();
       page.once('dialog', (dialog) => dialog.accept());
       await page.getByRole('button', { name: button, exact: true }).click();
       await expect(page.getByText('Keputusan HRD tersimpan')).toBeVisible();
-      await expect(page.getByText(`Status HRD: ${status}`)).toBeVisible();
+      await expect(
+        page
+          .getByRole('definition')
+          .filter({ hasText: status === 'approved' ? 'Disetujui' : 'Ditolak' }),
+      ).toBeVisible();
       await expect(page.getByRole('button', { name: 'Setujui' })).toHaveCount(
         0,
       );
@@ -76,8 +82,10 @@ test('HRD approves and rejects while other actors cannot decide', async ({
       ).toBe(409);
       await page.getByRole('link', { name: 'Kembali' }).click();
       await expect(
-        page.getByRole('row').filter({ hasText: amount }),
-      ).toContainText(status);
+        page.getByRole('row').filter({
+          hasText: new Intl.NumberFormat('id-ID').format(Number(amount)),
+        }),
+      ).toContainText(status === 'approved' ? 'Disetujui' : 'Ditolak');
     }
   } finally {
     if (ids.length) {

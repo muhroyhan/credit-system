@@ -5,6 +5,7 @@ import {
   MultiSelect,
   PasswordInput,
   TextInput,
+  Title,
 } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { FormActions } from '@web/components/crud/FormActions';
@@ -45,7 +46,7 @@ export function AdminUserForm({
     >
       <FormSection title="Akun administrator">
         {(save.error ?? programs.error) && (
-          <Alert color="red">{(save.error ?? programs.error)?.message}</Alert>
+          <Alert color="red.8">{(save.error ?? programs.error)?.message}</Alert>
         )}
         {programs.isPending && <div>Memuat program...</div>}
         <FieldsGrid>
@@ -77,6 +78,9 @@ export function AdminUserForm({
             error={errors.isActive?.message}
           />
         </FieldsGrid>
+        <Title order={3} size="h4">
+          Hak akses per program
+        </Title>
         <Controller
           name="roles"
           control={control}
@@ -109,7 +113,7 @@ export function AdminUserForm({
                 />
               ))}
               {errors.roles?.message && users.options.length === 0 && (
-                <Alert color="red">{errors.roles.message}</Alert>
+                <Alert color="red.8">{errors.roles.message}</Alert>
               )}
             </FieldsGrid>
           )}

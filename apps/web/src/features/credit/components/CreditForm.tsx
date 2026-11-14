@@ -46,7 +46,7 @@ export function CreditForm({
             />
           )}
         />
-        {rates.error && <Alert color="red">{rates.error.message}</Alert>}
+        {rates.error && <Alert color="red.8">{rates.error.message}</Alert>}
         {rates.data && (
           <Table>
             <Table.Thead>
@@ -126,7 +126,9 @@ export function CreditForm({
           />
         )}
         {(save.error || simulation.error) && (
-          <Alert color="red">{(save.error || simulation.error)?.message}</Alert>
+          <Alert color="red.8">
+            {(save.error || simulation.error)?.message}
+          </Alert>
         )}
         <FormActions
           pending={save.isPending}

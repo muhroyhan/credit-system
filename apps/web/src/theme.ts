@@ -1,4 +1,4 @@
-import { createTheme } from '@mantine/core';
+import { createTheme, InputWrapper } from '@mantine/core';
 
 /** Maps the retained brand tokens to standard Mantine component variants. */
 export const theme = createTheme({
@@ -24,4 +24,11 @@ export const theme = createTheme({
     ],
   },
   headings: { sizes: { h1: { fontSize: '2.25rem' } } },
+  components: {
+    InputWrapper: InputWrapper.extend({
+      defaultProps: {
+        inputWrapperOrder: ['label', 'input', 'description', 'error'],
+      },
+    }),
+  },
 });

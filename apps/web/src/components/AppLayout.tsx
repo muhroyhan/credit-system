@@ -8,7 +8,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { crudaAccess } from '@web/utils/cruda';
@@ -16,6 +16,7 @@ import { crudaAccess } from '@web/utils/cruda';
 export function AppLayout() {
   const { session, logout } = useSession();
   const [opened, { toggle, close }] = useDisclosure();
+  const mobile = useMediaQuery('(max-width: 47.99em)');
   const path = useRouterState({ select: (state) => state.location.pathname });
   if (!session || path === '/login' || path.startsWith('/registration/')) {
     return <Outlet />;
@@ -103,13 +104,14 @@ export function AppLayout() {
             <Text size="sm" visibleFrom="xs">
               {session.type}
             </Text>
-            <Button variant="light" onClick={logout}>
+            <Button variant="light" color="#005691" onClick={logout}>
               Keluar
             </Button>
           </Group>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar
+        visibleFrom="sm"
         p="md"
         id="main-navigation"
         style={{ overflowY: 'auto' }}
@@ -121,11 +123,12 @@ export function AppLayout() {
       </AppShell.Navbar>
       <Drawer
         id="mobile-navigation"
-        opened={opened}
+        opened={opened && mobile}
         onClose={close}
         title="Navigasi"
         size={280}
         hiddenFrom="sm"
+        closeButtonProps={{ 'aria-label': 'Tutup navigasi' }}
       >
         <nav aria-label="Navigasi mobile">{navigation}</nav>
       </Drawer>

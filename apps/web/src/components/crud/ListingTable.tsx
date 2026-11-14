@@ -50,7 +50,7 @@ export function ListingTable<T extends { id: number }>({
 }) {
   return (
     <>
-      {error && <Alert color="red">{error}</Alert>}
+      {error && <Alert color="red.8">{error}</Alert>}
       <Group justify="space-between" align="flex-start">
         {addAction}
         <Group gap="xs">
@@ -98,7 +98,14 @@ export function ListingTable<T extends { id: number }>({
         <SimpleGrid type="container" cols={{ base: 1, '480px': 2, '760px': 3 }}>
           {filters}
         </SimpleGrid>
-        <Group align="flex-start">{sort}</Group>
+        <SimpleGrid
+          maw={640}
+          w="100%"
+          type="container"
+          cols={{ base: 1, '480px': 2 }}
+        >
+          {sort}
+        </SimpleGrid>
       </Stack>
       {loading && <Text>Memuat...</Text>}
       <Table.ScrollContainer

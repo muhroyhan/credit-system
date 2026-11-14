@@ -158,7 +158,7 @@ function Form({
             )}
           />
         </FieldsGrid>
-        {save.error && <Alert color="red">{save.error.message}</Alert>}
+        {save.error && <Alert color="red.8">{save.error.message}</Alert>}
         <Button type="submit" loading={save.isPending}>
           Simpan keputusan
         </Button>

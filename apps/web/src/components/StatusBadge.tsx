@@ -7,7 +7,7 @@ export function StatusBadge({ value }: { value: string | null | undefined }) {
   return (
     <Badge
       variant="light"
-      color={presentation?.color ?? 'gray'}
+      color={`${presentation?.color ?? 'gray'}.8`}
       style={{ textTransform: 'none' }}
     >
       {presentation?.label ?? value ?? '—'}

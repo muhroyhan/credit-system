@@ -63,7 +63,7 @@ function Content() {
             <Alert color="green">Keputusan HRD tersimpan</Alert>
           )}
           {approval.error && (
-            <Alert color="red">{approval.error.message}</Alert>
+            <Alert color="red.8">{approval.error.message}</Alert>
           )}
           {session?.type === AccountTypeEnum.Company &&
             crudaAccess(session, 'CGP').approve &&
@@ -83,7 +83,7 @@ function Content() {
                   Setujui
                 </Button>
                 <Button
-                  color="red"
+                  color="red.8"
                   disabled={approval.isPending}
                   onClick={() => {
                     if (window.confirm('Tolak pengajuan ini?')) {

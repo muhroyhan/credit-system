@@ -64,7 +64,9 @@ test('admin interface adds and finds a user', async ({ page, request }) => {
     ).toBeVisible();
     await row.getByRole('link', { name: 'Lihat' }).click();
     await expect(
-      page.getByText(`Email: ${username}_edit@example.invalid`),
+      page
+        .getByRole('definition')
+        .filter({ hasText: `${username}_edit@example.invalid` }),
     ).toBeVisible();
     await expect(page.locator('input')).toHaveCount(0);
     await page.getByRole('link', { name: 'Kembali' }).click();

@@ -84,7 +84,19 @@ test('BPR can approve, reject and complete HRD-approved applications', async ({
         ).toHaveCount(0);
       }
       await page.getByRole('link', { name: 'Kembali' }).click();
-      await expect(page.getByText(`Status BPR: ${status}`)).toBeVisible();
+      await expect(
+        page
+          .getByRole('definition')
+          .filter({
+            hasText:
+              status === 'approved'
+                ? 'Disetujui'
+                : status === 'rejected'
+                  ? 'Ditolak'
+                  : 'Selesai',
+          })
+          .last(),
+      ).toBeVisible();
       await page.getByRole('link', { name: 'Kembali' }).click();
     }
   } finally {

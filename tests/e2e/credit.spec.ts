@@ -80,7 +80,7 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     await page.getByRole('button', { name: 'Simpan pengajuan' }).click();
     await expect(page).toHaveURL(/\/credits$/);
     await expect(
-      page.getByRole('row').filter({ hasText: '10000000' }).first(),
+      page.getByRole('row').filter({ hasText: '10.000.000' }).first(),
     ).toBeVisible();
   } finally {
     if (id) {

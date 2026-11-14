@@ -40,6 +40,9 @@ export function EmployeeForm(props: EmployeePageProps) {
           />
           <PasswordInput
             label="Password karyawan"
+            description={
+              props.id ? 'Kosongkan untuk mempertahankan password.' : undefined
+            }
             {...register('password')}
             error={errors.password?.message}
             required={!props.id}
@@ -70,7 +73,7 @@ export function EmployeeForm(props: EmployeePageProps) {
             />
           </>
         )}
-        {save.error && <Alert color="red">{save.error.message}</Alert>}
+        {save.error && <Alert color="red.8">{save.error.message}</Alert>}
         {save.isSuccess && <Text>Akun tersimpan</Text>}
         <FormActions
           pending={save.isPending}

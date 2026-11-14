@@ -64,7 +64,7 @@ export function EmployeeProfileForm({
             />
           ))}
         </FieldsGrid>
-        {save.error && <Alert color="red">{save.error.message}</Alert>}
+        {save.error && <Alert color="red.8">{save.error.message}</Alert>}
         {save.isSuccess && <Text>Profil tersimpan</Text>}
         <FormActions
           pending={save.isPending}

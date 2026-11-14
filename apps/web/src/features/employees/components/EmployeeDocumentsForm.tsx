@@ -47,6 +47,7 @@ export function EmployeeDocumentsForm({
               {data.documents[kind] && (
                 <Button
                   variant="subtle"
+                  color="#005691"
                   type="button"
                   onClick={() => download.mutate(kind)}
                 >
@@ -57,7 +58,7 @@ export function EmployeeDocumentsForm({
           ))}
         </FieldsGrid>
         {(save.error ?? download.error) && (
-          <Alert color="red">{(save.error ?? download.error)?.message}</Alert>
+          <Alert color="red.8">{(save.error ?? download.error)?.message}</Alert>
         )}
         {save.isSuccess && <Text>Dokumen tersimpan</Text>}
         <FormActions

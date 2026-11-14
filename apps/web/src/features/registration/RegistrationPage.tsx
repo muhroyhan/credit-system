@@ -49,9 +49,9 @@ export function RegistrationPage() {
               error={errors.confirmPassword?.message}
               required
             />
-            {save.error && <Alert color="red">{save.error.message}</Alert>}
+            {save.error && <Alert color="red.8">{save.error.message}</Alert>}
             {loginError && (
-              <Alert color="red">
+              <Alert color="red.8">
                 Akun berhasil dibuat. Login otomatis gagal; silakan masuk
                 melalui halaman login.
               </Alert>

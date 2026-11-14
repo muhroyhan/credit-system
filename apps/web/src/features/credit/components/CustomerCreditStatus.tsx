@@ -4,6 +4,7 @@ import { RecordState } from '@web/components/crud/RecordState';
 import { FieldsGrid } from '@web/components/FieldsGrid';
 import { FormSection } from '@web/components/FormSection';
 import { useCustomerCredit } from '@web/features/credit/hooks/useCustomerCredit';
+import { formatMoney } from '@web/utils/format-money';
 
 export function CustomerCreditStatus({
   token,
@@ -26,7 +27,7 @@ export function CustomerCreditStatus({
           ) : (
             row.expenses.map((item) => (
               <Text key={item.id}>
-                {item.expenseName}: {item.amount}
+                {item.expenseName}: {formatMoney(item.amount)}
               </Text>
             ))
           )}
@@ -48,10 +49,10 @@ export function CustomerCreditStatus({
               </Button>
             )}
           {generate.error && (
-            <Alert color="red">{generate.error.message}</Alert>
+            <Alert color="red.8">{generate.error.message}</Alert>
           )}
           {(cancel.error || confirm.error) && (
-            <Alert color="red">
+            <Alert color="red.8">
               {(cancel.error ?? confirm.error)?.message}
             </Alert>
           )}
@@ -60,7 +61,7 @@ export function CustomerCreditStatus({
             !row.credit.debitorAcknowledgmentTimestamp && (
               <>
                 <Button
-                  color="red"
+                  color="red.8"
                   disabled={cancel.isPending || confirm.isPending}
                   onClick={() => {
                     if (window.confirm('Batalkan pengajuan?')) {

@@ -17,7 +17,7 @@ export function DashboardPage() {
     return <Navigate to="/login" replace />;
   }
   return (
-    <Container>
+    <Container size="xl" px={0}>
       <Stack>
         <Text>Beranda</Text>
         <Title>Credit System</Title>
@@ -35,22 +35,46 @@ function DashboardSummary({ token }: { token: string }) {
   }
   if (query.error) {
     return (
-      <Alert color="red">Gagal memuat ringkasan: {query.error.message}</Alert>
+      <Alert color="red.8">Gagal memuat ringkasan: {query.error.message}</Alert>
     );
   }
   const money = (value: string) =>
     `Rp ${new Intl.NumberFormat('id-ID').format(BigInt(value))}`;
   return (
-    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+    <SimpleGrid type="container" cols={{ base: 1, '580px': 2, '900px': 3 }}>
       {[
-        `Perusahaan aktif dan nonaktif: ${query.data.totalUsers}`,
-        `Jumlah debitor: ${query.data.totalDebitor}`,
-        `Pengajuan pending: ${money(query.data.totalCredits.pending)}`,
-        `Pengajuan approved: ${money(query.data.totalCredits.approved)}`,
-        `Pengajuan completed: ${money(query.data.totalCredits.completed)}`,
-      ].map((value) => (
-        <Paper key={value} p="md" radius="md" withBorder>
-          <Text>{value}</Text>
+        {
+          label: 'Perusahaan aktif dan nonaktif',
+          value: query.data.totalUsers,
+        },
+        { label: 'Jumlah debitor', value: query.data.totalDebitor },
+        {
+          label: 'Pengajuan pending',
+          value: money(query.data.totalCredits.pending),
+        },
+        {
+          label: 'Pengajuan approved',
+          value: money(query.data.totalCredits.approved),
+        },
+        {
+          label: 'Pengajuan completed',
+          value: money(query.data.totalCredits.completed),
+        },
+      ].map(({ label, value }) => (
+        <Paper key={label} p="lg" radius="md" withBorder>
+          <Text size="sm" c="dimmed">
+            {label}:{' '}
+            <Text
+              component="span"
+              display="block"
+              size="xl"
+              fw={700}
+              c="#333333"
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {value}
+            </Text>
+          </Text>
         </Paper>
       ))}
     </SimpleGrid>

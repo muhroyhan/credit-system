@@ -48,12 +48,16 @@ function Content() {
             ]}
           />
           <Title order={2}>Bunga per tenor</Title>
+          {data.bungaKredits.length === 0 && (
+            <Text c="dimmed">Tidak ada bunga per tenor</Text>
+          )}
           {data.bungaKredits.map((v) => (
             <Text key={v.id}>
               {v.jangkaWaktuBulan} bulan: {v.bungaPercentage}%
             </Text>
           ))}
           <Title order={2}>Biaya</Title>
+          {data.biaya.length === 0 && <Text c="dimmed">Tidak ada biaya</Text>}
           {data.biaya.map((v) => (
             <Text key={v.id}>
               {v.expenseType}: {v.value} ({v.type})

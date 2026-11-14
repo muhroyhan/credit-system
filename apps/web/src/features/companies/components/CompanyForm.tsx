@@ -38,7 +38,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
     <form noValidate onSubmit={handleSubmit((data) => save.mutate(data))}>
       <FormSection title="Data perusahaan">
         {(save.error ?? entity.error) && (
-          <Alert color="red">{(save.error ?? entity.error)?.message}</Alert>
+          <Alert color="red.8">{(save.error ?? entity.error)?.message}</Alert>
         )}
         <FieldsGrid>
           <Controller
@@ -124,7 +124,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
             </FieldsGrid>
             <Button
               variant="subtle"
-              color="red"
+              color="red.8"
               style={{ alignSelf: 'flex-start' }}
               type="button"
               onClick={() => interests.remove(index)}
@@ -135,6 +135,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         ))}
         <Button
           variant="light"
+          color="#005691"
           style={{ alignSelf: 'flex-start' }}
           type="button"
           onClick={() =>
@@ -176,7 +177,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
             </FieldsGrid>
             <Button
               variant="subtle"
-              color="red"
+              color="red.8"
               style={{ alignSelf: 'flex-start' }}
               type="button"
               onClick={() => expenses.remove(index)}
@@ -187,6 +188,7 @@ export function CompanyForm({ token, id, initial }: CompanyFormProps) {
         ))}
         <Button
           variant="light"
+          color="#005691"
           style={{ alignSelf: 'flex-start' }}
           type="button"
           onClick={() =>
