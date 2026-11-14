@@ -1,6 +1,7 @@
 import { connectDatabase } from '@credit/database/client';
 import { credits, debitors } from '@credit/database/schema';
 import { expect } from '@playwright/test';
+import { creditListSchema } from '@web/features/credit/credit.type';
 import { eq, inArray } from 'drizzle-orm';
 import { loginHeaders } from './fixtures/login';
 import { test } from './fixtures/test';
@@ -56,6 +57,25 @@ test('search matches alternate columns, preserves tenant scope and exports', asy
       );
       expect(result.status()).toBe(200);
       expect((await result.json()).count).toBe(1);
+    }
+    for (const key of ['companyName', 'jumlahPengajuan'] as const) {
+      for (const direction of ['asc', 'desc'] as const) {
+        const response = await request.get(
+          `/api/credit/list?search=Perusahaan%20Sintetis&sortBy=${key}&sortDirection=${direction}`,
+          { headers: admin },
+        );
+        expect(response.status()).toBe(200);
+        const data = creditListSchema.parse(await response.json()).data;
+        const first = data.findIndex((row) => row.credit.id === rows[0]?.id);
+        const second = data.findIndex((row) => row.credit.id === rows[1]?.id);
+        expect(first).toBeGreaterThanOrEqual(0);
+        expect(second).toBeGreaterThanOrEqual(0);
+        const firstBeforeSecond =
+          key === 'jumlahPengajuan'
+            ? direction === 'asc'
+            : direction === 'desc';
+        expect(firstBeforeSecond ? first < second : second < first).toBe(true);
+      }
     }
     const scoped = await request.get(
       '/api/credit/list?search=Perusahaan%20Sintetis%20Dua',
