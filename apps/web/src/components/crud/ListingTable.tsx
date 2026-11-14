@@ -69,28 +69,34 @@ export function ListingTable<T extends { id: number }>({
         )}
       </Group>
       {loading && <Text>Memuat...</Text>}
-      <Table>
-        <Table.Thead>
-          <Table.Tr>
-            {columns.map((col) => (
-              <Table.Th key={col.label}>{col.label}</Table.Th>
-            ))}
-            <Table.Th>Aksi</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((row) => (
-            <Table.Tr key={row.id}>
+      <Table.ScrollContainer
+        minWidth={700}
+        aria-label="Tabel hasil"
+        tabIndex={0}
+      >
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
               {columns.map((col) => (
-                <Table.Td key={col.label}>{col.render(row)}</Table.Td>
+                <Table.Th key={col.label}>{col.label}</Table.Th>
               ))}
-              <Table.Td>
-                <Group>{actions(row)}</Group>
-              </Table.Td>
+              <Table.Th>Aksi</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+          </Table.Thead>
+          <Table.Tbody>
+            {rows.map((row) => (
+              <Table.Tr key={row.id}>
+                {columns.map((col) => (
+                  <Table.Td key={col.label}>{col.render(row)}</Table.Td>
+                ))}
+                <Table.Td>
+                  <Group>{actions(row)}</Group>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
       {!loading && !rows.length && <Text>Tidak ada data</Text>}
       <NumberInput
         label="Halaman"

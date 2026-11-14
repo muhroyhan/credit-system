@@ -6,6 +6,7 @@ import {
   Link,
   Outlet,
 } from '@tanstack/react-router';
+import { AppLayout } from '@web/components/AppLayout';
 import { adminUsersRoutes } from '@web/features/admin-users/admin-users.routes';
 import { LoginPage } from '@web/features/auth/LoginPage';
 import { companiesRoutes } from '@web/features/companies/companies.routes';
@@ -16,7 +17,7 @@ import { employeesRoutes } from '@web/features/employees/employees.routes';
 import { registrationRoutes } from '@web/features/registration/registration.routes';
 
 const rootRoute = createRootRoute({
-  component: Outlet,
+  component: AppLayout,
   notFoundComponent: () => (
     <Container>
       <Title>Halaman tidak ditemukan</Title>
