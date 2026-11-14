@@ -56,6 +56,11 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 ## Technical limitations
 
+- The 14 November frontend source audit in `design-audit.md` identifies unresolved
+  layout and usability gaps across CRUD features. Passing browser tests do not
+  establish visual conformance: current responsive coverage checks one admin
+  list/form. Lookup-selector proposals depend on authorized data sources and must
+  preserve current tenant scopes and input contracts.
 - The recorded audit found sixteen `as never` assertions in RPC gateways,
   including four P05 manual controller query validations. They weaken end-to-end
   input type checking; verify current code and use typed Hono validators before

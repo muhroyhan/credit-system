@@ -11,3 +11,9 @@ business impact before implementation; do not change business rules implicitly.
 | Persistent collapsible desktop sidebar | Gives more room to wide tables. | Requires custom shell state, icon labels/tooltips, keyboard behavior and a decision on persistence. The baseline uses a readable expanded desktop sidebar. |
 | Undo or restore for committed actions | Could help users recover from mistakes. | Requires product approval and server support for each action; some credit decisions may be irreversible. Existing cancellation and confirmation remain authoritative. |
 | Unsaved-change protection | Could prevent accidental loss when leaving a form. | Requires route and browser navigation handling and a decision about when data is considered dirty. |
+
+The expanded [frontend audit](design-audit.md) also proposes searchable company
+and employee selectors to replace ID recall. Review permitted lookup sources,
+pagination, endpoint support and accessibility before implementing this behavior.
+Ordinary responsive grids and white-card layouts require only standard Mantine
+composition and are not custom widget proposals.
