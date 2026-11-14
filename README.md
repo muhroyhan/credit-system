@@ -26,7 +26,8 @@ Use synthetic local data and credentials, never production data or secrets.
    `credit_*test`. See [seed.ts](packages/database/src/seed.ts) for account names.
 5. Run `pnpm dev` and open `http://localhost:5173`. Vite serves the frontend
    with React hot module replacement and proxies `/api` to the Bun backend at
-   `http://localhost:3000`. Bun watches the workspace from its root, including
+   `http://localhost:3000`. In development the Bun port serves only API routes;
+   frontend pages and assets are served by Vite. Bun watches the workspace from its root, including
    imported contracts and database code, and restarts when those files change.
    In development both ports are used. For the combined build, run `pnpm build`
    then `pnpm start`; `PORT` controls the single production server port.

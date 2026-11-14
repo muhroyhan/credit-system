@@ -17,7 +17,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "dev": "cd ../.. && bun --watch apps/server/src/index.ts",
+    "dev": "cd ../.. && bun --watch apps/server/src/dev/index.ts",
     "build": "bun build src/index.ts --target=bun --outdir=dist",
     "start": "bun dist/index.js"
   },
