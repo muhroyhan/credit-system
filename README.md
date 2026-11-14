@@ -24,9 +24,12 @@ Use synthetic local data and credentials, never production data or secrets.
    and `SEED_PASSWORD` to at least eight characters in the environment, then
    run `pnpm db:seed`. The database name must match `credit_*development` or
    `credit_*test`. See [seed.ts](packages/database/src/seed.ts) for account names.
-5. Run `pnpm dev` and open the Vite URL printed in the terminal. Vite proxies
-   `/api` to `localhost:3000`. For the combined build, run `pnpm build` then
-   `pnpm start`; `PORT` controls the server port.
+5. Run `pnpm dev` and open `http://localhost:5173`. Vite serves the frontend
+   with React hot module replacement and proxies `/api` to the Bun backend at
+   `http://localhost:3000`. Bun watches the workspace from its root, including
+   imported contracts and database code, and restarts when those files change.
+   In development both ports are used. For the combined build, run `pnpm build`
+   then `pnpm start`; `PORT` controls the single production server port.
 
 Bun loads `.env` from the working directory. Set environment variables in the
 shell for Node-based test runners rather than assuming they load `.env`.
