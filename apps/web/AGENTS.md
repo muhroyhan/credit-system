@@ -1,8 +1,7 @@
 # Frontend
 
 Use [DESIGN.md](DESIGN.md) as the primary guide for frontend layout and visual
-design. Record proposed custom design work in
-[design-improvement.md](../../docs/design-improvement.md).
+design, including proposed custom design work.
 
 Components use hooks/use cases; RPC and DTO mapping live in `feature.api.ts`.
 Each feature hook has its own file named after the hook. Import package types
