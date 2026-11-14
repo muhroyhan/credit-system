@@ -71,6 +71,8 @@ export function ListingTable<T extends { id: number }>({
       {loading && <Text>Memuat...</Text>}
       <Table.ScrollContainer
         minWidth={700}
+        type="native"
+        role="region"
         aria-label="Tabel hasil"
         tabIndex={0}
       >
