@@ -57,6 +57,12 @@ test('search matches alternate columns, preserves tenant scope and exports', asy
       );
       expect(result.status()).toBe(200);
       expect((await result.json()).count).toBe(1);
+      const byId = await request.get(
+        `${endpoint}?search=900002&status=approved`,
+        { headers: admin },
+      );
+      expect(byId.status()).toBe(200);
+      expect((await byId.json()).count).toBe(1);
     }
     for (const key of ['companyName', 'jumlahPengajuan'] as const) {
       for (const direction of ['asc', 'desc'] as const) {

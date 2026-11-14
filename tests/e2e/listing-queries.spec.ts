@@ -43,7 +43,12 @@ test('listing search and header sort use shared query state', async ({
     await column.getByRole('button').click();
     expect((await reversed).ok()).toBe(true);
     await expect(column).toHaveAttribute('aria-sort', 'descending');
-    const field = page.getByRole('textbox', { name: 'Cari', exact: true });
+    const field = page.getByRole('textbox', { name: /^Cari:/ });
+    await expect(field).toHaveCount(1);
+    await expect(page.getByLabel('ID perusahaan', { exact: true })).toHaveCount(
+      0,
+    );
+    await expect(page.getByLabel('ID debitor', { exact: true })).toHaveCount(0);
     const filtered = page.waitForResponse((response) => {
       const url = new URL(response.url());
       return (

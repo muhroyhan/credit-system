@@ -51,40 +51,11 @@ function Content() {
       filters={
         <>
           <TextInput
-            label="Cari"
-            description="Cari berdasarkan: Nama, perusahaan"
+            label="Cari: Nama / Perusahaan / ID perusahaan / ID debitor"
             value={queries.search ?? ''}
             onChange={(event) => {
               const value = event.currentTarget.value || undefined;
               setQueries((current) => ({ ...current, search: value, page: 1 }));
-            }}
-          />
-          <TextInput
-            label="ID perusahaan"
-            type="number"
-            min={1}
-            value={queries.userId ?? ''}
-            onChange={(event) => {
-              const value = event.currentTarget.value || undefined;
-              setQueries((current) => ({
-                ...current,
-                userId: value,
-                page: 1,
-              }));
-            }}
-          />
-          <TextInput
-            label="ID debitor"
-            type="number"
-            min={1}
-            value={queries.debitorId ?? ''}
-            onChange={(event) => {
-              const value = event.currentTarget.value || undefined;
-              setQueries((current) => ({
-                ...current,
-                debitorId: value,
-                page: 1,
-              }));
             }}
           />
           <Select

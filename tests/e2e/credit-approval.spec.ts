@@ -52,7 +52,7 @@ test('HRD approves and rejects while other actors cannot decide', async ({
         ).toBe(403);
       }
       await page
-        .getByLabel('Cari', { exact: true })
+        .getByLabel(/^Cari:/)
         .fill(
           status === 'approved' ? 'Debitor Sintetis Satu' : 'Debitor Sintetis',
         );

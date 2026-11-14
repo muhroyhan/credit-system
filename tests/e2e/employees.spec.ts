@@ -199,7 +199,7 @@ test('HRD creates and deletes a scoped employee through standard pages', async (
   await page.getByRole('button', { name: 'Simpan akun' }).click();
   const { id } = await (await created).json();
   try {
-    await page.getByLabel('Cari', { exact: true }).fill(username);
+    await page.getByLabel(/^Cari:/).fill(username);
     const row = page
       .getByRole('row')
       .filter({ has: page.getByRole('cell', { name: new RegExp(username) }) });

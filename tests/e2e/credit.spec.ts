@@ -32,9 +32,7 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     expect(createResponse.status()).toBe(201);
     id = (await createResponse.json()).id;
     await expect(page).toHaveURL(/\/credits$/);
-    await page
-      .getByLabel('Cari', { exact: true })
-      .fill('Debitor Sintetis Satu');
+    await page.getByLabel(/^Cari:/).fill('Debitor Sintetis Satu');
     const row = page
       .getByRole('row')
       .filter({ hasText: 'Debitor Sintetis Satu' })

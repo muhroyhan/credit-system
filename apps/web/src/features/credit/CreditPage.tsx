@@ -86,8 +86,7 @@ function Content() {
       filters={
         <>
           <TextInput
-            label="Cari"
-            description="Cari berdasarkan: Nama, perusahaan"
+            label="Cari: Nama / Perusahaan / ID perusahaan / ID debitor"
             value={rows.queries.search ?? ''}
             onChange={(event) => {
               const value = event.currentTarget.value || undefined;

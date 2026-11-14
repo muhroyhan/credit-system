@@ -69,8 +69,7 @@ function Listing() {
       filters={
         <>
           <TextInput
-            label="Cari"
-            description="Cari berdasarkan: Nama, alias"
+            label="Cari: Nama / Alias"
             value={rows.queries.search ?? ''}
             onChange={(event) => {
               const value = event.currentTarget.value || undefined;

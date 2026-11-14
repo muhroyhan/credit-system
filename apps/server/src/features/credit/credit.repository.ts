@@ -230,6 +230,8 @@ export const creditRepository = {
         ? or(
             like(debitors.namaLengkap, `%${query.search}%`),
             like(users.companyName, `%${query.search}%`),
+            like(sql`CAST(${debitors.userId} AS CHAR)`, `%${query.search}%`),
+            like(sql`CAST(${credits.debitorId} AS CHAR)`, `%${query.search}%`),
           )
         : undefined,
       query.nama ? like(debitors.namaLengkap, `%${query.nama}%`) : undefined,
