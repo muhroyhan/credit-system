@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Session } from '@web/constant/type';
 import { signIn } from '@web/features/auth/auth.api';
+import {
+  readStoredSession,
+  writeStoredSession,
+} from '@web/features/auth/auth-session';
 
 const sessionKey = ['session'] as const;
 export function useSession() {
@@ -8,7 +12,13 @@ export function useSession() {
   const { data: session = null } = useQuery<Session | null>({
     queryKey: sessionKey,
     queryFn: () => null,
-    initialData: null,
+    initialData: () => {
+      try {
+        return readStoredSession(window.sessionStorage);
+      } catch {
+        return null;
+      }
+    },
     enabled: false,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -16,6 +26,11 @@ export function useSession() {
   const mutation = useMutation({
     mutationFn: signIn,
     onSuccess: (data) => {
+      try {
+        writeStoredSession(window.sessionStorage, data);
+      } catch {
+        // Access to sessionStorage itself may be blocked.
+      }
       client.setQueryData(sessionKey, data);
     },
   });
@@ -25,6 +40,11 @@ export function useSession() {
     error: mutation.error?.message ?? '',
     login: mutation.mutate,
     logout: () => {
+      try {
+        writeStoredSession(window.sessionStorage, null);
+      } catch {
+        // Access to sessionStorage itself may be blocked.
+      }
       void client.cancelQueries();
       client.setQueryData(sessionKey, null);
       client.removeQueries({

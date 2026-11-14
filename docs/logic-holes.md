@@ -21,6 +21,11 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 ## Compatibility and operational risks
 
+- The frontend persists the login snapshot and bearer token in sessionStorage
+  per tab to survive reload. Same-origin JavaScript can read it, so an XSS can
+  expose the token; closing the tab clears it. Client expiry checks are not
+  signature verification: the API remains authoritative for token and access
+  validation, and revoked accounts can retain a stale UI snapshot until login.
 - Listing APIs accept an optional `search` parameter that OR-matches the text
   columns named in each listing. Existing per-column parameters remain supported
   and combine with `search` as additional filters. List, count and exports use
