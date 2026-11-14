@@ -17,7 +17,7 @@ downloads. DTO validation stays in the feature. Use `toExportQuery` from
 The root router defines `/`, `/login` and feature prefixes; feature routes use
 `createCrudRoutes`. Standard list, add, edit and view pages provide filtering,
 sorting, pagination and export; view pages display text rather than disabled
-inputs. Reuse `CrudPage`, `ListingTable`, `ListingSort`, `RecordState`,
+inputs. Reuse `CrudPage`, `ListingTable`, `RecordState`,
 `DetailFields`, `DeleteAction` and `FormActions` from `src/components/crud`.
 
 TanStack Router handles routing and Query handles API state. Include session and

@@ -147,11 +147,20 @@ the exact meaning and scope of existing totals; see
 ### Lists and tables
 
 Use a consistent order: title; permitted add action with secondary outline
-exports; labeled filters; separate sorting; results; compact pagination and total.
-Filters use one column, two from 480px and three from 760px of container width.
-Sorting uses a separate grid up to 640px wide, with two columns from 480px. Filters and actions wrap
+exports; one search input naming searchable fields and structured filters;
+results; compact pagination and total. Filters use one column, two from 480px
+and three from 760px of container width. Sort with table header buttons: the
+active column exposes `aria-sort`, and clicking again reverses the direction.
+Filters and actions wrap
 on smaller screens. Keep filters, sort, pagination and export semantics intact,
 including the shared filter state and page reset rules in `AGENTS.md`.
+
+The search label names the fields checked together with OR. Admin User searches
+username and email; Perusahaan searches company name, username and email;
+Master Karyawan searches name and alias; both credit listings search debtor name
+and company name. Status, entity and ID filters remain separate. List and export
+use the same search, structured filters and sort state. The existing default
+order remains creation date descending until a visible column is selected.
 
 Use `ListingTable` and Mantine `Table` as the basis. Keep column headings
 visible and rows easy to scan; align numeric values consistently, preferably to

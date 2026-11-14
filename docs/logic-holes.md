@@ -21,6 +21,12 @@ direction. Earlier MVP plans and verification records remain in Git history.
 
 ## Compatibility and operational risks
 
+- Listing APIs accept an optional `search` parameter that OR-matches the text
+  columns named in each listing. Existing per-column parameters remain supported
+  and combine with `search` as additional filters. List, count and exports use
+  the same criteria and tenant scope. New sort keys cover visible columns;
+  clients using old sort keys remain supported. Search retains MySQL LIKE
+  wildcard and collation behavior, which may differ from literal matching.
 - The frontend now has a classic-sidebar shell. Direct-route access gates,
   permission-dependent actions, public flows and existing dashboard aggregate
   meanings must remain intact in further design work. Mobile navigation uses a
