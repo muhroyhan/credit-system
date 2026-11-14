@@ -27,6 +27,8 @@ direction. Earlier MVP plans and verification records remain in Git history.
   the same criteria and tenant scope. New sort keys cover visible columns;
   clients using old sort keys remain supported. Search retains MySQL LIKE
   wildcard and collation behavior, which may differ from literal matching.
+  Credit search also matches partial company and debtor IDs as text; the older
+  exact ID API parameters remain available to clients that require exact match.
 - The frontend now has a classic-sidebar shell. Direct-route access gates,
   permission-dependent actions, public flows and existing dashboard aggregate
   meanings must remain intact in further design work. Mobile navigation uses a

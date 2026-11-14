@@ -158,7 +158,7 @@ including the shared filter state and page reset rules in `AGENTS.md`.
 The search label names the fields checked together with OR. Admin User searches
 username and email; Perusahaan searches company name, username and email;
 Master Karyawan searches name and alias; both credit listings search debtor name
-and company name. Status, entity and ID filters remain separate. List and export
+company name, company ID and debtor ID. Status and entity filters remain separate. List and export
 use the same search, structured filters and sort state. The existing default
 order remains creation date descending until a visible column is selected.
 
