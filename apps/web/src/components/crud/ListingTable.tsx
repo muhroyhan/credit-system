@@ -1,6 +1,7 @@
 import { ExportTypeEnum } from '@credit/contracts';
 import {
   Alert,
+  Box,
   Button,
   Group,
   NumberInput,
@@ -100,11 +101,22 @@ export function ListingTable<T extends { id: number }>({
         </Group>
       </Group>
       <Stack component="section" aria-label="Filter dan pengurutan" gap="md">
+        <Box>
+          <Text fw={600} size="sm">
+            Filter data
+          </Text>
+          <Text size="sm" c="dimmed">
+            Gunakan pencarian dan filter untuk mempersempit hasil.
+          </Text>
+        </Box>
         <SimpleGrid type="container" cols={{ base: 1, '480px': 2, '760px': 3 }}>
           {filters}
         </SimpleGrid>
       </Stack>
-      {loading && <Text>Memuat...</Text>}
+      {loading && <Text role="status">Memuat...</Text>}
+      <Text fw={600} size="sm">
+        Daftar data
+      </Text>
       <Table.ScrollContainer
         minWidth={700}
         type="native"
@@ -112,8 +124,8 @@ export function ListingTable<T extends { id: number }>({
         aria-label="Tabel hasil"
         tabIndex={0}
       >
-        <Table>
-          <Table.Thead>
+        <Table highlightOnHover verticalSpacing="sm">
+          <Table.Thead bg="gray.0">
             <Table.Tr>
               {columns.map((col) => (
                 <Table.Th
@@ -132,6 +144,8 @@ export function ListingTable<T extends { id: number }>({
                       variant="subtle"
                       color="#005691"
                       size="compact-sm"
+                      style={{ minHeight: 44 }}
+                      aria-label={`${col.label} - urutkan ${col.sortKey === sortBy && sortDirection === 'asc' ? 'menurun' : 'menaik'}`}
                       onClick={() => col.sortKey && onSort(col.sortKey)}
                     >
                       {col.label}{' '}
@@ -174,12 +188,18 @@ export function ListingTable<T extends { id: number }>({
         </Table>
       </Table.ScrollContainer>
       {!loading && !error && !rows.length && (
-        <Text c="dimmed">Tidak ada data</Text>
+        <Stack align="center" gap="xs" py="xl">
+          <Text fw={600}>Tidak ada data</Text>
+          <Text size="sm" c="dimmed" ta="center">
+            Coba ubah pencarian atau filter untuk melihat hasil lainnya.
+          </Text>
+        </Stack>
       )}
       <Group justify="space-between" align="end">
         <NumberInput
           w={120}
           label="Halaman"
+          description={`dari ${Math.max(1, Math.ceil(total / 20))} halaman`}
           min={1}
           max={Math.max(1, Math.ceil(total / 20))}
           value={page}

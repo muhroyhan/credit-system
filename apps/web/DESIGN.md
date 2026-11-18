@@ -47,7 +47,9 @@ hero may use `clamp(2.5rem, 5vw, 4rem)` at weight 700. Limit prose to about
 Authenticated pages use a classic sidebar around 250px wide, a compact top bar
 and a fluid content area. The sidebar scrolls independently, shows only existing
 permitted destinations, and marks the current page visually and semantically.
-The top bar contains session context, logout and the mobile menu trigger.
+The top bar contains a compact CS brand mark, session context, logout and the
+mobile menu trigger. Sidebar items use a consistent 44px minimum height; a
+subdued footer repeats the current account type as workspace context.
 Direct-route gates and server authorization remain mandatory.
 
 Below Mantine's `sm` breakpoint, hide the desktop sidebar and use a Mantine
@@ -64,8 +66,9 @@ similarly focused layout to public completion pages when applicable.
 
 ### Dashboard
 
-Show the page title and session context followed by a responsive grid of simple
-summary cards. Distinguish labels, counts, monetary values and units. Preserve
+Show the page title and session context followed by a labeled summary section
+and a responsive grid of simple, subtly elevated cards. Distinguish labels,
+counts, monetary values and units. Preserve
 existing aggregate meanings and actor scope described in
 [logic-holes.md](../../docs/logic-holes.md); do not add targets, trends or
 comparisons without data and a separate product decision.
@@ -91,7 +94,11 @@ header buttons with a direction indicator and `aria-sort` on the active column.
 The default is creation date descending; clicking another column starts ascending,
 then toggles direction.
 
-Use `ListingTable` and Mantine `Table`. Keep rows and actions easy to scan,
+Use `ListingTable` and Mantine `Table`. Label the filter and result sections,
+use a quiet table header and row hover feedback, and give empty results a concise
+next step. The page control describes the number of available pages. Sort buttons
+have a 44px minimum height and announce the direction of the next sort action.
+Keep rows and actions easy to scan,
 right-align financial numbers where practical, and retain all essential columns.
 Wide tables use a labeled, keyboard-accessible horizontal scroll region rather
 than page-level overflow. Distinguish loading, errors and genuinely empty results;

@@ -19,7 +19,12 @@ export function CrudPage({
       <Container size="xl" px={0}>
         <Stack>
           <Title order={1}>{title}</Title>
-          <Paper p={{ base: 'md', sm: 'xl' }} radius="md" withBorder>
+          <Paper
+            p={{ base: 'md', sm: 'xl' }}
+            radius="md"
+            shadow="xs"
+            withBorder
+          >
             <Stack gap="xl">{children}</Stack>
           </Paper>
         </Stack>

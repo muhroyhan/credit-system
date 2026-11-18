@@ -32,6 +32,9 @@ test('listing search and header sort use shared query state', async ({
     await column.getByRole('button').click();
     expect((await sorted).ok()).toBe(true);
     await expect(column).toHaveAttribute('aria-sort', 'ascending');
+    await expect(column.getByRole('button')).toHaveAccessibleName(
+      `${header} - urutkan menurun`,
+    );
     const reversed = page.waitForResponse((response) => {
       const url = new URL(response.url());
       return (
@@ -40,9 +43,13 @@ test('listing search and header sort use shared query state', async ({
         url.searchParams.get('sortDirection') === 'desc'
       );
     });
-    await column.getByRole('button').click();
+    await column.getByRole('button').focus();
+    await page.keyboard.press('Enter');
     expect((await reversed).ok()).toBe(true);
     await expect(column).toHaveAttribute('aria-sort', 'descending');
+    await expect(column.getByRole('button')).toHaveAccessibleName(
+      `${header} - urutkan menaik`,
+    );
     const field = page.getByRole('textbox', { name: /^Cari:/ });
     await expect(field).toHaveCount(1);
     await expect(page.getByLabel('ID perusahaan', { exact: true })).toHaveCount(

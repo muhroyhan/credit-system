@@ -1,5 +1,6 @@
 import {
   AppShell,
+  Box,
   Burger,
   Button,
   Drawer,
@@ -7,6 +8,7 @@ import {
   NavLink,
   Stack,
   Text,
+  ThemeIcon,
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
@@ -60,6 +62,10 @@ export function AppLayout() {
             component={Link}
             to={item.to}
             label={item.label}
+            styles={{
+              root: { borderRadius: 8, minHeight: 44 },
+              label: { fontSize: 14, fontWeight: 500 },
+            }}
             aria-current={
               (
                 item.to === '/'
@@ -87,7 +93,7 @@ export function AppLayout() {
     >
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-          <Group wrap="nowrap">
+          <Group wrap="nowrap" gap="sm">
             <Burger
               opened={opened}
               onClick={toggle}
@@ -96,9 +102,25 @@ export function AppLayout() {
               aria-controls="mobile-navigation"
               aria-label={opened ? 'Tutup menu' : 'Buka menu'}
             />
-            <Text fw={700} c="#005691">
-              Credit System
-            </Text>
+            <ThemeIcon
+              variant="light"
+              color="#005691"
+              size="lg"
+              radius="md"
+              aria-hidden="true"
+            >
+              <Text size="sm" fw={800}>
+                CS
+              </Text>
+            </ThemeIcon>
+            <Box>
+              <Text fw={700} c="#005691" lh={1.2}>
+                Credit System
+              </Text>
+              <Text size="xs" c="dimmed" visibleFrom="md">
+                Administrasi kredit
+              </Text>
+            </Box>
           </Group>
           <Group gap="sm" wrap="nowrap">
             <Text size="sm" visibleFrom="xs">
@@ -116,10 +138,24 @@ export function AppLayout() {
         id="main-navigation"
         style={{ overflowY: 'auto' }}
       >
-        <Text size="xs" fw={700} c="dimmed" mb="sm">
-          NAVIGASI
-        </Text>
-        <nav aria-label="Navigasi utama">{navigation}</nav>
+        <AppShell.Section grow>
+          <Text size="xs" fw={700} c="dimmed" mb="sm" px="sm">
+            MENU UTAMA
+          </Text>
+          <nav aria-label="Navigasi utama">{navigation}</nav>
+        </AppShell.Section>
+        <AppShell.Section
+          pt="md"
+          mt="md"
+          style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}
+        >
+          <Text size="xs" c="dimmed">
+            Masuk sebagai
+          </Text>
+          <Text size="sm" fw={600}>
+            {session.type}
+          </Text>
+        </AppShell.Section>
       </AppShell.Navbar>
       <Drawer
         id="mobile-navigation"
