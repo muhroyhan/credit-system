@@ -19,7 +19,7 @@ export function AccessGate({
     return <Navigate to="/login" replace />;
   }
   if (!crudaAccess(session, program)[action]) {
-    return <Alert color="red">Akses ditolak</Alert>;
+    return <Alert color="red.8">Akses ditolak</Alert>;
   }
   return children;
 }

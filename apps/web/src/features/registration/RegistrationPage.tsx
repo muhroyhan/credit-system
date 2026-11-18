@@ -1,7 +1,6 @@
 import {
   Alert,
   Button,
-  Container,
   PasswordInput,
   Stack,
   Text,
@@ -9,6 +8,7 @@ import {
   Title,
 } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
+import { PublicPage } from '@web/components/PublicPage';
 import { useRegistration } from '@web/features/registration/hooks/useRegistration';
 export function RegistrationPage() {
   const { slug } = useParams({ from: '/registration/$slug' });
@@ -19,7 +19,7 @@ export function RegistrationPage() {
     formState: { errors },
   } = form;
   return (
-    <Container size="xs">
+    <PublicPage>
       <Stack>
         <Title>Registrasi nasabah</Title>
         <Text>Perusahaan: {slug}</Text>
@@ -49,9 +49,9 @@ export function RegistrationPage() {
               error={errors.confirmPassword?.message}
               required
             />
-            {save.error && <Alert color="red">{save.error.message}</Alert>}
+            {save.error && <Alert color="red.8">{save.error.message}</Alert>}
             {loginError && (
-              <Alert color="red">
+              <Alert color="red.8">
                 Akun berhasil dibuat. Login otomatis gagal; silakan masuk
                 melalui halaman login.
               </Alert>
@@ -67,6 +67,6 @@ export function RegistrationPage() {
         </form>
         <Link to="/login">Masuk</Link>
       </Stack>
-    </Container>
+    </PublicPage>
   );
 }

@@ -3,11 +3,12 @@ import {
   Alert,
   NumberInput,
   PasswordInput,
-  Stack,
   Text,
   TextInput,
 } from '@mantine/core';
 import { FormActions } from '@web/components/crud/FormActions';
+import { FieldsGrid } from '@web/components/FieldsGrid';
+import { FormSection } from '@web/components/FormSection';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import type { EmployeePageProps } from '@web/features/employees/employees.type';
 import { useEmployeeForm } from '@web/features/employees/hooks/useEmployeeForm';
@@ -23,25 +24,30 @@ export function EmployeeForm(props: EmployeePageProps) {
   } = form;
   return (
     <form noValidate onSubmit={handleSubmit((input) => save.mutate(input))}>
-      <Stack>
-        <TextInput
-          label="Nama lengkap"
-          {...register('namaLengkap')}
-          error={errors.namaLengkap?.message}
-          required
-        />
-        <TextInput
-          label="Username karyawan"
-          {...register('username')}
-          error={errors.username?.message}
-          required
-        />
-        <PasswordInput
-          label="Password karyawan"
-          {...register('password')}
-          error={errors.password?.message}
-          required={!props.id}
-        />
+      <FormSection title="Akun karyawan">
+        <FieldsGrid>
+          <TextInput
+            label="Nama lengkap"
+            {...register('namaLengkap')}
+            error={errors.namaLengkap?.message}
+            required
+          />
+          <TextInput
+            label="Username karyawan"
+            {...register('username')}
+            error={errors.username?.message}
+            required
+          />
+          <PasswordInput
+            label="Password karyawan"
+            description={
+              props.id ? 'Kosongkan untuk mempertahankan password.' : undefined
+            }
+            {...register('password')}
+            error={errors.password?.message}
+            required={!props.id}
+          />
+        </FieldsGrid>
         {session?.type === AccountTypeEnum.Admin && !props.id && (
           <>
             <Text>
@@ -67,14 +73,14 @@ export function EmployeeForm(props: EmployeePageProps) {
             />
           </>
         )}
-        {save.error && <Alert color="red">{save.error.message}</Alert>}
+        {save.error && <Alert color="red.8">{save.error.message}</Alert>}
         {save.isSuccess && <Text>Akun tersimpan</Text>}
         <FormActions
           pending={save.isPending}
           label="Simpan akun"
           cancel={null}
         />
-      </Stack>
+      </FormSection>
     </form>
   );
 }

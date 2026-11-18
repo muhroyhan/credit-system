@@ -1,5 +1,7 @@
-import { Alert, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Alert, Text, TextInput, Title } from '@mantine/core';
 import { FormActions } from '@web/components/crud/FormActions';
+import { FieldsGrid } from '@web/components/FieldsGrid';
+import { FormSection } from '@web/components/FormSection';
 import {
   employeeOptionalFields,
   employeeProfileFields,
@@ -21,41 +23,55 @@ export function EmployeeProfileForm({
   } = form;
   return (
     <form noValidate onSubmit={handleSubmit((input) => save.mutate(input))}>
-      <Stack>
-        <Title order={2}>Profil dan penghasilan</Title>
-        {employeeProfileFields.map(([name, label]) => (
+      <FormSection title="Profil dan penghasilan">
+        <Title order={3} size="h4">
+          Identitas dan alamat
+        </Title>
+        <FieldsGrid>
+          {employeeProfileFields.map(([name, label]) => (
+            <TextInput
+              key={name}
+              label={label}
+              type={name === 'tanggalLahir' ? 'date' : 'text'}
+              required
+              style={
+                name === 'alamatKtp' || name === 'alamatDomisili'
+                  ? { gridColumn: '1 / -1' }
+                  : undefined
+              }
+              {...register(name)}
+              error={errors[name]?.message}
+            />
+          ))}
+        </FieldsGrid>
+        <Title order={3} size="h4">
+          Kontak dan penghasilan
+        </Title>
+        <FieldsGrid>
           <TextInput
-            key={name}
-            label={label}
-            type={name === 'tanggalLahir' ? 'date' : 'text'}
+            label="Pendapatan bersih bulanan"
+            inputMode="numeric"
             required
-            {...register(name)}
-            error={errors[name]?.message}
+            {...register('takehomePay')}
+            error={errors.takehomePay?.message}
           />
-        ))}
-        <TextInput
-          label="Pendapatan bersih bulanan"
-          inputMode="numeric"
-          required
-          {...register('takehomePay')}
-          error={errors.takehomePay?.message}
-        />
-        {employeeOptionalFields.map(([name, label]) => (
-          <TextInput
-            key={name}
-            label={label}
-            {...register(name)}
-            error={errors[name]?.message}
-          />
-        ))}
-        {save.error && <Alert color="red">{save.error.message}</Alert>}
+          {employeeOptionalFields.map(([name, label]) => (
+            <TextInput
+              key={name}
+              label={label}
+              {...register(name)}
+              error={errors[name]?.message}
+            />
+          ))}
+        </FieldsGrid>
+        {save.error && <Alert color="red.8">{save.error.message}</Alert>}
         {save.isSuccess && <Text>Profil tersimpan</Text>}
         <FormActions
           pending={save.isPending}
           label="Simpan profil"
           cancel={null}
         />
-      </Stack>
+      </FormSection>
     </form>
   );
 }

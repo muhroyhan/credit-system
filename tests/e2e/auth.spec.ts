@@ -31,9 +31,7 @@ test('AUTH-E wrong credentials show a real server error and allow retry', async 
   await expect(page.getByText('Masuk sebagai admin')).toBeVisible();
 });
 
-test('AUTH-E reload ends the in-memory session and redirects to login', async ({
-  page,
-}) => {
+test('AUTH-E reload keeps the current page until logout', async ({ page }) => {
   await page.goto('/login');
   await page.getByLabel('Username atau email').fill('admin_sintetis');
   await page.getByLabel('Password').fill(password ?? '');
@@ -42,6 +40,12 @@ test('AUTH-E reload ends the in-memory session and redirects to login', async ({
   await expect(
     page.getByRole('heading', { name: 'Admin User', exact: true }),
   ).toBeVisible();
+  await page.reload();
+  await expect(page).toHaveURL(/\/admin-users$/);
+  await expect(
+    page.getByRole('heading', { name: 'Admin User', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Keluar' }).click();
   await page.reload();
   await expect(page).toHaveURL(/\/login$/);
   await expect(
@@ -65,7 +69,30 @@ test('tenant actors can sign in', async ({ page }) => {
     await page.getByLabel('Password').fill(password ?? '');
     await page.getByRole('button', { name: 'Masuk' }).click();
     await expect(page.getByText(`Masuk sebagai ${actor.result}`)).toBeVisible();
+    await page.getByRole('button', { name: 'Keluar' }).click();
   }
+});
+
+test('expired saved session redirects to login on reload', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Username atau email').fill('admin_sintetis');
+  await page.getByLabel('Password').fill(password ?? '');
+  await page.getByRole('button', { name: 'Masuk', exact: true }).click();
+  await expect(page.getByText('Masuk sebagai admin')).toBeVisible();
+  await page.evaluate(() => {
+    const raw = sessionStorage.getItem('credit-system.session');
+    if (!raw) {
+      throw new Error('Missing saved session');
+    }
+    const session = JSON.parse(raw);
+    session.authToken = `header.${btoa(JSON.stringify({ exp: 1 }))}.signature`;
+    sessionStorage.setItem('credit-system.session', JSON.stringify(session));
+  });
+  await page.reload();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(
+    await page.evaluate(() => sessionStorage.getItem('credit-system.session')),
+  ).toBeNull();
 });
 
 test('AUTH-E unknown browser path displays the not-found page', async ({

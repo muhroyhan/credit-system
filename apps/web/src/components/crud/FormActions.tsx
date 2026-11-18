@@ -13,7 +13,7 @@ export function FormActions({
   cancel: ReactNode;
 }) {
   return (
-    <Group>
+    <Group mt="sm" gap="md">
       <Button type="submit" loading={pending} disabled={disabled}>
         {label}
       </Button>

@@ -17,6 +17,14 @@ export const adminUsersRepository: AdminRepository = {
     if (query.active !== undefined) {
       conditions.push(eq(adminUsers.isActive, query.active === 'true'));
     }
+    if (query.search) {
+      conditions.push(
+        or(
+          like(adminUsers.username, `%${query.search}%`),
+          like(adminUsers.email, `%${query.search}%`),
+        ),
+      );
+    }
     const where = and(...conditions);
     const [total] = await db
       .select({ count: count() })

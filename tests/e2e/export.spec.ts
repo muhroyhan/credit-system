@@ -69,7 +69,7 @@ test('CSV and ZIP respect filters and tenant access', async ({
     expect(await employeeCsv.text()).toContain('11111111');
     expect(await employeeCsv.text()).not.toContain('22222222');
     const zip = await request.get(
-      '/api/credit/export-zip?debitorId=900001&limit=1',
+      '/api/credit/export-zip?debitorId=900001&limit=1&search=Perusahaan%20Sintetis%20Satu',
       { headers: firstTenant },
     );
     expect(zip.status()).toBe(200);

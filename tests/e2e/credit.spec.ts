@@ -32,14 +32,12 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     expect(createResponse.status()).toBe(201);
     id = (await createResponse.json()).id;
     await expect(page).toHaveURL(/\/credits$/);
-    await page
-      .getByLabel('Nama', { exact: true })
-      .fill('Debitor Sintetis Satu');
+    await page.getByLabel(/^Cari:/).fill('Debitor Sintetis Satu');
     const row = page
       .getByRole('row')
       .filter({ hasText: 'Debitor Sintetis Satu' })
       .filter({ has: page.locator(`a[href="/credits/${id}/edit"]`) });
-    await expect(row).toContainText('pending');
+    await expect(row).toContainText('Menunggu');
     const href = await row
       .getByRole('link', { name: 'Ubah' })
       .getAttribute('href');
@@ -80,7 +78,7 @@ test('HRD simulates, submits, filters and edits a pending application', async ({
     await page.getByRole('button', { name: 'Simpan pengajuan' }).click();
     await expect(page).toHaveURL(/\/credits$/);
     await expect(
-      page.getByRole('row').filter({ hasText: '10000000' }).first(),
+      page.getByRole('row').filter({ hasText: '10.000.000' }).first(),
     ).toBeVisible();
   } finally {
     if (id) {

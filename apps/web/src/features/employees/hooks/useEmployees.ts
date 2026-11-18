@@ -8,6 +8,7 @@ import { useListing } from '@web/hooks/useListing';
 export function useEmployees(token: string) {
   return useListing({
     initialQueries: {
+      search: undefined as string | undefined,
       page: 1,
       limit: 20,
       namaLengkap: undefined as string | undefined,

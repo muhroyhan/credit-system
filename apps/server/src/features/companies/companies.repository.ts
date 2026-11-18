@@ -18,6 +18,13 @@ export const companiesRepository = {
   async list(query: CompanyQuery, paginate = true) {
     const db = connectDatabase().db;
     const where = and(
+      query.search
+        ? or(
+            like(users.companyName, `%${query.search}%`),
+            like(users.username, `%${query.search}%`),
+            like(users.email, `%${query.search}%`),
+          )
+        : undefined,
       query.email ? like(users.email, `%${query.email}%`) : undefined,
       query.username ? like(users.username, `%${query.username}%`) : undefined,
       query.companyName
@@ -48,7 +55,9 @@ export const companiesRepository = {
       .where(where)
       .orderBy(
         (query.sortDirection === SortDirectionEnum.Ascending ? asc : desc)(
-          users[query.sortBy],
+          query.sortBy === 'entityType'
+            ? entityTypes.value
+            : users[query.sortBy],
         ),
         desc(users.id),
       );

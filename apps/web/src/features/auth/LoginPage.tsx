@@ -2,7 +2,6 @@ import { AccountTypeEnum } from '@credit/contracts';
 import {
   Alert,
   Button,
-  Container,
   PasswordInput,
   Select,
   Stack,
@@ -11,6 +10,7 @@ import {
   Title,
 } from '@mantine/core';
 import { Link, Navigate } from '@tanstack/react-router';
+import { PublicPage } from '@web/components/PublicPage';
 
 import { useCompanies } from '@web/features/auth/hooks/useCompanies';
 import { useLoginForm } from '@web/features/auth/hooks/useLoginForm';
@@ -33,12 +33,12 @@ export function LoginPage() {
     return <Navigate to="/" replace />;
   }
   return (
-    <Container size="xs">
+    <PublicPage>
       <Stack>
         <Title>Credit System</Title>
         <Text>Masuk ke akun</Text>
-        {error && <Alert color="red">{error}</Alert>}
-        {companyError && <Alert color="red">{companyError}</Alert>}
+        {error && <Alert color="red.8">{error}</Alert>}
+        {companyError && <Alert color="red.8">{companyError}</Alert>}
         <form noValidate onSubmit={handleSubmit((data) => login(data))}>
           <Stack>
             <Controller
@@ -109,6 +109,6 @@ export function LoginPage() {
           </Link>
         )}
       </Stack>
-    </Container>
+    </PublicPage>
   );
 }

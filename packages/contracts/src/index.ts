@@ -71,6 +71,7 @@ export const adminUpdateSchema = adminInputSchema.extend({
 });
 export const adminDeleteSchema = z.object({ id: z.number().int().positive() });
 export const adminListQuerySchema = z.object({
+  search: z.string().max(255).optional(),
   sortBy: z
     .enum(['createdAt', 'username', 'email', 'isActive'])
     .default('createdAt'),
@@ -149,6 +150,7 @@ export const companyUpdateSchema = companyInputSchema.extend({
   id: z.number().int().positive(),
 });
 export const companyQuerySchema = z.object({
+  search: z.string().max(255).optional(),
   email: z.string().optional(),
   username: z.string().optional(),
   companyName: z.string().optional(),
@@ -157,7 +159,15 @@ export const companyQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   sortBy: z
-    .enum(['companyName', 'username', 'email', 'status', 'createdAt'])
+    .enum([
+      'companyName',
+      'username',
+      'email',
+      'status',
+      'createdAt',
+      'entityType',
+      'slug',
+    ])
     .default('createdAt'),
   sortDirection: z.enum(SortDirectionEnum).default('desc'),
 });

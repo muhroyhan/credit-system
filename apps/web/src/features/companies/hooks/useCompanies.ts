@@ -8,6 +8,7 @@ import { useListing } from '@web/hooks/useListing';
 export function useCompanies(token: string) {
   return useListing({
     initialQueries: {
+      search: undefined as string | undefined,
       page: 1,
       limit: 20,
       companyName: undefined as string | undefined,

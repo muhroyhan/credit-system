@@ -3,9 +3,11 @@ import { Link, useParams } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
 import { DetailFields } from '@web/components/crud/DetailFields';
 import { RecordState } from '@web/components/crud/RecordState';
+import { StatusBadge } from '@web/components/StatusBadge';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCreditReview } from '@web/features/credit-review/hooks/useCreditReview';
 import { crudaAccess } from '@web/utils/cruda';
+import { formatMoney } from '@web/utils/format-money';
 export function CreditorReviewViewPage() {
   return (
     <CrudPage program="DKN" action="read" title="Review Kredit">
@@ -23,17 +25,36 @@ function Content() {
       {(row) => (
         <>
           <DetailFields
+            title="Ringkasan kredit"
             fields={[
               { label: 'Nama', value: row.nama },
               { label: 'NIK', value: row.noKtp },
               { label: 'Perusahaan', value: row.companyName },
-              { label: 'Nominal', value: row.credit.jumlahPengajuan },
+              {
+                label: 'Nominal',
+                value: formatMoney(row.credit.jumlahPengajuan),
+              },
               { label: 'Tenor', value: row.credit.jangkaWaktuBulan },
-              { label: 'Angsuran', value: row.credit.jumlahAngsuran },
-              { label: 'Status HRD', value: row.credit.status },
-              { label: 'Status BPR', value: row.credit.statusAdminApproval },
-              { label: 'Pengajuan terbuka', value: row.summary?.open },
-              { label: 'Score informatif', value: row.summary?.score },
+              {
+                label: 'Angsuran',
+                value: formatMoney(row.credit.jumlahAngsuran),
+              },
+              {
+                label: 'Status HRD',
+                value: <StatusBadge value={row.credit.status} />,
+              },
+              {
+                label: 'Status BPR',
+                value: <StatusBadge value={row.credit.statusAdminApproval} />,
+              },
+              {
+                label: 'Pengajuan terbuka',
+                value: formatMoney(row.summary?.open),
+              },
+              {
+                label: 'Score informatif',
+                value: formatMoney(row.summary?.score),
+              },
             ]}
           />
           {row.expenses.map((expense) => (
@@ -42,7 +63,7 @@ function Content() {
               fields={[
                 {
                   label: expense.expenseName ?? 'Biaya',
-                  value: expense.amount,
+                  value: formatMoney(expense.amount),
                 },
               ]}
             />

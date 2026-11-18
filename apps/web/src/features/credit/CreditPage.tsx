@@ -1,12 +1,14 @@
 import { AccountTypeEnum, CreditStatusEnum } from '@credit/contracts';
-import { Select, TextInput } from '@mantine/core';
+import { Button, Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
-import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
+import { StatusBadge } from '@web/components/StatusBadge';
+import { statusPresentation } from '@web/constant/constant';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCredits } from '@web/features/credit/hooks/useCredits';
 import { crudaAccess } from '@web/utils/cruda';
+import { formatMoney } from '@web/utils/format-money';
 export function CreditPage() {
   return (
     <CrudPage program="CGP" action="read" title="Pengajuan Kredit">
@@ -38,34 +40,70 @@ function Content() {
       onExportZip={() => rows.zip.mutate()}
       zipping={rows.zip.isPending}
       columns={[
-        { label: 'Nama', render: (r) => r.nama },
-        { label: 'Perusahaan', render: (r) => r.companyName },
-        { label: 'Nominal', render: (r) => r.credit.jumlahPengajuan },
-        { label: 'Tenor', render: (r) => r.credit.jangkaWaktuBulan },
-        { label: 'Status', render: (r) => r.credit.status },
+        { label: 'Nama', sortKey: 'nama', render: (r) => r.nama },
+        {
+          label: 'Perusahaan',
+          sortKey: 'companyName',
+          render: (r) => r.companyName,
+        },
+        {
+          label: 'Nominal',
+          sortKey: 'jumlahPengajuan',
+          align: 'right',
+          render: (r) => formatMoney(r.credit.jumlahPengajuan),
+        },
+        {
+          label: 'Tenor',
+          sortKey: 'jangkaWaktuBulan',
+          render: (r) => r.credit.jangkaWaktuBulan,
+        },
+        {
+          label: 'Status',
+          sortKey: 'status',
+          render: (r) => <StatusBadge value={r.credit.status} />,
+        },
       ]}
       addAction={
         (access.create || session?.type === AccountTypeEnum.Debitor) && (
-          <Link to="/credits/add">Tambah pengajuan</Link>
+          <Button component={Link} to="/credits/add">
+            Tambah pengajuan
+          </Button>
         )
+      }
+      sortBy={rows.queries.sortBy}
+      sortDirection={rows.queries.sortDirection}
+      onSort={(key) =>
+        rows.setQueries((current) => ({
+          ...current,
+          sortBy: key,
+          sortDirection:
+            current.sortBy === key && current.sortDirection === 'asc'
+              ? 'desc'
+              : 'asc',
+          page: 1,
+        }))
       }
       filters={
         <>
           <TextInput
-            label="Nama"
-            value={rows.queries.nama ?? ''}
-            onChange={(e) => {
-              const value = e.currentTarget.value || undefined;
+            label="Cari: Nama / Perusahaan / ID perusahaan / ID debitor"
+            value={rows.queries.search ?? ''}
+            onChange={(event) => {
+              const value = event.currentTarget.value || undefined;
               rows.setQueries((current) => ({
                 ...current,
-                nama: value,
+                search: value,
                 page: 1,
               }));
             }}
           />
+
           <Select
             label="Status"
-            data={Object.values(CreditStatusEnum)}
+            data={Object.values(CreditStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             clearable
             value={rows.queries.status || null}
             onChange={(v) => {
@@ -75,25 +113,6 @@ function Content() {
                 page: 1,
               }));
             }}
-          />
-          <ListingSort
-            value={rows.queries.sortBy}
-            direction={rows.queries.sortDirection}
-            options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
-            onSort={(value) =>
-              rows.setQueries((current) => ({
-                ...current,
-                sortBy: value,
-                page: 1,
-              }))
-            }
-            onDirection={(value) =>
-              rows.setQueries((current) => ({
-                ...current,
-                sortDirection: value,
-                page: 1,
-              }))
-            }
           />
         </>
       }

@@ -115,6 +115,7 @@ export const creditConfirmationSchema = z.strictObject({
 export type CreditConfirmation = z.infer<typeof creditConfirmationSchema>;
 
 export const creditQuerySchema = z.object({
+  search: z.string().max(255).optional(),
   userId: z.coerce.number().int().positive().optional(),
   debitorId: z.coerce.number().int().positive().optional(),
   nama: z.string().max(255).optional(),
@@ -126,7 +127,17 @@ export const creditQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   sortBy: z
-    .enum(['id', 'createdAt', 'tanggalPengajuan', 'jumlahPengajuan'])
+    .enum([
+      'id',
+      'createdAt',
+      'tanggalPengajuan',
+      'jumlahPengajuan',
+      'nama',
+      'companyName',
+      'jangkaWaktuBulan',
+      'status',
+      'statusAdminApproval',
+    ])
     .default('createdAt'),
   sortDirection: z.enum(SortDirectionEnum).default('desc'),
 });

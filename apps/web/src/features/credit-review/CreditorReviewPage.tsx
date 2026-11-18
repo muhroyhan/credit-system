@@ -2,10 +2,12 @@ import { CreditStatusEnum } from '@credit/contracts';
 import { Select, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { CrudPage } from '@web/components/crud/CrudPage';
-import { ListingSort } from '@web/components/crud/ListingSort';
 import { ListingTable } from '@web/components/crud/ListingTable';
+import { StatusBadge } from '@web/components/StatusBadge';
+import { statusPresentation } from '@web/constant/constant';
 import { useSession } from '@web/features/auth/hooks/useSession';
 import { useCreditReviews } from '@web/features/credit-review/hooks/useCreditReviews';
+import { formatMoney } from '@web/utils/format-money';
 export function CreditorReviewPage() {
   return (
     <CrudPage program="DKN" action="read" title="Daftar Kredit Karyawan">
@@ -33,39 +35,35 @@ function Content() {
       onExport={(format) => exporting.mutate(format)}
       onExportZip={() => zip.mutate()}
       zipping={zip.isPending}
+      sortBy={queries.sortBy}
+      sortDirection={queries.sortDirection}
+      onSort={(key) =>
+        setQueries((current) => ({
+          ...current,
+          sortBy: key,
+          sortDirection:
+            current.sortBy === key && current.sortDirection === 'asc'
+              ? 'desc'
+              : 'asc',
+          page: 1,
+        }))
+      }
       filters={
         <>
           <TextInput
-            label="ID perusahaan"
-            type="number"
-            min={1}
-            value={queries.userId ?? ''}
+            label="Cari: Nama / Perusahaan / ID perusahaan / ID debitor"
+            value={queries.search ?? ''}
             onChange={(event) => {
               const value = event.currentTarget.value || undefined;
-              setQueries((current) => ({
-                ...current,
-                userId: value,
-                page: 1,
-              }));
-            }}
-          />
-          <TextInput
-            label="ID debitor"
-            type="number"
-            min={1}
-            value={queries.debitorId ?? ''}
-            onChange={(event) => {
-              const value = event.currentTarget.value || undefined;
-              setQueries((current) => ({
-                ...current,
-                debitorId: value,
-                page: 1,
-              }));
+              setQueries((current) => ({ ...current, search: value, page: 1 }));
             }}
           />
           <Select
             label="Status BPR"
-            data={Object.values(CreditStatusEnum)}
+            data={Object.values(CreditStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             clearable
             value={queries.statusAdminApproval ?? null}
             onChange={(value) => {
@@ -76,21 +74,13 @@ function Content() {
               }));
             }}
           />
-          <TextInput
-            label="Nama"
-            value={queries.nama ?? ''}
-            onChange={(event) => {
-              const value = event.currentTarget.value || undefined;
-              setQueries((current) => ({
-                ...current,
-                nama: value,
-                page: 1,
-              }));
-            }}
-          />
+
           <Select
             label="Status HRD"
-            data={Object.values(CreditStatusEnum)}
+            data={Object.values(CreditStatusEnum).map((value) => ({
+              value,
+              label: statusPresentation[value]?.label ?? value,
+            }))}
             value={queries.status ?? ''}
             onChange={(value) => {
               setQueries((current) => ({
@@ -100,31 +90,32 @@ function Content() {
               }));
             }}
           />
-          <ListingSort
-            value={queries.sortBy}
-            direction={queries.sortDirection}
-            options={['createdAt', 'id', 'tanggalPengajuan', 'jumlahPengajuan']}
-            onSort={(value) =>
-              setQueries((current) => ({ ...current, sortBy: value, page: 1 }))
-            }
-            onDirection={(value) =>
-              setQueries((current) => ({
-                ...current,
-                sortDirection: value,
-                page: 1,
-              }))
-            }
-          />
         </>
       }
       columns={[
-        { label: 'Nama', render: (row) => row.nama },
-        { label: 'Perusahaan', render: (row) => row.companyName },
-        { label: 'Nominal', render: (row) => row.credit.jumlahPengajuan },
-        { label: 'Status HRD', render: (row) => row.credit.status },
+        { label: 'Nama', sortKey: 'nama', render: (row) => row.nama },
+        {
+          label: 'Perusahaan',
+          sortKey: 'companyName',
+          render: (row) => row.companyName,
+        },
+        {
+          label: 'Nominal',
+          sortKey: 'jumlahPengajuan',
+          align: 'right',
+          render: (row) => formatMoney(row.credit.jumlahPengajuan),
+        },
+        {
+          label: 'Status HRD',
+          sortKey: 'status',
+          render: (row) => <StatusBadge value={row.credit.status} />,
+        },
         {
           label: 'Status BPR',
-          render: (row) => row.credit.statusAdminApproval,
+          sortKey: 'statusAdminApproval',
+          render: (row) => (
+            <StatusBadge value={row.credit.statusAdminApproval} />
+          ),
         },
       ]}
       actions={(row) => (
