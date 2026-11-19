@@ -32,8 +32,8 @@ Use synthetic local data and credentials, never production data or secrets.
    In development both ports are used. For the combined build, run `pnpm build`
    then `pnpm start`; `PORT` controls the single production server port.
 
-Bun loads `.env` from the working directory. Set environment variables in the
-shell for Node-based test runners rather than assuming they load `.env`.
+Bun loads `.env` from the working directory. The integration and E2E test setup
+explicitly loads the root `.env` when present. Shell values take precedence.
 Migrations are explicit and do not run at build or startup. The current single
 baseline is for an empty database; if the baseline changes or migration history
 differs, use a new disposable database. Do not discard an existing database or
@@ -59,11 +59,12 @@ was not tested in the recorded MVP verification.
 | Generate baseline / migrate / seed | `pnpm db:generate` / `pnpm db:migrate` / `pnpm db:seed` |
 
 Integration and E2E tests need a separate disposable local MySQL database named
-`credit_*test`, migrated and seeded with synthetic data. Set `DATABASE_URL`,
-`JWT_SECRET`, `SEED_PASSWORD`, `SEED_SYNTHETIC=true` and
-`DOCUMENT_STORAGE_DIR` to a directory inside `.data/qa`; remove live WhatsApp
-credentials. Set the three agreement bank identity variables for successful PDF
-cases. Install the Playwright browser matching the dependency or set
+`credit_*test`, migrated and seeded with synthetic data. Configure
+`TEST_DATABASE_URL`, `JWT_SECRET`, `SEED_PASSWORD`, and
+`TEST_DOCUMENT_STORAGE_DIR` inside `.data/qa`. Keep these server settings
+unprefixed and omit live WhatsApp credentials. Set the three agreement bank
+identity variables for successful PDF cases. Install the Playwright browser
+matching the dependency or set
 `PLAYWRIGHT_BROWSER_PATH` to a compatible local executable. Tests use the
 Asia/Jakarta timezone. Do not run integration and E2E suites simultaneously
 against the same seeded dataset. The test runner starts its own server on port
@@ -72,8 +73,14 @@ against the same seeded dataset. The test runner starts its own server on port
 Compose initializes `credit_development` and `credit_test` in the same MySQL
 service on a fresh volume. Run `pnpm db:migrate:test` to apply the baseline using
 `TEST_DATABASE_URL`. This command also creates the test database on an existing
-volume if needed and requires MySQL CREATE privileges. For seeding and running
-the test suites, set `DATABASE_URL` in the shell to the same test URL.
+volume if needed and requires MySQL CREATE privileges. To seed the test
+database, run `pnpm db:seed` with `SEED_SYNTHETIC=true` and a temporary shell
+`DATABASE_URL` set to the test URL. The test runners select `TEST_DATABASE_URL`
+and `TEST_DOCUMENT_STORAGE_DIR` themselves.
+
+If another MySQL instance already uses the host port, choose a free
+`MYSQL_PORT`, update the port in both database URLs, and run
+`docker compose up -d` again.
 
 ## Repository
 

@@ -61,6 +61,17 @@ Belum ada temuan Critical yang terverifikasi dalam cakupan audit ini.
 
 ## Keputusan kompatibilitas
 
+- **Reproduksi suite integrasi lokal (19 November 2026).** P13 memakai MySQL
+  disposable yang sudah dimigrasi, diisi seed, dan dikonfigurasi dari shell
+  (runbook pada commit `d03e576`). Pada workspace ini, port 3306 mengarah ke
+  MySQL proyek lain. Vitest membaca nilai `VITE_*` yang dipakai percobaan lokal,
+  sementara Playwright gagal memuatnya dan backend mengharapkan nama tanpa
+  prefix. Setup bersama sekarang memuat `.env`, memprioritaskan nilai shell,
+  dan memilih `TEST_DATABASE_URL` serta `TEST_DOCUMENT_STORAGE_DIR`. Migrasi
+  dan seed tetap eksplisit. Suite belum memiliki pemeriksaan awal bersama untuk
+  koneksi dan seed, sehingga satu masalah MySQL masih bisa memicu banyak
+  kegagalan. Belum ada verifikasi suite integrasi otomatis yang dilacak di repo.
+
 - **Data lama dan deployment (REL-10).** Migrasi terpisah perlu mengaudit
   konversi ACL `WRITE`, `created_at` yang pernah dapat tertimpa
   pada migrasi 0005 sebelum perbaikan 0006, URL profil lama ke key privat,
