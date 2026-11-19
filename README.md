@@ -63,8 +63,8 @@ Integration and E2E tests need a separate disposable local MySQL database named
 `TEST_DATABASE_URL`, `JWT_SECRET`, `SEED_PASSWORD`, and
 `TEST_DOCUMENT_STORAGE_DIR` inside `.data/qa`. Keep these server settings
 unprefixed and omit live WhatsApp credentials. Set the three agreement bank
-identity variables for successful PDF cases. Install the Playwright browser
-matching the dependency or set
+identity variables for successful PDF cases. The E2E command installs the
+Playwright Chromium headless shell if needed. You can also set
 `PLAYWRIGHT_BROWSER_PATH` to a compatible local executable. Tests use the
 Asia/Jakarta timezone. Do not run integration and E2E suites simultaneously
 against the same seeded dataset. The test runner starts its own server on port

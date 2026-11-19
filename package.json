@@ -15,7 +15,7 @@
     "db:seed": "bun packages/database/src/seed.ts",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration && playwright test --project api",
-    "test:e2e": "playwright test --project browser"
+    "test:e2e": "playwright install --only-shell chromium && playwright test --project browser"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
