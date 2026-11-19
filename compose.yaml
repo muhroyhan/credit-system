@@ -6,8 +6,9 @@ services:
       - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:?Set MYSQL_DATABASE}
+      MYSQL_DATABASE: credit_development
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./packages/database/init-test.sql:/docker-entrypoint-initdb.d/10-credit-test.sql:ro
 volumes:
   mysql_data:

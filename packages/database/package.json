@@ -5,6 +5,7 @@
     "mysql2": "^3.14.0"
   },
   "devDependencies": {
+    "@credit/test-utils": "workspace:*",
     "drizzle-kit": "^0.31.0",
     "@types/bun": "^1.2.0"
   },
