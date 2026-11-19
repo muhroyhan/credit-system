@@ -1,8 +1,29 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { testDatabaseUrl } from '@credit/test-utils/database';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 import type { RowDataPacket } from 'mysql2';
+import mysql from 'mysql2/promise';
 import { connectDatabase } from './client';
+
+if (process.argv.includes('--test')) {
+  const url = testDatabaseUrl(process.env.TEST_DATABASE_URL);
+  if (!url) {
+    throw new Error(
+      'TEST_DATABASE_URL for a disposable credit_*test is required',
+    );
+  }
+  const target = new URL(url);
+  const database = target.pathname.slice(1);
+  target.pathname = '/';
+  const connection = await mysql.createConnection(target.toString());
+  try {
+    await connection.query('CREATE DATABASE IF NOT EXISTS ??', [database]);
+  } finally {
+    await connection.end();
+  }
+  process.env.DATABASE_URL = url;
+}
 
 const { db, pool } = connectDatabase();
 try {

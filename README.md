@@ -69,6 +69,12 @@ Asia/Jakarta timezone. Do not run integration and E2E suites simultaneously
 against the same seeded dataset. The test runner starts its own server on port
 3100. Clean up only disposable test resources after the runners stop.
 
+Compose initializes `credit_development` and `credit_test` in the same MySQL
+service on a fresh volume. Run `pnpm db:migrate:test` to apply the baseline using
+`TEST_DATABASE_URL`. This command also creates the test database on an existing
+volume if needed and requires MySQL CREATE privileges. For seeding and running
+the test suites, set `DATABASE_URL` in the shell to the same test URL.
+
 ## Repository
 
 - `apps/server`: API, business services and server-side exports.
